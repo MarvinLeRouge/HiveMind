@@ -2,6 +2,7 @@
   "name": "hivemind",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
   "engines": {
     "node": ">=20.0.0",
     "pnpm": ">=9.0.0"
@@ -9,7 +10,25 @@
   "scripts": {
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
-    "build": "pnpm -r build"
+    "build": "pnpm -r build",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.24.0",
+    "eslint": "^9.24.0",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-vue": "^9.32.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.0",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.29.1"
+  },
+  "lint-staged": {
+    "*.{ts,vue}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   },
   "packageManager": "pnpm@9.15.4"
 }
