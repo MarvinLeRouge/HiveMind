@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "ES2022",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "@hivemind/shared": ["./packages/shared/src/index.ts"],
+      "@hivemind/shared/*": ["./packages/shared/src/*"]
+    }
+  }
+}
