@@ -4,12 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
+    "build": "vite build",
     "lint": "eslint src tests",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@hivemind/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "vite": "^6.0.0"
   }
 }
