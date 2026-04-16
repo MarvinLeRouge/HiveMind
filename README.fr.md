@@ -312,11 +312,11 @@ docker compose exec api npx prisma db seed
 ### V1 — Backend
 
 - [x] BLOCK-01 · Dépôt & README
-- [ ] BLOCK-02 · Monorepo & outillage
-- [ ] BLOCK-03 · Stack Docker de développement
-- [ ] BLOCK-04 · Schéma de base de données & Prisma
-- [ ] BLOCK-05 · API d'authentification (register, login, refresh, logout)
-- [ ] BLOCK-06 · API Templates
+- [x] BLOCK-02 · Monorepo & outillage
+- [x] BLOCK-03 · Stack Docker de développement
+- [x] BLOCK-04 · Schéma de base de données & Prisma
+- [x] BLOCK-05 · API d'authentification (register, login, refresh, logout)
+- [x] BLOCK-06 · API Templates
 - [ ] BLOCK-07 · API Collections
 - [ ] BLOCK-08 · API Invitations
 - [ ] BLOCK-09 · API Puzzles
