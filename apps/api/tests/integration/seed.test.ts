@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { createHash } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 const prisma = new PrismaClient({
@@ -7,11 +8,119 @@ const prisma = new PrismaClient({
 
 beforeAll(async () => {
   await prisma.$connect();
+  await reseed();
 });
 
 afterAll(async () => {
   await prisma.$disconnect();
 });
+
+/**
+ * Re-applies the seed data so this test file is independent
+ * of execution order with other integration tests that clean the DB.
+ */
+async function reseed(): Promise<void> {
+  function hashPassword(plain: string): string {
+    return createHash('sha256').update(plain).digest('hex');
+  }
+
+  const admin = await prisma.user.upsert({
+    where: { email: 'admin@HiveMind.local' },
+    update: {},
+    create: {
+      username: 'admin',
+      email: 'admin@HiveMind.local',
+      passwordHash: hashPassword('change_me_admin'),
+      isAdmin: true,
+    },
+  });
+
+  await prisma.template.upsert({
+    where: { id: 'system-template-generic' },
+    update: {},
+    create: {
+      id: 'system-template-generic',
+      name: 'Generic',
+      description:
+        'A minimal template suitable for any type of puzzle collection.',
+      isSystem: true,
+      isPublic: true,
+    },
+  });
+
+  await prisma.template.upsert({
+    where: { id: 'system-template-geocaching' },
+    update: {},
+    create: {
+      id: 'system-template-geocaching',
+      name: 'Geocaching',
+      description: 'Template for geocaching mystery series.',
+      isSystem: true,
+      isPublic: true,
+      useGcCode: true,
+      useDifficulty: true,
+      useTerrain: true,
+      useCoords: true,
+      useHint: true,
+      useSpoiler: true,
+    },
+  });
+
+  const collection = await prisma.collection.upsert({
+    where: { id: 'sample-collection-dev' },
+    update: {},
+    create: {
+      id: 'sample-collection-dev',
+      name: 'Sample Geocaching Series',
+      description: 'A sample collection seeded for development and testing.',
+      createdBy: admin.id,
+      templateSnapshotId: 'system-template-geocaching',
+      members: { create: { userId: admin.id, role: 'owner' } },
+    },
+  });
+
+  const puzzleDefs = [
+    {
+      id: 'sample-puzzle-1',
+      title: 'The Old Mill',
+      sortOrder: 1,
+      gcCode: 'GC12345',
+      difficulty: 2.0,
+      terrain: 1.5,
+      coords: 'N 48° 51.500 E 002° 21.000',
+      hint: 'Look under the big stone.',
+    },
+    {
+      id: 'sample-puzzle-2',
+      title: 'Forest Cipher',
+      sortOrder: 2,
+      gcCode: 'GC23456',
+      difficulty: 3.5,
+      terrain: 2.5,
+      coords: 'N 48° 52.100 E 002° 22.300',
+      hint: 'Caesar never forgets.',
+    },
+    {
+      id: 'sample-puzzle-3',
+      title: 'The Invisible Ink',
+      sortOrder: 3,
+      gcCode: 'GC34567',
+      difficulty: 4.0,
+      terrain: 1.0,
+      status: 'in_progress',
+      coords: null,
+      hint: 'UV light.',
+    },
+  ];
+
+  for (const p of puzzleDefs) {
+    await prisma.puzzle.upsert({
+      where: { id: p.id },
+      update: {},
+      create: { ...p, collectionId: collection.id },
+    });
+  }
+}
 
 describe('Seed integrity — Admin user', () => {
   it('creates exactly one admin user', async () => {
