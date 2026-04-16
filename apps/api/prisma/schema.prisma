@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  email        String   @unique
+  passwordHash String
+  isAdmin      Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  createdCollections Collection[]       @relation("CollectionCreator")
+  memberships        CollectionMember[]
+  sentInvitations    Invitation[]       @relation("InvitationSender")
+  templates          Template[]
+  notes              Note[]
+  attempts           Attempt[]
+  workingOn          Puzzle[]           @relation("PuzzleWorker")
+}
+
+model Template {
+  id               String  @id @default(uuid())
+  name             String
+  description      String?
+  isSystem         Boolean @default(false)
+  isPublic         Boolean @default(false)
+  createdBy        String?
+  creator          User?   @relation(fields: [createdBy], references: [id])
+  useIndex         Boolean @default(false)
+  useGcCode        Boolean @default(false)
+  useDifficulty    Boolean @default(false)
+  useTerrain       Boolean @default(false)
+  useCoords        Boolean @default(false)
+  useHint          Boolean @default(false)
+  useSpoiler       Boolean @default(false)
+  customField1Label String?
+  customField2Label String?
+  createdAt        DateTime @default(now())
+
+  collections Collection[]
+}
+
+model Collection {
+  id                 String   @id @default(uuid())
+  name               String
+  description        String?
+  createdBy          String
+  creator            User     @relation("CollectionCreator", fields: [createdBy], references: [id])
+  templateSnapshotId String
+  templateSnapshot   Template @relation(fields: [templateSnapshotId], references: [id])
+  createdAt          DateTime @default(now())
+
+  members     CollectionMember[]
+  invitations Invitation[]
+  puzzles     Puzzle[]
+}
+
+model CollectionMember {
+  collectionId String
+  userId       String
+  role         String   // "owner" | "member"
+  joinedAt     DateTime @default(now())
+
+  collection Collection @relation(fields: [collectionId], references: [id])
+  user       User       @relation(fields: [userId], references: [id])
+
+  @@id([collectionId, userId])
+}
+
+model Invitation {
+  id           String   @id @default(uuid())
+  collectionId String
+  invitedBy    String
+  inviteeEmail String
+  status       String   @default("pending") // "pending"|"accepted"|"declined"|"expired"
+  createdAt    DateTime @default(now())
+  expiresAt    DateTime
+
+  collection Collection @relation(fields: [collectionId], references: [id])
+  sender     User       @relation("InvitationSender", fields: [invitedBy], references: [id])
+}
+
+model Puzzle {
+  id           String   @id @default(uuid())
+  collectionId String
+  sortOrder    Int
+  title        String
+  status       String   @default("open") // "open"|"in_progress"|"solved"|"verified"
+  workingOnId  String?
+  checkerUrl   String?
+  gcCode       String?
+  difficulty   Float?
+  terrain      Float?
+  coords       String?
+  hint         String?
+  spoiler      String?
+  customFields Json?
+  updatedAt    DateTime @updatedAt
+
+  collection Collection @relation(fields: [collectionId], references: [id])
+  worker     User?      @relation("PuzzleWorker", fields: [workingOnId], references: [id])
+  notes      Note[]
+  attempts   Attempt[]
+}
+
+model Note {
+  id        String   @id @default(uuid())
+  puzzleId  String
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  puzzle Puzzle @relation(fields: [puzzleId], references: [id])
+  author User   @relation(fields: [userId], references: [id])
+}
+
+model Attempt {
+  id            String   @id @default(uuid())
+  puzzleId      String
+  userId        String
+  valueTested   String
+  checkerResult Boolean
+  comment       String?
+  createdAt     DateTime @default(now())
+
+  puzzle Puzzle @relation(fields: [puzzleId], references: [id])
+  author User   @relation(fields: [userId], references: [id])
+}

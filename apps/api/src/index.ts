@@ -1,3 +1,4 @@
+import './config/env.js';
 import { createServer } from 'node:http';
 
 const PORT = parseInt(process.env['PORT'] ?? '3000', 10);
