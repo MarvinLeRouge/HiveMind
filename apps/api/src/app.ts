@@ -13,6 +13,7 @@ import { env } from './config/env.js';
 import prismaPlugin from './plugins/prisma.js';
 import authRoutes from './routes/auth.js';
 import templateRoutes from './routes/templates.js';
+import collectionRoutes from './routes/collections.js';
 
 /**
  * Builds and configures the Fastify application instance.
@@ -58,6 +59,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   // ── Routes ─────────────────────────────────────────────────────────────────
   await app.register(authRoutes, { prefix: '/auth' });
   await app.register(templateRoutes, { prefix: '/templates' });
+  await app.register(collectionRoutes, { prefix: '/collections' });
 
   return app;
 }
