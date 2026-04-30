@@ -8,6 +8,8 @@ services:
       - "3000:3000"
     volumes:
       - ./apps/api/src:/app/apps/api/src
+      - ./apps/api/tests:/app/apps/api/tests
+      - ./apps/api/prisma:/app/apps/api/prisma
       - ./packages/shared/src:/app/packages/shared/src
     env_file:
       - ./apps/api/.env

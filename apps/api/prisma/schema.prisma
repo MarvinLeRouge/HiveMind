@@ -67,7 +67,7 @@ model CollectionMember {
   role         String   // "owner" | "member"
   joinedAt     DateTime @default(now())
 
-  collection Collection @relation(fields: [collectionId], references: [id])
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
   user       User       @relation(fields: [userId], references: [id])
 
   @@id([collectionId, userId])
@@ -82,7 +82,7 @@ model Invitation {
   createdAt    DateTime @default(now())
   expiresAt    DateTime
 
-  collection Collection @relation(fields: [collectionId], references: [id])
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
   sender     User       @relation("InvitationSender", fields: [invitedBy], references: [id])
 }
 
@@ -103,7 +103,7 @@ model Puzzle {
   customFields Json?
   updatedAt    DateTime @updatedAt
 
-  collection Collection @relation(fields: [collectionId], references: [id])
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
   worker     User?      @relation("PuzzleWorker", fields: [workingOnId], references: [id])
   notes      Note[]
   attempts   Attempt[]
@@ -117,7 +117,7 @@ model Note {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  puzzle Puzzle @relation(fields: [puzzleId], references: [id])
+  puzzle Puzzle @relation(fields: [puzzleId], references: [id], onDelete: Cascade)
   author User   @relation(fields: [userId], references: [id])
 }
 
@@ -130,6 +130,6 @@ model Attempt {
   comment       String?
   createdAt     DateTime @default(now())
 
-  puzzle Puzzle @relation(fields: [puzzleId], references: [id])
+  puzzle Puzzle @relation(fields: [puzzleId], references: [id], onDelete: Cascade)
   author User   @relation(fields: [userId], references: [id])
 }

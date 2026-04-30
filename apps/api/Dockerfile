@@ -17,6 +17,7 @@ WORKDIR /app
 COPY tsconfig.json ./
 COPY apps/api ./apps/api
 COPY packages/shared ./packages/shared
+RUN pnpm --filter api exec prisma generate
 EXPOSE 3000
 CMD ["pnpm", "--filter", "api", "dev"]
 
@@ -26,13 +27,14 @@ WORKDIR /app
 COPY tsconfig.json ./
 COPY apps/api ./apps/api
 COPY packages/shared ./packages/shared
+RUN pnpm --filter api exec prisma generate
 RUN pnpm --filter api build
 
 # ─── production — minimal runtime image ───────────────────────────────────────
 FROM node:20-alpine AS production
 WORKDIR /app
 RUN corepack enable
-COPY --from=deps /app/node_modules ./node_modules
+COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/apps/api/dist ./dist
 COPY apps/api/package.json ./
 EXPOSE 3000
