@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gpx xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+     version="1.0"
+     creator="Groundspeak Pocket Query"
+     xmlns:groundspeak="http://www.groundspeak.com/cache/1/0"
+     xmlns="http://www.topografix.com/GPX/1/0">
+  <wpt lat="48.850293" lon="2.349241">
+    <name>GC12345</name>
+    <groundspeak:cache>
+      <groundspeak:difficulty>2</groundspeak:difficulty>
+      <groundspeak:terrain>1.5</groundspeak:terrain>
+      <groundspeak:short_description>Look under the bridge</groundspeak:short_description>
+    </groundspeak:cache>
+  </wpt>
+  <wpt lat="48.860371" lon="2.359182">
+    <name>GC67890</name>
+    <groundspeak:cache>
+      <groundspeak:difficulty>3</groundspeak:difficulty>
+      <groundspeak:terrain>2</groundspeak:terrain>
+      <groundspeak:short_description>Behind the old tree</groundspeak:short_description>
+    </groundspeak:cache>
+  </wpt>
+  <wpt lat="48.870512" lon="2.369034">
+    <name>Regular Waypoint</name>
+  </wpt>
+</gpx>
