@@ -65,6 +65,9 @@ importers:
       bcryptjs:
         specifier: ^3.0.3
         version: 3.0.3
+      csv-parse:
+        specifier: ^6.2.1
+        version: 6.2.1
       fast-xml-parser:
         specifier: ^5.7.2
         version: 5.7.2
@@ -1053,6 +1056,9 @@ packages:
     resolution: {integrity: sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==}
     engines: {node: '>=4'}
     hasBin: true
+
+  csv-parse@6.2.1:
+    resolution: {integrity: sha512-LRLMV+UCyfMokp8Wb411duBf1gaBKJfOfBWU9eHMJ+b+cJYZsNu3AFmjJf3+yPGd59Exz1TsMjaSFyxnYB9+IQ==}
 
   debug@4.4.3:
     resolution: {integrity: sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA==}
@@ -2944,6 +2950,8 @@ snapshots:
       which: 2.0.2
 
   cssesc@3.0.0: {}
+
+  csv-parse@6.2.1: {}
 
   debug@4.4.3:
     dependencies:
