@@ -10,6 +10,7 @@ import {
 } from 'fastify-type-provider-zod';
 import type { FastifyInstance } from 'fastify';
 import { env } from './config/env.js';
+import multipart from '@fastify/multipart';
 import prismaPlugin from './plugins/prisma.js';
 import authRoutes from './routes/auth.js';
 import templateRoutes from './routes/templates.js';
@@ -17,6 +18,7 @@ import collectionRoutes from './routes/collections.js';
 import invitationRoutes from './routes/invitations.js';
 import puzzleRoutes from './routes/puzzles.js';
 import notesAttemptsRoutes from './routes/notes-attempts.js';
+import importRoutes from './routes/import.js';
 
 /**
  * Builds and configures the Fastify application instance.
@@ -57,6 +59,8 @@ export async function buildApp(): Promise<FastifyInstance> {
 
   await app.register(swaggerUi, { routePrefix: '/docs' });
 
+  await app.register(multipart, { limits: { fileSize: 10 * 1024 * 1024 } });
+
   await app.register(prismaPlugin);
 
   // ── Routes ─────────────────────────────────────────────────────────────────
@@ -66,6 +70,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(invitationRoutes, { prefix: '/invitations' });
   await app.register(puzzleRoutes, { prefix: '/collections' });
   await app.register(notesAttemptsRoutes, { prefix: '/puzzles' });
+  await app.register(importRoutes, { prefix: '/collections' });
 
   return app;
 }

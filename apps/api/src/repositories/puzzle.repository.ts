@@ -128,6 +128,14 @@ export class PuzzleRepository {
   }
 
   /**
+   * Bulk-inserts multiple puzzles and returns the number created.
+   */
+  async createMany(data: CreatePuzzleData[]): Promise<number> {
+    const result = await this.prisma.puzzle.createMany({ data });
+    return result.count;
+  }
+
+  /**
    * Deletes a puzzle. DB cascades handle notes and attempts.
    */
   async delete(id: string): Promise<void> {
