@@ -16,6 +16,7 @@ import templateRoutes from './routes/templates.js';
 import collectionRoutes from './routes/collections.js';
 import invitationRoutes from './routes/invitations.js';
 import puzzleRoutes from './routes/puzzles.js';
+import notesAttemptsRoutes from './routes/notes-attempts.js';
 
 /**
  * Builds and configures the Fastify application instance.
@@ -64,6 +65,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(collectionRoutes, { prefix: '/collections' });
   await app.register(invitationRoutes, { prefix: '/invitations' });
   await app.register(puzzleRoutes, { prefix: '/collections' });
+  await app.register(notesAttemptsRoutes, { prefix: '/puzzles' });
 
   return app;
 }
