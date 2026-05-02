@@ -34,7 +34,8 @@ afterAll(async () => {
 });
 
 beforeEach(async () => {
-  // Clean non-system templates and test users
+  // Collections reference template snapshots — must be deleted first.
+  await prisma.collection.deleteMany({});
   await prisma.template.deleteMany({ where: { isSystem: false } });
   await prisma.user.deleteMany({ where: { isAdmin: false } });
 
