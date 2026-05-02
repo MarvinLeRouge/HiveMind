@@ -4,6 +4,8 @@ import { z } from 'zod';
 import { CollectionRepository } from '../repositories/collection.repository.js';
 import { TemplateRepository } from '../repositories/template.repository.js';
 import { CollectionService } from '../services/collection.service.js';
+import { InvitationRepository } from '../repositories/invitation.repository.js';
+import { InvitationService } from '../services/invitation.service.js';
 import { authenticate } from '../middlewares/authenticate.js';
 import { requireMember } from '../middlewares/requireMember.js';
 import { requireOwner } from '../middlewares/requireOwner.js';
@@ -17,6 +19,10 @@ import {
   memberParamSchema,
   updateCollectionBodySchema,
 } from './collection.schemas.js';
+import {
+  invitationSchema,
+  sendInvitationBodySchema,
+} from './invitation.schemas.js';
 
 /** Serializes a CollectionRow to the API response shape. */
 function serializeCollection(c: {
@@ -56,7 +62,7 @@ function serializeCollection(c: {
 
 /**
  * Collection routes: list, get, create, update, delete, list members,
- * remove member.
+ * remove member, send invitation.
  */
 export default async function collectionRoutes(
   app: FastifyInstance,
@@ -65,6 +71,9 @@ export default async function collectionRoutes(
   const service = new CollectionService(
     new CollectionRepository(app.prisma),
     new TemplateRepository(app.prisma),
+  );
+  const invitationService = new InvitationService(
+    new InvitationRepository(app.prisma),
   );
 
   // ── GET /collections ──────────────────────────────────────────────────────
@@ -193,6 +202,31 @@ export default async function collectionRoutes(
     handler: async (request, reply) => {
       await service.removeMember(request.params.id, request.params.userId);
       return reply.status(204).send({});
+    },
+  });
+
+  // ── POST /collections/:id/invitations ─────────────────────────────────────
+  typed.post('/:id/invitations', {
+    schema: {
+      tags: ['invitations'],
+      summary: 'Send an invitation to a collection (owner only)',
+      security: [{ bearerAuth: [] }],
+      params: collectionIdParamSchema,
+      body: sendInvitationBodySchema,
+      response: { 201: invitationSchema, 403: errorSchema, 409: errorSchema },
+    },
+    preHandler: [authenticate, requireOwner],
+    handler: async (request, reply) => {
+      const invitation = await invitationService.sendInvitation(
+        request.params.id,
+        request.user.sub,
+        request.body.email,
+      );
+      return reply.status(201).send({
+        ...invitation,
+        createdAt: invitation.createdAt.toISOString(),
+        expiresAt: invitation.expiresAt.toISOString(),
+      });
     },
   });
 }

@@ -14,6 +14,7 @@ import prismaPlugin from './plugins/prisma.js';
 import authRoutes from './routes/auth.js';
 import templateRoutes from './routes/templates.js';
 import collectionRoutes from './routes/collections.js';
+import invitationRoutes from './routes/invitations.js';
 
 /**
  * Builds and configures the Fastify application instance.
@@ -60,6 +61,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(authRoutes, { prefix: '/auth' });
   await app.register(templateRoutes, { prefix: '/templates' });
   await app.register(collectionRoutes, { prefix: '/collections' });
+  await app.register(invitationRoutes, { prefix: '/invitations' });
 
   return app;
 }
