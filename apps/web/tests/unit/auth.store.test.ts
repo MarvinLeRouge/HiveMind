@@ -121,4 +121,25 @@ describe('useAuthStore', () => {
       expect(auth.isAuthenticated).toBe(false);
     });
   });
+
+  describe('init', () => {
+    it('restores session when a valid refresh cookie is present', async () => {
+      mockFetch.mockResolvedValueOnce(mockAuthResponse);
+      const auth = useAuthStore();
+
+      await auth.init();
+
+      expect(auth.isAuthenticated).toBe(true);
+      expect(auth.user).toEqual(mockUser);
+    });
+
+    it('leaves state unauthenticated when no valid session exists', async () => {
+      mockFetch.mockRejectedValueOnce(new Error('401'));
+      const auth = useAuthStore();
+
+      await auth.init();
+
+      expect(auth.isAuthenticated).toBe(false);
+    });
+  });
 });
