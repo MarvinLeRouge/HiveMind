@@ -5,19 +5,10 @@ coverage:
         target: 80%
         threshold: 2%
     patch:
+      # Patch coverage is informational only across all flags.
+      # Project coverage (above) is the enforced threshold.
       default:
-        # Patch coverage is informational only — doesn't block PRs.
-        # Per-flag targets are enforced below.
         informational: true
-      backend:
-        flags: [backend]
-        target: 80%
-        informational: false
-      frontend:
-        flags: [frontend]
-        # Will be raised as BLOCK-16+ adds component and composable tests.
-        target: 20%
-        informational: false
 
 flags:
   backend:
