@@ -1,0 +1,35 @@
+coverage:
+  status:
+    project:
+      backend:
+        flags: [backend]
+        target: 80%
+        threshold: 2%
+      frontend:
+        flags: [frontend]
+        # Target increases as BLOCK-16+ adds tests
+        target: 20%
+        threshold: 2%
+    patch:
+      backend:
+        flags: [backend]
+        target: 80%
+      frontend:
+        flags: [frontend]
+        # Relaxed during frontend scaffold phase (BLOCK-15)
+        target: 20%
+
+flags:
+  backend:
+    paths:
+      - apps/api/
+    carryforward: false
+  frontend:
+    paths:
+      - apps/web/
+    carryforward: false
+
+comment:
+  layout: reach,diff,flags,files
+  behavior: default
+  require_changes: true
