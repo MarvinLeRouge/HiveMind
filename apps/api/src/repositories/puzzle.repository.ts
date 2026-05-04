@@ -18,6 +18,7 @@ export type PuzzleRow = Puzzle & {
   collection: { templateSnapshot: TemplateFlags };
 };
 
+/** Input shape for creating a puzzle. */
 export interface CreatePuzzleData {
   collectionId: string;
   sortOrder: number;
@@ -32,6 +33,7 @@ export interface CreatePuzzleData {
   customFields?: Record<string, unknown>;
 }
 
+/** Input shape for updating a puzzle's mutable fields. */
 export interface UpdatePuzzleData {
   title?: string;
   status?: string;

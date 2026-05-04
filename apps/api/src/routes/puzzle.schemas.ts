@@ -1,10 +1,12 @@
 import { z } from 'zod';
 
+/** Route params containing a collection ID and a puzzle ID. */
 export const puzzleParamsSchema = z.object({
   id: z.string().uuid(),
   pid: z.string().uuid(),
 });
 
+/** Request body for bulk-reordering puzzles. */
 export const reorderBodySchema = z.object({
   puzzles: z
     .array(
@@ -16,6 +18,7 @@ export const reorderBodySchema = z.object({
     .min(1),
 });
 
+/** Request body for creating a puzzle. */
 export const createPuzzleBodySchema = z.object({
   title: z.string().min(1).max(255),
   checkerUrl: z.string().url().optional(),
@@ -28,6 +31,7 @@ export const createPuzzleBodySchema = z.object({
   customFields: z.record(z.unknown()).optional(),
 });
 
+/** Request body for partially updating a puzzle (at least one field required). */
 export const updatePuzzleBodySchema = z
   .object({
     title: z.string().min(1).max(255).optional(),
@@ -45,6 +49,7 @@ export const updatePuzzleBodySchema = z
     message: 'At least one field must be provided',
   });
 
+/** Response shape for a puzzle resource (template-driven optional fields omitted when disabled). */
 export const puzzleSchema = z.object({
   id: z.string(),
   collectionId: z.string(),
@@ -63,4 +68,5 @@ export const puzzleSchema = z.object({
   customFields: z.unknown().optional(),
 });
 
+/** Response shape for a list of puzzles. */
 export const puzzleListSchema = z.array(puzzleSchema);

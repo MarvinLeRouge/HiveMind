@@ -34,4 +34,5 @@ function validateEnv(): z.infer<typeof envSchema> {
   return result.data;
 }
 
+/** Validated and typed environment configuration. Process exits on startup if any variable is invalid. */
 export const env = validateEnv();

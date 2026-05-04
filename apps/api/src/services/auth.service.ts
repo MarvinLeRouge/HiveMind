@@ -6,11 +6,13 @@ import { env } from '../config/env.js';
 
 const BCRYPT_ROUNDS = 12;
 
+/** Access and refresh token pair returned after successful authentication. */
 export interface TokenPair {
   accessToken: string;
   refreshToken: string;
 }
 
+/** Public user fields returned by auth endpoints. */
 export interface AuthUser {
   id: string;
   username: string;
