@@ -317,14 +317,14 @@ docker compose exec api npx prisma db seed
 - [x] BLOCK-04 · Schéma de base de données & Prisma
 - [x] BLOCK-05 · API d'authentification (register, login, refresh, logout)
 - [x] BLOCK-06 · API Templates
-- [ ] BLOCK-07 · API Collections
-- [ ] BLOCK-08 · API Invitations
-- [ ] BLOCK-09 · API Puzzles
-- [ ] BLOCK-10 · API Notes & Tentatives
-- [ ] BLOCK-11 · Import GPX
-- [ ] BLOCK-12 · Import CSV
-- [ ] BLOCK-13 · Passe qualité backend (couverture, JSDoc, Swagger)
-- [ ] BLOCK-14 · GitHub Actions CI + scaffold CD
+- [x] BLOCK-07 · API Collections
+- [x] BLOCK-08 · API Invitations
+- [x] BLOCK-09 · API Puzzles
+- [x] BLOCK-10 · API Notes & Tentatives
+- [x] BLOCK-11 · Import GPX
+- [x] BLOCK-12 · Import CSV
+- [x] BLOCK-13 · Passe qualité backend (couverture, JSDoc, Swagger)
+- [x] BLOCK-14 · GitHub Actions CI + scaffold CD
 
 ### V2 — Frontend
 

@@ -32,10 +32,10 @@ Each **Collection** contains **Puzzles**. Each puzzle can carry free-text **Note
 
 | Metric | Value |
 |--------|-------|
-| API endpoints | — |
-| Backend test coverage | — |
-| Frontend test coverage | — |
-| E2E spec files | — |
+| API endpoints | 30+ (auth, templates, collections, invitations, puzzles, notes, attempts, import) |
+| Backend test coverage | 98 % (261 tests) |
+| Frontend test coverage | — *(BLOCK-15+)* |
+| E2E spec files | — *(BLOCK-22)* |
 
 ---
 
@@ -317,14 +317,14 @@ docker compose exec api npx prisma db seed
 - [x] BLOCK-04 · Database schema & Prisma
 - [x] BLOCK-05 · Auth API (register, login, refresh, logout)
 - [x] BLOCK-06 · Templates API
-- [ ] BLOCK-07 · Collections API
-- [ ] BLOCK-08 · Invitations API
-- [ ] BLOCK-09 · Puzzles API
-- [ ] BLOCK-10 · Notes & Attempts API
-- [ ] BLOCK-11 · GPX import
-- [ ] BLOCK-12 · CSV import
-- [ ] BLOCK-13 · Backend quality pass (coverage, JSDoc, Swagger)
-- [ ] BLOCK-14 · GitHub Actions CI + CD scaffold
+- [x] BLOCK-07 · Collections API
+- [x] BLOCK-08 · Invitations API
+- [x] BLOCK-09 · Puzzles API
+- [x] BLOCK-10 · Notes & Attempts API
+- [x] BLOCK-11 · GPX import
+- [x] BLOCK-12 · CSV import
+- [x] BLOCK-13 · Backend quality pass (coverage, JSDoc, Swagger)
+- [x] BLOCK-14 · GitHub Actions CI + CD scaffold
 
 ### V2 — Frontend
 

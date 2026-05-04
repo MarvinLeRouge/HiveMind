@@ -1,0 +1,101 @@
+name: Build & Deploy
+
+on:
+  # Triggered automatically after E2E passes on main
+  workflow_run:
+    workflows: [E2E]
+    types: [completed]
+    branches: [main]
+  # Manual trigger for hotfixes (bypasses E2E gate)
+  workflow_dispatch:
+
+jobs:
+  build-deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      # ── Resolve the exact commit SHA ────────────────────────────────────────
+      - name: Resolve SHA
+        id: sha
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "sha=${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.sha.outputs.sha }}
+
+      # ── Authenticate with GHCR ───────────────────────────────────────────────
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── Build and push images ────────────────────────────────────────────────
+      - name: Build and push backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/api/Dockerfile
+          target: production
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/backend:latest
+            ghcr.io/${{ github.repository }}/backend:${{ steps.sha.outputs.sha }}
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/web/Dockerfile
+          target: production
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/frontend:latest
+            ghcr.io/${{ github.repository }}/frontend:${{ steps.sha.outputs.sha }}
+
+      # ── Deploy to VPS ────────────────────────────────────────────────────────
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1
+        env:
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          ACTOR: ${{ github.actor }}
+          SHA: ${{ steps.sha.outputs.sha }}
+          REPO: ${{ github.repository }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script_stop: true
+          envs: GHCR_TOKEN,ACTOR,SHA,REPO
+          script: |
+            # Fetch the exact compose file for this SHA
+            curl -fsSL \
+              "https://raw.githubusercontent.com/${REPO}/${SHA}/docker-compose.prod.yml" \
+              -o /opt/hivemind/docker-compose.prod.yml
+
+            cd /opt/hivemind
+
+            # Authenticate with GHCR on the VPS
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$ACTOR" --password-stdin
+
+            # Pull new images and restart services
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
+
+            # Run pending migrations
+            docker compose -f docker-compose.prod.yml exec -T backend \
+              sh -c "cd /app/apps/api && npx prisma migrate deploy"
