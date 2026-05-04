@@ -48,6 +48,7 @@ function makeCollection(
 ) {
   return {
     id: collectionId,
+    slug: 'my-collection',
     name: 'My Collection',
     description: null,
     createdBy: userId,
@@ -78,6 +79,9 @@ function makeCollectionRepo(
   return {
     findAllByMember: vi.fn().mockResolvedValue([]),
     findById: vi.fn().mockResolvedValue(null),
+    findBySlug: vi.fn().mockResolvedValue(null),
+    findBySlugOrId: vi.fn().mockResolvedValue(null),
+    slugExists: vi.fn().mockResolvedValue(false),
     findMembership: vi.fn().mockResolvedValue(null),
     createSnapshot: vi.fn().mockResolvedValue(makeSnapshot()),
     create: vi.fn().mockResolvedValue(makeCollection()),
@@ -123,7 +127,7 @@ describe('CollectionService.getById', () => {
   it('returns the collection when it exists', async () => {
     const collection = makeCollection();
     const repo = makeCollectionRepo({
-      findById: vi.fn().mockResolvedValue(collection),
+      findBySlugOrId: vi.fn().mockResolvedValue(collection),
     });
     const service = new CollectionService(repo, makeTemplateRepo());
 
@@ -185,13 +189,16 @@ describe('CollectionService.update', () => {
   it('updates the collection when it exists', async () => {
     const collection = makeCollection();
     const repo = makeCollectionRepo({
-      findById: vi.fn().mockResolvedValue(collection),
+      findBySlugOrId: vi.fn().mockResolvedValue(collection),
     });
     const service = new CollectionService(repo, makeTemplateRepo());
 
     await service.update(collectionId, { name: 'Updated' });
 
-    expect(repo.update).toHaveBeenCalledWith(collectionId, { name: 'Updated' });
+    expect(repo.update).toHaveBeenCalledWith(
+      collectionId,
+      expect.objectContaining({ name: 'Updated', slug: 'updated' }),
+    );
   });
 
   it('throws 404 when the collection does not exist', async () => {
@@ -210,7 +217,7 @@ describe('CollectionService.delete', () => {
   it('deletes the collection when it exists', async () => {
     const collection = makeCollection();
     const repo = makeCollectionRepo({
-      findById: vi.fn().mockResolvedValue(collection),
+      findBySlugOrId: vi.fn().mockResolvedValue(collection),
     });
     const service = new CollectionService(repo, makeTemplateRepo());
 
@@ -234,7 +241,7 @@ describe('CollectionService.delete', () => {
 describe('CollectionService.listMembers', () => {
   it('returns the member list for an existing collection', async () => {
     const repo = makeCollectionRepo({
-      findById: vi.fn().mockResolvedValue(makeCollection()),
+      findBySlugOrId: vi.fn().mockResolvedValue(makeCollection()),
       findMembers: vi.fn().mockResolvedValue([]),
     });
     const service = new CollectionService(repo, makeTemplateRepo());
@@ -260,7 +267,7 @@ describe('CollectionService.removeMember', () => {
   it('removes a regular member successfully', async () => {
     const memberMembership = makeMembership('member', otherId);
     const repo = makeCollectionRepo({
-      findById: vi.fn().mockResolvedValue(makeCollection()),
+      findBySlugOrId: vi.fn().mockResolvedValue(makeCollection()),
       findMembership: vi.fn().mockResolvedValue(memberMembership),
     });
     const service = new CollectionService(repo, makeTemplateRepo());
@@ -281,7 +288,7 @@ describe('CollectionService.removeMember', () => {
       user: { id: userId, username: 'me', email: 'me@example.com' },
     };
     const repo = makeCollectionRepo({
-      findById: vi.fn().mockResolvedValue(makeCollection()),
+      findBySlugOrId: vi.fn().mockResolvedValue(makeCollection()),
       findMembership: vi.fn().mockResolvedValue(ownerMembership),
       findMembers: vi.fn().mockResolvedValue([myOwnerRow, ownerRow]),
     });
@@ -299,7 +306,7 @@ describe('CollectionService.removeMember', () => {
       user: { id: userId, username: 'me', email: 'me@example.com' },
     };
     const repo = makeCollectionRepo({
-      findById: vi.fn().mockResolvedValue(makeCollection()),
+      findBySlugOrId: vi.fn().mockResolvedValue(makeCollection()),
       findMembership: vi.fn().mockResolvedValue(ownerMembership),
       findMembers: vi.fn().mockResolvedValue([ownerRow]),
     });
@@ -327,7 +334,7 @@ describe('CollectionService.removeMember', () => {
 
   it('throws 404 when the target user is not a member', async () => {
     const repo = makeCollectionRepo({
-      findById: vi.fn().mockResolvedValue(makeCollection()),
+      findBySlugOrId: vi.fn().mockResolvedValue(makeCollection()),
       findMembership: vi.fn().mockResolvedValue(null),
     });
     const service = new CollectionService(repo, makeTemplateRepo());

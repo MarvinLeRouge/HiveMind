@@ -15,6 +15,7 @@ export type MemberRow = CollectionMember & {
 
 /** Input shape for creating a collection. */
 export interface CreateCollectionData {
+  slug: string;
   name: string;
   description?: string;
   createdBy: string;
@@ -23,6 +24,7 @@ export interface CreateCollectionData {
 
 /** Input shape for updating a collection's mutable fields. */
 export interface UpdateCollectionData {
+  slug?: string;
   name?: string;
   description?: string | null;
 }
@@ -53,6 +55,39 @@ export class CollectionRepository {
       where: { id },
       include: { templateSnapshot: true },
     });
+  }
+
+  /**
+   * Finds a collection by its URL slug, including its template snapshot.
+   */
+  async findBySlug(slug: string): Promise<CollectionRow | null> {
+    return this.prisma.collection.findUnique({
+      where: { slug },
+      include: { templateSnapshot: true },
+    });
+  }
+
+  /**
+   * Finds a collection by slug or UUID — used by route handlers that accept
+   * either identifier (slug in URLs, UUID in internal references).
+   */
+  async findBySlugOrId(slugOrId: string): Promise<CollectionRow | null> {
+    return this.prisma.collection.findFirst({
+      where: { OR: [{ slug: slugOrId }, { id: slugOrId }] },
+      include: { templateSnapshot: true },
+    });
+  }
+
+  /**
+   * Returns true if a slug is already taken by another collection.
+   */
+  async slugExists(slug: string, excludeId?: string): Promise<boolean> {
+    const existing = await this.prisma.collection.findUnique({
+      where: { slug },
+      select: { id: true },
+    });
+    if (!existing) return false;
+    return existing.id !== excludeId;
   }
 
   /**
@@ -87,6 +122,7 @@ export class CollectionRepository {
   async create(data: CreateCollectionData): Promise<CollectionRow> {
     return this.prisma.collection.create({
       data: {
+        slug: data.slug,
         name: data.name,
         description: data.description,
         createdBy: data.createdBy,

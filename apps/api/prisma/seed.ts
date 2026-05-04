@@ -10,7 +10,8 @@ async function hashPassword(plain: string): Promise<string> {
 
 /**
  * Seeds the database with:
- * - 1 admin user (from env)
+ * - 1 standard dev/test admin (admin@HiveMind.local / change_me_admin)
+ * - 1 custom admin from env (if different from the standard one)
  * - 2 system templates (generic, geocaching)
  * - 1 sample collection with 3 puzzles (dev only)
  */
@@ -19,7 +20,21 @@ async function main(): Promise<void> {
   const adminEmail = process.env['SEED_ADMIN_EMAIL'] ?? 'admin@HiveMind.local';
   const adminPassword = process.env['SEED_ADMIN_PASSWORD'] ?? 'change_me_admin';
 
-  // ── Admin user ──────────────────────────────────────────────────────────────
+  // ── Standard dev/test admin (always present — used by integration tests) ────
+  // Uses username 'admin-test' to avoid conflicts with the custom admin below.
+  const testAdminHash = await hashPassword('change_me_admin');
+  await prisma.user.upsert({
+    where: { email: 'admin@HiveMind.local' },
+    update: { passwordHash: testAdminHash },
+    create: {
+      username: 'admin-test',
+      email: 'admin@HiveMind.local',
+      passwordHash: testAdminHash,
+      isAdmin: true,
+    },
+  });
+
+  // ── Custom admin from env ────────────────────────────────────────────────────
   const passwordHash = await hashPassword(adminPassword);
   const admin = await prisma.user.upsert({
     where: { email: adminEmail },
@@ -72,10 +87,10 @@ async function main(): Promise<void> {
   // ── Sample collection (dev only) ────────────────────────────────────────────
   if (process.env['NODE_ENV'] !== 'production') {
     const sampleCollection = await prisma.collection.upsert({
-      where: { id: 'sample-collection-dev' },
+      where: { slug: 'sample-geocaching-series' },
       update: {},
       create: {
-        id: 'sample-collection-dev',
+        slug: 'sample-geocaching-series',
         name: 'Sample Geocaching Series',
         description: 'A sample collection seeded for development and testing.',
         createdBy: admin.id,

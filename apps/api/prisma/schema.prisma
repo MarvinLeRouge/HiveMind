@@ -48,6 +48,7 @@ model Template {
 
 model Collection {
   id                 String   @id @default(uuid())
+  slug               String   @unique
   name               String
   description        String?
   createdBy          String

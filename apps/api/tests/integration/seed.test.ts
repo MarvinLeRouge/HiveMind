@@ -28,7 +28,7 @@ async function reseed(): Promise<void> {
     where: { email: 'admin@HiveMind.local' },
     update: {},
     create: {
-      username: 'admin',
+      username: 'admin-test',
       email: 'admin@HiveMind.local',
       passwordHash: hashPassword('change_me_admin'),
       isAdmin: true,
@@ -67,10 +67,10 @@ async function reseed(): Promise<void> {
   });
 
   const collection = await prisma.collection.upsert({
-    where: { id: 'sample-collection-dev' },
+    where: { slug: 'sample-geocaching-series' },
     update: {},
     create: {
-      id: 'sample-collection-dev',
+      slug: 'sample-geocaching-series',
       name: 'Sample Geocaching Series',
       description: 'A sample collection seeded for development and testing.',
       createdBy: admin.id,
@@ -171,7 +171,7 @@ describe('Seed integrity — System templates', () => {
 describe('Seed integrity — Sample collection', () => {
   it('creates the sample collection with geocaching template snapshot', async () => {
     const collection = await prisma.collection.findUnique({
-      where: { id: 'sample-collection-dev' },
+      where: { slug: 'sample-geocaching-series' },
       include: { templateSnapshot: true },
     });
     expect(collection).not.toBeNull();
@@ -180,11 +180,16 @@ describe('Seed integrity — Sample collection', () => {
   });
 
   it('admin is owner of the sample collection', async () => {
-    const admin = await prisma.user.findFirst({ where: { isAdmin: true } });
+    const admin = await prisma.user.findUnique({
+      where: { email: 'admin@HiveMind.local' },
+    });
+    const collection = await prisma.collection.findUnique({
+      where: { slug: 'sample-geocaching-series' },
+    });
     const membership = await prisma.collectionMember.findUnique({
       where: {
         collectionId_userId: {
-          collectionId: 'sample-collection-dev',
+          collectionId: collection!.id,
           userId: admin!.id,
         },
       },
@@ -194,16 +199,22 @@ describe('Seed integrity — Sample collection', () => {
   });
 
   it('creates 3 puzzles in the sample collection', async () => {
+    const collection = await prisma.collection.findUnique({
+      where: { slug: 'sample-geocaching-series' },
+    });
     const puzzles = await prisma.puzzle.findMany({
-      where: { collectionId: 'sample-collection-dev' },
+      where: { collectionId: collection!.id },
       orderBy: { sortOrder: 'asc' },
     });
     expect(puzzles).toHaveLength(3);
   });
 
   it('puzzles have correct sort order and required fields', async () => {
+    const collection = await prisma.collection.findUnique({
+      where: { slug: 'sample-geocaching-series' },
+    });
     const puzzles = await prisma.puzzle.findMany({
-      where: { collectionId: 'sample-collection-dev' },
+      where: { collectionId: collection!.id },
       orderBy: { sortOrder: 'asc' },
     });
     expect(puzzles[0]!.sortOrder).toBe(1);
@@ -212,7 +223,7 @@ describe('Seed integrity — Sample collection', () => {
 
     for (const puzzle of puzzles) {
       expect(puzzle.title).toBeTruthy();
-      expect(puzzle.collectionId).toBe('sample-collection-dev');
+      expect(puzzle.collectionId).toBe(collection!.id);
     }
   });
 

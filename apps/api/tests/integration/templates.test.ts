@@ -23,7 +23,7 @@ beforeAll(async () => {
   // Re-hash the admin password with bcrypt so login works in tests.
   const bcryptHash = await bcrypt.hash('change_me_admin', 1);
   await prisma.user.update({
-    where: { email: 'admin@HiveMind.local' },
+    where: { email: process.env['SEED_ADMIN_EMAIL'] ?? 'admin@HiveMind.local' },
     data: { passwordHash: bcryptHash },
   });
 });

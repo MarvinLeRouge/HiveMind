@@ -3,9 +3,9 @@ import { templateSchema } from './template.schemas.js';
 
 // ── Params ────────────────────────────────────────────────────────────────────
 
-/** Route params containing a collection ID. */
+/** Route params containing a collection slug. */
 export const collectionIdParamSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().min(1),
 });
 
 /** Route params containing a collection ID and a member user ID. */
@@ -38,6 +38,7 @@ export const updateCollectionBodySchema = z
 /** Response shape for a collection resource (includes template snapshot). */
 export const collectionSchema = z.object({
   id: z.string(),
+  slug: z.string(),
   name: z.string(),
   description: z.string().nullable(),
   createdBy: z.string(),
