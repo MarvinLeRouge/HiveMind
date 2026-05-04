@@ -28,6 +28,21 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/collections/new',
+      component: () => import('@/pages/CollectionNewPage.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/collections/:id',
+      component: () => import('@/pages/CollectionDetailPage.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/collections/:id/settings',
+      component: () => import('@/pages/CollectionSettingsPage.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/:pathMatch(.*)*',
       redirect: '/',
     },
