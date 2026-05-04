@@ -1,0 +1,123 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+
+jobs:
+  # ── Backend ──────────────────────────────────────────────────────────────────
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: hivemind
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: hivemind
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://hivemind:password@localhost:5432/hivemind
+      JWT_ACCESS_SECRET: ci_access_secret_32chars_minimum_x
+      JWT_REFRESH_SECRET: ci_refresh_secret_32chars_minimum_x
+      JWT_ACCESS_EXPIRES_IN: 15m
+      JWT_REFRESH_EXPIRES_IN: 7d
+      PORT: 3000
+      NODE_ENV: test
+      CORS_ORIGIN: http://localhost:5173
+      SEED_ADMIN_USERNAME: admin
+      SEED_ADMIN_EMAIL: admin@HiveMind.local
+      SEED_ADMIN_PASSWORD: change_me_admin
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter api exec prisma generate
+
+      - name: Run migrations
+        run: pnpm --filter api exec prisma migrate deploy
+
+      - name: Seed database
+        run: pnpm --filter api exec prisma db seed
+
+      - name: Lint
+        run: pnpm --filter api lint
+
+      - name: Test with coverage
+        run: pnpm --filter api test:coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          use_oidc: true
+          flags: backend
+          files: apps/api/coverage/lcov.info
+
+  # ── Frontend ─────────────────────────────────────────────────────────────────
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    # Frontend scaffold is completed in BLOCK-15; steps are in place for when it lands.
+    continue-on-error: true
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm --filter web lint
+
+      - name: Test with coverage
+        run: pnpm --filter web test:coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          use_oidc: true
+          flags: frontend
+          files: apps/web/coverage/lcov.info
