@@ -13,6 +13,7 @@ export type MemberRow = CollectionMember & {
   user: { id: string; username: string; email: string };
 };
 
+/** Input shape for creating a collection. */
 export interface CreateCollectionData {
   name: string;
   description?: string;
@@ -20,6 +21,7 @@ export interface CreateCollectionData {
   templateSnapshotId: string;
 }
 
+/** Input shape for updating a collection's mutable fields. */
 export interface UpdateCollectionData {
   name?: string;
   description?: string | null;

@@ -1,5 +1,6 @@
 import type { Attempt, PrismaClient } from '@prisma/client';
 
+/** Input shape for recording an attempt. */
 export interface CreateAttemptData {
   puzzleId: string;
   userId: string;

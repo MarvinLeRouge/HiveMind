@@ -1,5 +1,6 @@
 import type { PrismaClient, Template } from '@prisma/client';
 
+/** Input shape for creating a template. */
 export interface CreateTemplateData {
   name: string;
   description?: string;
@@ -17,6 +18,7 @@ export interface CreateTemplateData {
   customField2Label?: string;
 }
 
+/** Input shape for updating a template (all fields optional except createdBy which is immutable). */
 export type UpdateTemplateData = Partial<Omit<CreateTemplateData, 'createdBy'>>;
 
 /**

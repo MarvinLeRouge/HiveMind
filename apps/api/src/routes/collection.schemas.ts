@@ -3,10 +3,12 @@ import { templateSchema } from './template.schemas.js';
 
 // ── Params ────────────────────────────────────────────────────────────────────
 
+/** Route params containing a collection ID. */
 export const collectionIdParamSchema = z.object({
   id: z.string().uuid(),
 });
 
+/** Route params containing a collection ID and a member user ID. */
 export const memberParamSchema = z.object({
   id: z.string().uuid(),
   userId: z.string().uuid(),
@@ -14,12 +16,14 @@ export const memberParamSchema = z.object({
 
 // ── Request bodies ────────────────────────────────────────────────────────────
 
+/** Request body for creating a collection. */
 export const createCollectionBodySchema = z.object({
   name: z.string().min(1).max(128),
   description: z.string().max(512).optional(),
   templateId: z.string().min(1),
 });
 
+/** Request body for updating a collection (at least one field required). */
 export const updateCollectionBodySchema = z
   .object({
     name: z.string().min(1).max(128).optional(),
@@ -31,6 +35,7 @@ export const updateCollectionBodySchema = z
 
 // ── Response schemas ──────────────────────────────────────────────────────────
 
+/** Response shape for a collection resource (includes template snapshot). */
 export const collectionSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -40,8 +45,10 @@ export const collectionSchema = z.object({
   createdAt: z.string(),
 });
 
+/** Response shape for a list of collections. */
 export const collectionListSchema = z.array(collectionSchema);
 
+/** Response shape for a collection member. */
 export const memberSchema = z.object({
   userId: z.string(),
   username: z.string(),
@@ -50,4 +57,5 @@ export const memberSchema = z.object({
   joinedAt: z.string(),
 });
 
+/** Response shape for a list of collection members. */
 export const memberListSchema = z.array(memberSchema);

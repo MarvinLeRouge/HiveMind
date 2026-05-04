@@ -1,5 +1,6 @@
 import type { Note, PrismaClient } from '@prisma/client';
 
+/** Input shape for creating a note. */
 export interface CreateNoteData {
   puzzleId: string;
   userId: string;

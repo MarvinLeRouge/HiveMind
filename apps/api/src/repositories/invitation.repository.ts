@@ -1,5 +1,6 @@
 import type { PrismaClient, Invitation } from '@prisma/client';
 
+/** Input shape for creating an invitation. */
 export interface CreateInvitationData {
   collectionId: string;
   invitedBy: string;

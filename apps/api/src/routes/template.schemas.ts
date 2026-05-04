@@ -19,8 +19,10 @@ const templateFields = {
 
 // ── Request schemas ──────────────────────────────────────────────────────────
 
+/** Request body for creating a template. */
 export const createTemplateBodySchema = z.object(templateFields);
 
+/** Request body for updating a template (at least one field required). */
 export const updateTemplateBodySchema = z
   .object(templateFields)
   .partial()
@@ -28,16 +30,19 @@ export const updateTemplateBodySchema = z
     message: 'At least one field must be provided',
   });
 
+/** Route params for a user-owned template (UUID). */
 export const templateIdParamSchema = z.object({
   id: z.string().uuid(),
 });
 
+/** Route params that accept any template ID (UUID or string slug for system templates). */
 export const templateAnyIdParamSchema = z.object({
   id: z.string().min(1),
 });
 
 // ── Response schemas ─────────────────────────────────────────────────────────
 
+/** Response shape for a template resource. */
 export const templateSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -57,4 +62,5 @@ export const templateSchema = z.object({
   createdAt: z.string(),
 });
 
+/** Response shape for a list of templates. */
 export const templateListSchema = z.array(templateSchema);
