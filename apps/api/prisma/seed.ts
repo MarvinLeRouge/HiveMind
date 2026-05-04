@@ -1,14 +1,11 @@
 import { PrismaClient } from '@prisma/client';
-import { createHash } from 'node:crypto';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
-/**
- * Minimal password hashing for seed purposes only.
- * Production code uses bcrypt (BLOCK-05). Seed runs before bcrypt is installed.
- */
-function hashPassword(plain: string): string {
-  return createHash('sha256').update(plain).digest('hex');
+/** Hashes a plain-text password with bcrypt (matches the auth service). */
+async function hashPassword(plain: string): Promise<string> {
+  return bcrypt.hash(plain, 12);
 }
 
 /**
@@ -23,13 +20,14 @@ async function main(): Promise<void> {
   const adminPassword = process.env['SEED_ADMIN_PASSWORD'] ?? 'change_me_admin';
 
   // ── Admin user ──────────────────────────────────────────────────────────────
+  const passwordHash = await hashPassword(adminPassword);
   const admin = await prisma.user.upsert({
     where: { email: adminEmail },
-    update: {},
+    update: { passwordHash, username: adminUsername },
     create: {
       username: adminUsername,
       email: adminEmail,
-      passwordHash: hashPassword(adminPassword),
+      passwordHash,
       isAdmin: true,
     },
   });
