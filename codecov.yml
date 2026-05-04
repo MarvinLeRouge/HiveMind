@@ -1,23 +1,23 @@
 coverage:
   status:
     project:
-      backend:
-        flags: [backend]
+      default:
         target: 80%
-        threshold: 2%
-      frontend:
-        flags: [frontend]
-        # Target increases as BLOCK-16+ adds tests
-        target: 20%
         threshold: 2%
     patch:
+      default:
+        # Patch coverage is informational only — doesn't block PRs.
+        # Per-flag targets are enforced below.
+        informational: true
       backend:
         flags: [backend]
         target: 80%
+        informational: false
       frontend:
         flags: [frontend]
-        # Relaxed during frontend scaffold phase (BLOCK-15)
+        # Will be raised as BLOCK-16+ adds component and composable tests.
         target: 20%
+        informational: false
 
 flags:
   backend:
