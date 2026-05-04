@@ -1,24 +1,51 @@
-coverage:
-  status:
-    project:
-      default:
-        target: 80%
-        threshold: 2%
-    patch:
-      # Patch coverage is informational only across all flags.
-      # Project coverage (above) is the enforced threshold.
-      default:
-        informational: true
+flag_management:
+  default_rules:
+    ignore:
+      # Backend — entry point and seed data, no business logic
+      - "apps/api/src/index.ts"
+      - "apps/api/prisma/seed.ts"
+      - "apps/api/prisma/migrations/**"
+      # Frontend — entry point and framework wiring
+      - "apps/web/src/main.ts"
+      - "apps/web/src/App.vue"
+      - "apps/web/env.d.ts"
 
 flags:
   backend:
     paths:
-      - apps/api/
+      - apps/api/src/
+    ignore:
+      # Entry point and startup wiring — not unit-testable in isolation
+      - "apps/api/src/index.ts"
+      - "apps/api/src/config/env.ts"
     carryforward: false
   frontend:
     paths:
-      - apps/web/
+      - apps/web/src/
+    ignore:
+      # Entry point, root wiring, and type-only files
+      - "apps/web/src/main.ts"
+      - "apps/web/src/App.vue"
+      - "apps/web/src/router/index.ts"
+      - "apps/web/src/types/**"
+      - "apps/web/src/assets/**"
+      - "apps/web/env.d.ts"
     carryforward: false
+
+coverage:
+  status:
+    project:
+      default:
+        enabled: true
+        target: 80%
+        threshold: 2%
+        informational: false
+    patch:
+      default:
+        enabled: true
+        target: 70%
+        threshold: 5%
+        informational: false
 
 comment:
   layout: reach,diff,flags,files
