@@ -1,0 +1,35 @@
+<template>
+  <nav class="border-b bg-background">
+    <div class="container flex h-14 items-center gap-6">
+      <RouterLink to="/collections" class="font-semibold text-foreground">
+        HiveMind
+      </RouterLink>
+
+      <div class="ml-auto flex items-center gap-4">
+        <span class="text-sm text-muted-foreground">{{
+          auth.user?.username
+        }}</span>
+        <button
+          class="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          @click="handleLogout"
+        >
+          Log out
+        </button>
+      </div>
+    </div>
+  </nav>
+</template>
+
+<script setup lang="ts">
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
+
+const auth = useAuthStore();
+const router = useRouter();
+
+/** Logs out and redirects to the login page. */
+async function handleLogout() {
+  await auth.logout();
+  router.push('/login');
+}
+</script>
