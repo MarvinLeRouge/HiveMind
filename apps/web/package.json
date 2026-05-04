@@ -6,8 +6,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint src",
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test": "echo 'Frontend not yet scaffolded — see BLOCK-15'",
+    "test:coverage": "echo 'Frontend not yet scaffolded — see BLOCK-15'"
   },
   "dependencies": {
     "@hivemind/shared": "workspace:*"
