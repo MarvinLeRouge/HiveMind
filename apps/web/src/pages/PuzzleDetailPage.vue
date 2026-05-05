@@ -6,7 +6,7 @@
 
     <template v-else-if="current">
       <!-- Header -->
-      <div class="mb-6 flex items-start justify-between">
+      <div class="mb-6 flex flex-wrap items-start justify-between gap-3">
         <div>
           <RouterLink
             :to="`/collections/${collectionId}/puzzles`"
@@ -51,7 +51,9 @@
       </div>
 
       <!-- Fields grid -->
-      <div class="mb-6 grid grid-cols-2 gap-x-8 gap-y-3 text-sm md:grid-cols-3">
+      <div
+        class="mb-6 grid grid-cols-1 gap-x-8 gap-y-3 text-sm sm:grid-cols-2 md:grid-cols-3"
+      >
         <div v-if="current.gcCode">
           <span class="font-medium text-muted-foreground">GC Code</span>
           <p>{{ current.gcCode }}</p>
@@ -95,8 +97,10 @@
       </div>
 
       <!-- Tabs -->
-      <div class="mb-4 flex gap-4 border-b">
+      <div role="tablist" class="mb-4 flex gap-4 border-b">
         <button
+          role="tab"
+          :aria-selected="activeTab === 'notes'"
           class="pb-2 text-sm font-medium"
           :class="
             activeTab === 'notes'
@@ -108,6 +112,8 @@
           Notes
         </button>
         <button
+          role="tab"
+          :aria-selected="activeTab === 'attempts'"
           class="pb-2 text-sm font-medium"
           :class="
             activeTab === 'attempts'
@@ -121,7 +127,7 @@
       </div>
 
       <!-- Notes tab -->
-      <section v-if="activeTab === 'notes'">
+      <section v-if="activeTab === 'notes'" role="tabpanel" aria-label="Notes">
         <ul class="mb-4 space-y-3">
           <li
             v-for="note in notes"
@@ -178,8 +184,14 @@
           </li>
         </ul>
 
-        <form class="flex gap-3" @submit.prevent="handleAddNote">
+        <form
+          aria-label="Add note"
+          class="flex flex-col gap-3 sm:flex-row sm:items-start"
+          @submit.prevent="handleAddNote"
+        >
+          <label for="new-note-content" class="sr-only">Note content</label>
           <textarea
+            id="new-note-content"
             v-model="newNoteContent"
             rows="2"
             required
@@ -200,7 +212,11 @@
       </section>
 
       <!-- Attempts tab -->
-      <section v-if="activeTab === 'attempts'">
+      <section
+        v-if="activeTab === 'attempts'"
+        role="tabpanel"
+        aria-label="Attempts"
+      >
         <ul class="mb-4 space-y-2">
           <li
             v-for="attempt in attempts"
@@ -215,7 +231,12 @@
                   : 'bg-red-100 text-red-700'
               "
             >
-              {{ attempt.checkerResult ? '✓' : '✗' }}
+              <span aria-hidden="true">{{
+                attempt.checkerResult ? '✓' : '✗'
+              }}</span>
+              <span class="sr-only">{{
+                attempt.checkerResult ? 'Correct' : 'Incorrect'
+              }}</span>
             </span>
             <span class="font-mono">{{ attempt.valueTested }}</span>
             <span v-if="attempt.comment" class="text-muted-foreground">
@@ -233,26 +254,36 @@
           No attempts yet.
         </p>
 
-        <form class="flex gap-3" @submit.prevent="handleAddAttempt">
+        <form
+          aria-label="Record attempt"
+          class="flex flex-col gap-3 sm:flex-row sm:flex-wrap"
+          @submit.prevent="handleAddAttempt"
+        >
+          <label for="attempt-value" class="sr-only">Value to test</label>
           <input
+            id="attempt-value"
             v-model="newAttemptValue"
             type="text"
             required
             placeholder="Value to test"
             class="flex h-9 flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
           />
+          <label for="attempt-result" class="sr-only">Result</label>
           <select
+            id="attempt-result"
             v-model="newAttemptResult"
             class="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
           >
             <option :value="true">✓ Correct</option>
             <option :value="false">✗ Incorrect</option>
           </select>
+          <label for="attempt-comment" class="sr-only">Comment</label>
           <input
+            id="attempt-comment"
             v-model="newAttemptComment"
             type="text"
             placeholder="Comment (optional)"
-            class="flex h-9 w-48 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring sm:w-48"
           />
           <button
             type="submit"

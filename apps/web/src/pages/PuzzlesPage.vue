@@ -6,7 +6,7 @@
 
     <template v-else>
       <!-- Header -->
-      <div class="mb-6 flex items-start justify-between">
+      <div class="mb-6 flex flex-wrap items-start justify-between gap-3">
         <div>
           <RouterLink
             :to="`/collections/${collectionId}`"
@@ -29,21 +29,26 @@
       <!-- Add puzzle form -->
       <form
         v-if="showAddForm"
-        class="mb-6 flex gap-3 rounded-md border p-4"
+        aria-label="Add puzzle"
+        class="mb-6 flex flex-col gap-3 rounded-md border p-4 sm:flex-row sm:flex-wrap"
         @submit.prevent="handleAdd"
       >
+        <label for="new-puzzle-title" class="sr-only">Puzzle title</label>
         <input
+          id="new-puzzle-title"
           v-model="newTitle"
           type="text"
           required
           placeholder="Puzzle title"
           class="flex h-9 flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
         />
+        <label for="new-puzzle-checker" class="sr-only">Checker URL</label>
         <input
+          id="new-puzzle-checker"
           v-model="newCheckerUrl"
           type="url"
           placeholder="Checker URL (optional)"
-          class="flex h-9 w-64 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring sm:w-64"
         />
         <button
           type="submit"
@@ -62,7 +67,7 @@
         No puzzles yet.
       </div>
 
-      <ul v-else class="space-y-2">
+      <ul v-else aria-label="Puzzle list" class="space-y-2">
         <li
           v-for="(puzzle, index) in puzzles"
           :key="puzzle.id"
@@ -75,6 +80,7 @@
           <!-- Drag handle -->
           <span
             v-if="isOwner"
+            aria-hidden="true"
             class="cursor-grab select-none text-muted-foreground"
             title="Drag to reorder"
           >

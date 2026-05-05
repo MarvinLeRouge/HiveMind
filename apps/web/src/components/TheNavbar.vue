@@ -1,6 +1,8 @@
 <template>
   <nav class="border-b bg-background">
-    <div class="container flex h-14 items-center gap-6">
+    <div
+      class="container flex min-h-14 flex-wrap items-center gap-x-6 gap-y-2 py-2"
+    >
       <RouterLink to="/collections" class="font-semibold text-foreground">
         HiveMind
       </RouterLink>

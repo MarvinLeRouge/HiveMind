@@ -6,7 +6,7 @@
 
     <template v-else-if="current">
       <!-- Header -->
-      <div class="mb-6 flex items-start justify-between">
+      <div class="mb-6 flex flex-wrap items-start justify-between gap-3">
         <div>
           <RouterLink
             to="/collections"
@@ -25,7 +25,7 @@
             Template: {{ current.templateSnapshot.name }}
           </p>
         </div>
-        <div class="flex items-center gap-4">
+        <div class="flex flex-wrap items-center gap-3">
           <RouterLink
             :to="`/collections/${current.slug}/puzzles`"
             class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90"
@@ -72,13 +72,18 @@
       <!-- Invite (owner only) -->
       <section v-if="isOwner">
         <h2 class="mb-3 text-lg font-semibold">Invite a member</h2>
-        <form class="flex gap-3" @submit.prevent="handleInvite">
+        <form
+          class="flex flex-col gap-3 sm:flex-row"
+          @submit.prevent="handleInvite"
+        >
+          <label for="invite-email" class="sr-only">Email address</label>
           <input
+            id="invite-email"
             v-model="inviteEmail"
             type="email"
             required
             placeholder="colleague@example.com"
-            class="flex h-9 w-72 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring sm:w-72"
           />
           <button
             type="submit"

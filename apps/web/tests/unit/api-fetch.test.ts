@@ -84,4 +84,26 @@ describe('apiFetch', () => {
     await expect(apiFetch('/test')).rejects.toEqual(err);
     expect(auth.refresh).not.toHaveBeenCalled();
   });
+
+  it('rethrows errors that have no status property', async () => {
+    const auth = useAuthStore();
+    vi.spyOn(auth, 'refresh');
+    mockFetch.mockRejectedValueOnce(new Error('Network failure'));
+
+    await expect(apiFetch('/test')).rejects.toThrow('Network failure');
+    expect(auth.refresh).not.toHaveBeenCalled();
+  });
+
+  it('merges explicit headers with the Authorization header', async () => {
+    const auth = useAuthStore();
+    auth.accessToken = 'my-token';
+    mockFetch.mockResolvedValueOnce({ data: 'ok' });
+
+    await apiFetch('/test', { headers: { 'X-Custom': 'yes' } });
+
+    const opts = mockFetch.mock.calls[0][1] as Record<string, unknown>;
+    const headers = opts.headers as Record<string, string>;
+    expect(headers['Authorization']).toBe('Bearer my-token');
+    expect(headers['X-Custom']).toBe('yes');
+  });
 });
