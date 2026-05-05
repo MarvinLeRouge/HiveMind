@@ -30,7 +30,7 @@
       <RouterLink
         v-for="col in collections"
         :key="col.id"
-        :to="`/collections/${col.id}`"
+        :to="`/collections/${col.slug}`"
         class="rounded-lg border bg-card p-5 shadow-sm transition-shadow hover:shadow-md"
       >
         <h2 class="font-semibold text-card-foreground">{{ col.name }}</h2>
