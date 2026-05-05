@@ -2,8 +2,8 @@ import type { FastifyReply, FastifyRequest } from 'fastify';
 
 /**
  * Verifies that the authenticated user is an owner of the collection
- * identified by `request.params.id`.
- * Returns 403 if the user is not a member or is only a regular member.
+ * identified by `request.params.id` (a slug or UUID).
+ * Returns 404 if the collection does not exist, 403 if the user is not an owner.
  * Must run after the `authenticate` middleware.
  */
 export async function requireOwner(
@@ -12,9 +12,26 @@ export async function requireOwner(
 ): Promise<void> {
   const { id } = request.params as { id: string };
 
+  const collection = await request.server.prisma.collection.findFirst({
+    where: { OR: [{ slug: id }, { id }] },
+    select: { id: true },
+  });
+
+  if (!collection) {
+    await reply.status(404).send({
+      statusCode: 404,
+      error: 'Not Found',
+      message: 'Collection not found',
+    });
+    return;
+  }
+
   const membership = await request.server.prisma.collectionMember.findUnique({
     where: {
-      collectionId_userId: { collectionId: id, userId: request.user.sub },
+      collectionId_userId: {
+        collectionId: collection.id,
+        userId: request.user.sub,
+      },
     },
   });
 

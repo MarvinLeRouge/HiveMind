@@ -23,7 +23,7 @@ beforeAll(async () => {
 
   const bcryptHash = await bcrypt.hash('change_me_admin', 1);
   await prisma.user.update({
-    where: { email: 'admin@HiveMind.local' },
+    where: { email: process.env['SEED_ADMIN_EMAIL'] ?? 'admin@HiveMind.local' },
     data: { passwordHash: bcryptHash },
   });
 
@@ -204,13 +204,13 @@ describe('GET /collections/:id', () => {
     expect(res.statusCode).toBe(403);
   });
 
-  it('returns 403 for an unknown collection (non-member cannot distinguish 403 from 404)', async () => {
+  it('returns 404 for an unknown collection', async () => {
     const res = await app.inject({
       method: 'GET',
       url: '/collections/00000000-0000-0000-0000-000000000000',
       headers: { authorization: `Bearer ${userToken}` },
     });
-    expect(res.statusCode).toBe(403);
+    expect(res.statusCode).toBe(404);
   });
 });
 
@@ -277,13 +277,13 @@ describe('DELETE /collections/:id', () => {
 
     expect(res.statusCode).toBe(204);
 
-    // Verify it's gone (user is no longer a member, so 403)
+    // Verify it's gone — collection no longer exists, so 404
     const getRes = await app.inject({
       method: 'GET',
       url: `/collections/${id}`,
       headers: { authorization: `Bearer ${userToken}` },
     });
-    expect(getRes.statusCode).toBe(403);
+    expect(getRes.statusCode).toBe(404);
   });
 
   it('returns 403 for a non-owner', async () => {

@@ -6,6 +6,16 @@ import type {
 } from '../repositories/collection.repository.js';
 import type { TemplateRepository } from '../repositories/template.repository.js';
 
+/** Converts a name to a URL-safe slug (e.g. "My Collection" → "my-collection"). */
+function slugify(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 /**
  * Business logic for collections.
  *
@@ -30,11 +40,11 @@ export class CollectionService {
   }
 
   /**
-   * Returns a collection by ID.
+   * Returns a collection by slug or UUID.
    * Throws 404 if the collection does not exist.
    */
-  async getById(id: string): Promise<CollectionRow> {
-    const collection = await this.repo.findById(id);
+  async getById(slugOrId: string): Promise<CollectionRow> {
+    const collection = await this.repo.findBySlugOrId(slugOrId);
     if (!collection) throw this.notFound();
     return collection;
   }
@@ -53,8 +63,10 @@ export class CollectionService {
       throw Object.assign(new Error('Template not found'), { statusCode: 404 });
 
     const snapshot = await this.repo.createSnapshot(template);
+    const slug = await this.uniqueSlug(slugify(data.name));
 
     return this.repo.create({
+      slug,
       name: data.name,
       description: data.description,
       createdBy: userId,
@@ -66,30 +78,40 @@ export class CollectionService {
    * Updates a collection's name or description.
    * Throws 404 if the collection does not exist.
    */
-  async update(id: string, data: UpdateCollectionData): Promise<CollectionRow> {
-    const collection = await this.repo.findById(id);
+  async update(
+    slugOrId: string,
+    data: UpdateCollectionData,
+  ): Promise<CollectionRow> {
+    const collection = await this.repo.findBySlugOrId(slugOrId);
     if (!collection) throw this.notFound();
-    return this.repo.update(id, data);
+    const slug =
+      data.name && data.name !== collection.name
+        ? await this.uniqueSlug(slugify(data.name), collection.id)
+        : undefined;
+    return this.repo.update(collection.id, {
+      ...data,
+      ...(slug ? { slug } : {}),
+    });
   }
 
   /**
    * Deletes a collection and all its related data (cascade).
    * Throws 404 if the collection does not exist.
    */
-  async delete(id: string): Promise<void> {
-    const collection = await this.repo.findById(id);
+  async delete(slugOrId: string): Promise<void> {
+    const collection = await this.repo.findBySlugOrId(slugOrId);
     if (!collection) throw this.notFound();
-    await this.repo.delete(id);
+    await this.repo.delete(collection.id);
   }
 
   /**
    * Returns all members of a collection.
    * Throws 404 if the collection does not exist.
    */
-  async listMembers(collectionId: string): Promise<MemberRow[]> {
-    const collection = await this.repo.findById(collectionId);
+  async listMembers(slugOrId: string): Promise<MemberRow[]> {
+    const collection = await this.repo.findBySlugOrId(slugOrId);
     if (!collection) throw this.notFound();
-    return this.repo.findMembers(collectionId);
+    return this.repo.findMembers(collection.id);
   }
 
   /**
@@ -97,22 +119,19 @@ export class CollectionService {
    * Throws 404 if the collection or the target member does not exist.
    * Throws 409 if removing would leave the collection without an owner.
    */
-  async removeMember(
-    collectionId: string,
-    targetUserId: string,
-  ): Promise<void> {
-    const collection = await this.repo.findById(collectionId);
+  async removeMember(slugOrId: string, targetUserId: string): Promise<void> {
+    const collection = await this.repo.findBySlugOrId(slugOrId);
     if (!collection) throw this.notFound();
 
     const targetMembership = await this.repo.findMembership(
-      collectionId,
+      collection.id,
       targetUserId,
     );
     if (!targetMembership)
       throw Object.assign(new Error('Member not found'), { statusCode: 404 });
 
     if (targetMembership.role === 'owner') {
-      const members = await this.repo.findMembers(collectionId);
+      const members = await this.repo.findMembers(collection.id);
       const ownerCount = members.filter((m) => m.role === 'owner').length;
       if (ownerCount <= 1)
         throw Object.assign(new Error('Cannot remove the last owner'), {
@@ -120,7 +139,17 @@ export class CollectionService {
         });
     }
 
-    await this.repo.removeMember(collectionId, targetUserId);
+    await this.repo.removeMember(collection.id, targetUserId);
+  }
+
+  /**
+   * Returns a collection by its URL slug.
+   * Throws 404 if the collection does not exist.
+   */
+  async getBySlug(slug: string): Promise<CollectionRow> {
+    const collection = await this.repo.findBySlug(slug);
+    if (!collection) throw this.notFound();
+    return collection;
   }
 
   // ── Private helpers ────────────────────────────────────────────────────────
@@ -129,5 +158,18 @@ export class CollectionService {
     return Object.assign(new Error('Collection not found'), {
       statusCode: 404,
     });
+  }
+
+  /**
+   * Generates a unique slug by appending -2, -3, … until no conflict is found.
+   */
+  private async uniqueSlug(base: string, excludeId?: string): Promise<string> {
+    let slug = base;
+    let counter = 2;
+    while (await this.repo.slugExists(slug, excludeId)) {
+      slug = `${base}-${counter}`;
+      counter++;
+    }
+    return slug;
   }
 }
