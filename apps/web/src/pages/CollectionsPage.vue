@@ -1,6 +1,6 @@
 <template>
   <div class="container py-8">
-    <div class="mb-6 flex items-center justify-between">
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
       <h1 class="text-2xl font-bold">Collections</h1>
       <RouterLink
         to="/collections/new"

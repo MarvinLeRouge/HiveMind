@@ -6,7 +6,7 @@
 
     <template v-else>
       <!-- Header -->
-      <div class="mb-6 flex items-start justify-between">
+      <div class="mb-6 flex flex-wrap items-start justify-between gap-3">
         <div>
           <RouterLink
             :to="`/collections/${collectionId}`"
@@ -30,7 +30,7 @@
       <form
         v-if="showAddForm"
         aria-label="Add puzzle"
-        class="mb-6 flex gap-3 rounded-md border p-4"
+        class="mb-6 flex flex-col gap-3 rounded-md border p-4 sm:flex-row sm:flex-wrap"
         @submit.prevent="handleAdd"
       >
         <label for="new-puzzle-title" class="sr-only">Puzzle title</label>
@@ -48,7 +48,7 @@
           v-model="newCheckerUrl"
           type="url"
           placeholder="Checker URL (optional)"
-          class="flex h-9 w-64 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring sm:w-64"
         />
         <button
           type="submit"

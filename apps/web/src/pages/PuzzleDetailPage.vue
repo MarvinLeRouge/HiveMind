@@ -6,7 +6,7 @@
 
     <template v-else-if="current">
       <!-- Header -->
-      <div class="mb-6 flex items-start justify-between">
+      <div class="mb-6 flex flex-wrap items-start justify-between gap-3">
         <div>
           <RouterLink
             :to="`/collections/${collectionId}/puzzles`"
@@ -51,7 +51,9 @@
       </div>
 
       <!-- Fields grid -->
-      <div class="mb-6 grid grid-cols-2 gap-x-8 gap-y-3 text-sm md:grid-cols-3">
+      <div
+        class="mb-6 grid grid-cols-1 gap-x-8 gap-y-3 text-sm sm:grid-cols-2 md:grid-cols-3"
+      >
         <div v-if="current.gcCode">
           <span class="font-medium text-muted-foreground">GC Code</span>
           <p>{{ current.gcCode }}</p>
@@ -184,7 +186,7 @@
 
         <form
           aria-label="Add note"
-          class="flex gap-3"
+          class="flex flex-col gap-3 sm:flex-row sm:items-start"
           @submit.prevent="handleAddNote"
         >
           <label for="new-note-content" class="sr-only">Note content</label>
@@ -254,7 +256,7 @@
 
         <form
           aria-label="Record attempt"
-          class="flex gap-3"
+          class="flex flex-col gap-3 sm:flex-row sm:flex-wrap"
           @submit.prevent="handleAddAttempt"
         >
           <label for="attempt-value" class="sr-only">Value to test</label>
@@ -281,7 +283,7 @@
             v-model="newAttemptComment"
             type="text"
             placeholder="Comment (optional)"
-            class="flex h-9 w-48 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring sm:w-48"
           />
           <button
             type="submit"
