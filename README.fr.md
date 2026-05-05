@@ -32,10 +32,10 @@ Chaque **Collection** contient des **Puzzles**. Chaque puzzle peut recevoir des 
 
 | Métrique | Valeur |
 |----------|--------|
-| Endpoints API | 30+ (auth, templates, collections, invitations, puzzles, notes, tentatives, import) |
-| Couverture de tests backend | 98 % (261 tests) |
-| Couverture de tests frontend | 76 % (43 tests) |
-| Fichiers de specs E2E | — *(BLOCK-22)* |
+| Endpoints API | — |
+| Couverture de tests backend | — |
+| Couverture de tests frontend | — |
+| Fichiers de specs E2E | — |
 
 ---
 
