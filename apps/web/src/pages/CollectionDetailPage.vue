@@ -25,13 +25,21 @@
             Template: {{ current.templateSnapshot.name }}
           </p>
         </div>
-        <RouterLink
-          v-if="isOwner"
-          :to="`/collections/${current.id}/settings`"
-          class="text-sm text-muted-foreground hover:text-foreground"
-        >
-          Settings
-        </RouterLink>
+        <div class="flex items-center gap-4">
+          <RouterLink
+            :to="`/collections/${current.slug}/puzzles`"
+            class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90"
+          >
+            View puzzles
+          </RouterLink>
+          <RouterLink
+            v-if="isOwner"
+            :to="`/collections/${current.slug}/settings`"
+            class="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Settings
+          </RouterLink>
+        </div>
       </div>
 
       <!-- Members -->
