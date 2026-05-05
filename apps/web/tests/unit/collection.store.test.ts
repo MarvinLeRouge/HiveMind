@@ -126,6 +126,36 @@ describe('useCollectionStore', () => {
     });
   });
 
+  describe('removeMember', () => {
+    it('removes a member from the list after the API call', async () => {
+      mockFetch.mockResolvedValueOnce(undefined);
+      const store = useCollectionStore();
+      store.members = [mockMember, { ...mockMember, userId: 'user-2' }];
+
+      await store.removeMember('col-1', 'user-2');
+
+      expect(store.members).toHaveLength(1);
+      expect(store.members[0].userId).toBe('user-1');
+    });
+  });
+
+  describe('invite', () => {
+    it('calls the invitations endpoint', async () => {
+      mockFetch.mockResolvedValueOnce(undefined);
+      const store = useCollectionStore();
+
+      await store.invite('col-1', 'bob@example.com');
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/invitations'),
+        expect.objectContaining({
+          method: 'POST',
+          body: { email: 'bob@example.com' },
+        }),
+      );
+    });
+  });
+
   describe('isOwner getter', () => {
     it('returns true when the current user has the owner role', () => {
       const store = useCollectionStore();
