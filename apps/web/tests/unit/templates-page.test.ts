@@ -194,4 +194,60 @@ describe('TemplatesPage', () => {
     expect(wrapper.text()).toContain('GC code');
     expect(wrapper.text()).toContain('Hint');
   });
+
+  it('calls store.delete when the delete button is clicked', async () => {
+    const store = useTemplateStore();
+    const auth = useAuthStore();
+    vi.spyOn(store, 'fetchAll').mockResolvedValue();
+    vi.spyOn(store, 'delete').mockResolvedValue();
+    store.templates = [mockTemplate];
+    auth.user = {
+      id: 'user-1',
+      username: 'alice',
+      email: 'alice@example.com',
+      isAdmin: false,
+      createdAt: '2025-01-01',
+    };
+
+    const router = makeRouter();
+    await router.push('/templates');
+
+    const wrapper = mount(TemplatesPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    await wrapper.find('button').trigger('click');
+    await flushPromises();
+
+    expect(store.delete).toHaveBeenCalledWith('tpl-1');
+  });
+
+  it('shows a delete error when deletion fails', async () => {
+    const store = useTemplateStore();
+    const auth = useAuthStore();
+    vi.spyOn(store, 'fetchAll').mockResolvedValue();
+    vi.spyOn(store, 'delete').mockRejectedValue(new Error('Cannot delete'));
+    store.templates = [mockTemplate];
+    auth.user = {
+      id: 'user-1',
+      username: 'alice',
+      email: 'alice@example.com',
+      isAdmin: false,
+      createdAt: '2025-01-01',
+    };
+
+    const router = makeRouter();
+    await router.push('/templates');
+
+    const wrapper = mount(TemplatesPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    await wrapper.find('button').trigger('click');
+    await flushPromises();
+
+    expect(wrapper.find('[role="alert"]').text()).toContain('Cannot delete');
+  });
 });

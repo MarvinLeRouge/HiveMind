@@ -29,6 +29,7 @@ flags:
       - "apps/web/src/router/index.ts"
       - "apps/web/src/types/**"
       - "apps/web/src/assets/**"
+      - "apps/web/src/composables/**"
       - "apps/web/env.d.ts"
     carryforward: false
 

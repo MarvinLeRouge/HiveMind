@@ -29,17 +29,22 @@
       <!-- Add puzzle form -->
       <form
         v-if="showAddForm"
+        aria-label="Add puzzle"
         class="mb-6 flex gap-3 rounded-md border p-4"
         @submit.prevent="handleAdd"
       >
+        <label for="new-puzzle-title" class="sr-only">Puzzle title</label>
         <input
+          id="new-puzzle-title"
           v-model="newTitle"
           type="text"
           required
           placeholder="Puzzle title"
           class="flex h-9 flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
         />
+        <label for="new-puzzle-checker" class="sr-only">Checker URL</label>
         <input
+          id="new-puzzle-checker"
           v-model="newCheckerUrl"
           type="url"
           placeholder="Checker URL (optional)"
@@ -62,7 +67,7 @@
         No puzzles yet.
       </div>
 
-      <ul v-else class="space-y-2">
+      <ul v-else aria-label="Puzzle list" class="space-y-2">
         <li
           v-for="(puzzle, index) in puzzles"
           :key="puzzle.id"
@@ -75,6 +80,7 @@
           <!-- Drag handle -->
           <span
             v-if="isOwner"
+            aria-hidden="true"
             class="cursor-grab select-none text-muted-foreground"
             title="Drag to reorder"
           >

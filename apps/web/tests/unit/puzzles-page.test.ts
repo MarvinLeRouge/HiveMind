@@ -152,4 +152,77 @@ describe('PuzzlesPage', () => {
 
     expect(wrapper.text()).toContain('Add puzzle');
   });
+
+  it('adds a puzzle and hides the form on success', async () => {
+    const puzzleStore = usePuzzleStore();
+    const collectionStore = useCollectionStore();
+    const authStore = useAuthStore();
+    vi.spyOn(puzzleStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(collectionStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'create').mockResolvedValue({
+      ...mockPuzzle,
+      id: 'pzl-new',
+      title: 'New Puzzle',
+    });
+    authStore.user = {
+      id: 'user-1',
+      username: 'alice',
+      email: 'alice@example.com',
+      isAdmin: true,
+      createdAt: '2025-01-01',
+    };
+
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles');
+
+    const wrapper = mount(PuzzlesPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    await wrapper.find('button').trigger('click');
+    await wrapper
+      .find('input[placeholder="Puzzle title"]')
+      .setValue('New Puzzle');
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    expect(puzzleStore.create).toHaveBeenCalledWith(
+      'col-1',
+      expect.objectContaining({ title: 'New Puzzle' }),
+    );
+  });
+
+  it('shows an error when adding a puzzle fails', async () => {
+    const puzzleStore = usePuzzleStore();
+    const collectionStore = useCollectionStore();
+    const authStore = useAuthStore();
+    vi.spyOn(puzzleStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(collectionStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'create').mockRejectedValue(
+      new Error('Server error'),
+    );
+    authStore.user = {
+      id: 'user-1',
+      username: 'alice',
+      email: 'alice@example.com',
+      isAdmin: true,
+      createdAt: '2025-01-01',
+    };
+
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles');
+
+    const wrapper = mount(PuzzlesPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    await wrapper.find('button').trigger('click');
+    await wrapper.find('input[placeholder="Puzzle title"]').setValue('Bad');
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('Server error');
+  });
 });

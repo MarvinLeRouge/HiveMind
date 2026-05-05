@@ -234,4 +234,123 @@ describe('PuzzleDetailPage', () => {
 
     expect(wrapper.find('[role="alert"]').text()).toContain('Not found');
   });
+
+  it('calls puzzleStore.update when advancing status', async () => {
+    const puzzleStore = usePuzzleStore();
+    const noteStore = useNoteStore();
+    const attemptStore = useAttemptStore();
+    vi.spyOn(puzzleStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(noteStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(attemptStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'update').mockResolvedValue();
+    puzzleStore.current = mockPuzzle;
+
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles/pzl-1');
+
+    const wrapper = mount(PuzzleDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    const statusBtn = wrapper
+      .findAll('button')
+      .find((b) => b.text().startsWith('Mark as'));
+    await statusBtn?.trigger('click');
+    await flushPromises();
+
+    expect(puzzleStore.update).toHaveBeenCalledWith(
+      'col-1',
+      'pzl-1',
+      expect.objectContaining({ status: 'in_progress' }),
+    );
+  });
+
+  it('calls puzzleStore.claim when clicking Claim', async () => {
+    const puzzleStore = usePuzzleStore();
+    const noteStore = useNoteStore();
+    const attemptStore = useAttemptStore();
+    vi.spyOn(puzzleStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(noteStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(attemptStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'claim').mockResolvedValue();
+    puzzleStore.current = mockPuzzle;
+
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles/pzl-1');
+
+    const wrapper = mount(PuzzleDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    const claimBtn = wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Claim');
+    await claimBtn?.trigger('click');
+    await flushPromises();
+
+    expect(puzzleStore.claim).toHaveBeenCalledWith('col-1', 'pzl-1');
+  });
+
+  it('calls noteStore.add when submitting a note', async () => {
+    const puzzleStore = usePuzzleStore();
+    const noteStore = useNoteStore();
+    const attemptStore = useAttemptStore();
+    vi.spyOn(puzzleStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(noteStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(attemptStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(noteStore, 'add').mockResolvedValue();
+    puzzleStore.current = mockPuzzle;
+
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles/pzl-1');
+
+    const wrapper = mount(PuzzleDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    await wrapper
+      .find('textarea[placeholder="Add a note…"]')
+      .setValue('My note');
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    expect(noteStore.add).toHaveBeenCalledWith('pzl-1', 'My note');
+  });
+
+  it('calls attemptStore.add when recording an attempt', async () => {
+    const puzzleStore = usePuzzleStore();
+    const noteStore = useNoteStore();
+    const attemptStore = useAttemptStore();
+    vi.spyOn(puzzleStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(noteStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(attemptStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(attemptStore, 'add').mockResolvedValue();
+    puzzleStore.current = mockPuzzle;
+
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles/pzl-1');
+
+    const wrapper = mount(PuzzleDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    const attemptsTab = wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Attempts');
+    await attemptsTab?.trigger('click');
+    await flushPromises();
+
+    await wrapper.find('input[placeholder="Value to test"]').setValue('12345');
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    expect(attemptStore.add).toHaveBeenCalledWith(
+      'pzl-1',
+      expect.objectContaining({ valueTested: '12345' }),
+    );
+  });
 });
