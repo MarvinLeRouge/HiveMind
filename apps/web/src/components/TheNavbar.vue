@@ -5,6 +5,13 @@
         HiveMind
       </RouterLink>
 
+      <RouterLink
+        to="/templates"
+        class="text-sm text-muted-foreground hover:text-foreground"
+      >
+        Templates
+      </RouterLink>
+
       <div class="ml-auto flex items-center gap-4">
         <span class="text-sm text-muted-foreground">{{
           auth.user?.username
