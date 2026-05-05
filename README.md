@@ -34,7 +34,7 @@ Each **Collection** contains **Puzzles**. Each puzzle can carry free-text **Note
 |--------|-------|
 | API endpoints | 30+ (auth, templates, collections, invitations, puzzles, notes, attempts, import) |
 | Backend test coverage | 98 % (261 tests) |
-| Frontend test coverage | — *(BLOCK-15+)* |
+| Frontend test coverage | 76 % (43 tests) |
 | E2E spec files | — *(BLOCK-22)* |
 
 ---
