@@ -49,6 +49,21 @@ const router = createRouter({
       component: () => import('@/pages/PuzzleDetailPage.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/templates',
+      component: () => import('@/pages/TemplatesPage.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/templates/new',
+      component: () => import('@/pages/TemplateNewPage.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/templates/:id/edit',
+      component: () => import('@/pages/TemplateEditPage.vue'),
+      meta: { requiresAuth: true },
+    },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
 });

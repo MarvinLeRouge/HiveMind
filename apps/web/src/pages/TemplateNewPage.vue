@@ -1,0 +1,202 @@
+<template>
+  <div class="container max-w-2xl py-8">
+    <RouterLink
+      to="/templates"
+      class="text-sm text-muted-foreground hover:text-foreground"
+    >
+      ← Templates
+    </RouterLink>
+    <h1 class="mt-2 text-2xl font-bold">New template</h1>
+
+    <form class="mt-6 space-y-6" @submit.prevent="handleSubmit">
+      <!-- Name -->
+      <div class="space-y-1">
+        <label for="name" class="text-sm font-medium">Name</label>
+        <input
+          id="name"
+          v-model="form.name"
+          type="text"
+          required
+          maxlength="64"
+          placeholder="My template"
+          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+        />
+      </div>
+
+      <!-- Description -->
+      <div class="space-y-1">
+        <label for="description" class="text-sm font-medium">
+          Description
+          <span class="text-muted-foreground">(optional)</span>
+        </label>
+        <textarea
+          id="description"
+          v-model="form.description"
+          rows="2"
+          maxlength="256"
+          placeholder="Short description…"
+          class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+        />
+      </div>
+
+      <!-- Visibility -->
+      <div class="flex items-center gap-2">
+        <input
+          id="isPublic"
+          v-model="form.isPublic"
+          type="checkbox"
+          class="h-4 w-4 rounded border-input"
+        />
+        <label for="isPublic" class="text-sm font-medium">
+          Public (visible to all users)
+        </label>
+      </div>
+
+      <!-- Fields -->
+      <fieldset class="space-y-3 rounded-md border p-4">
+        <legend class="px-1 text-sm font-medium">Puzzle fields</legend>
+
+        <div
+          v-for="field in booleanFields"
+          :key="field.key"
+          class="flex items-center gap-2"
+        >
+          <input
+            :id="field.key"
+            v-model="form[field.key]"
+            type="checkbox"
+            class="h-4 w-4 rounded border-input"
+          />
+          <label :for="field.key" class="text-sm">{{ field.label }}</label>
+        </div>
+
+        <!-- Custom field labels -->
+        <div class="pt-2 space-y-2">
+          <div class="space-y-1">
+            <label
+              for="customField1Label"
+              class="text-xs font-medium text-muted-foreground"
+            >
+              Custom field 1 label (optional, max 32 chars)
+            </label>
+            <input
+              id="customField1Label"
+              v-model="form.customField1Label"
+              type="text"
+              maxlength="32"
+              placeholder="e.g. Zone"
+              class="flex h-8 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+          </div>
+          <div class="space-y-1">
+            <label
+              for="customField2Label"
+              class="text-xs font-medium text-muted-foreground"
+            >
+              Custom field 2 label (optional, max 32 chars)
+            </label>
+            <input
+              id="customField2Label"
+              v-model="form.customField2Label"
+              type="text"
+              maxlength="32"
+              placeholder="e.g. Reference"
+              class="flex h-8 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+          </div>
+        </div>
+      </fieldset>
+
+      <p v-if="error" role="alert" class="text-sm text-destructive">
+        {{ error }}
+      </p>
+
+      <div class="flex gap-3">
+        <button
+          type="submit"
+          :disabled="saving"
+          class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-50"
+        >
+          {{ saving ? 'Saving…' : 'Create template' }}
+        </button>
+        <RouterLink
+          to="/templates"
+          class="inline-flex h-9 items-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
+        >
+          Cancel
+        </RouterLink>
+      </div>
+    </form>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useTemplateStore } from '@/stores/template';
+
+const router = useRouter();
+const store = useTemplateStore();
+
+const saving = ref(false);
+const error = ref('');
+
+const form = ref({
+  name: '',
+  description: '',
+  isPublic: false,
+  useIndex: false,
+  useGcCode: false,
+  useDifficulty: false,
+  useTerrain: false,
+  useCoords: false,
+  useHint: false,
+  useSpoiler: false,
+  customField1Label: '',
+  customField2Label: '',
+});
+
+const booleanFields = [
+  { key: 'useIndex' as const, label: 'Index number' },
+  { key: 'useGcCode' as const, label: 'GC code' },
+  { key: 'useDifficulty' as const, label: 'Difficulty rating' },
+  { key: 'useTerrain' as const, label: 'Terrain rating' },
+  { key: 'useCoords' as const, label: 'Coordinates' },
+  { key: 'useHint' as const, label: 'Hint' },
+  { key: 'useSpoiler' as const, label: 'Spoiler' },
+];
+
+/** Submits the create form. */
+async function handleSubmit() {
+  error.value = '';
+  saving.value = true;
+  try {
+    const payload = {
+      name: form.value.name,
+      ...(form.value.description
+        ? { description: form.value.description }
+        : {}),
+      isPublic: form.value.isPublic,
+      useIndex: form.value.useIndex,
+      useGcCode: form.value.useGcCode,
+      useDifficulty: form.value.useDifficulty,
+      useTerrain: form.value.useTerrain,
+      useCoords: form.value.useCoords,
+      useHint: form.value.useHint,
+      useSpoiler: form.value.useSpoiler,
+      ...(form.value.customField1Label
+        ? { customField1Label: form.value.customField1Label }
+        : {}),
+      ...(form.value.customField2Label
+        ? { customField2Label: form.value.customField2Label }
+        : {}),
+    };
+    await store.create(payload);
+    router.push('/templates');
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : 'Failed to create template.';
+  } finally {
+    saving.value = false;
+  }
+}
+</script>
