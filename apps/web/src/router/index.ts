@@ -8,10 +8,7 @@ import { useAuthStore } from '@/stores/auth';
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {
-      path: '/',
-      redirect: '/collections',
-    },
+    { path: '/', redirect: '/collections' },
     {
       path: '/login',
       component: () => import('@/pages/LoginPage.vue'),
@@ -43,9 +40,16 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/:pathMatch(.*)*',
-      redirect: '/',
+      path: '/collections/:id/puzzles',
+      component: () => import('@/pages/PuzzlesPage.vue'),
+      meta: { requiresAuth: true },
     },
+    {
+      path: '/collections/:id/puzzles/:pid',
+      component: () => import('@/pages/PuzzleDetailPage.vue'),
+      meta: { requiresAuth: true },
+    },
+    { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
 });
 
