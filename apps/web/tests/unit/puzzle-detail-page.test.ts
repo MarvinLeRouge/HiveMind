@@ -6,6 +6,7 @@ import PuzzleDetailPage from '../../src/pages/PuzzleDetailPage.vue';
 import { usePuzzleStore } from '../../src/stores/puzzle';
 import { useNoteStore } from '../../src/stores/note';
 import { useAttemptStore } from '../../src/stores/attempt';
+import { useAuthStore } from '../../src/stores/auth';
 
 vi.mock('../../src/lib/api-fetch', () => ({ apiFetch: vi.fn() }));
 
@@ -352,5 +353,266 @@ describe('PuzzleDetailPage', () => {
       'pzl-1',
       expect.objectContaining({ valueTested: '12345' }),
     );
+  });
+
+  it('renders optional fields (coords, difficulty, terrain, hint, spoiler) when present', async () => {
+    const puzzleStore = usePuzzleStore();
+    const noteStore = useNoteStore();
+    const attemptStore = useAttemptStore();
+    vi.spyOn(puzzleStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(noteStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(attemptStore, 'fetchAll').mockResolvedValue();
+    puzzleStore.current = {
+      ...mockPuzzle,
+      coords: 'N 48° 51.500 E 002° 21.000',
+      difficulty: 3.0,
+      terrain: 2.0,
+      hint: 'Look under the stone',
+      spoiler: 'The answer is 42',
+    };
+
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles/pzl-1');
+
+    const wrapper = mount(PuzzleDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('N 48° 51.500 E 002° 21.000');
+    expect(wrapper.text()).toContain('3 / 5');
+    expect(wrapper.text()).toContain('2 / 5');
+    expect(wrapper.text()).toContain('Look under the stone');
+    expect(wrapper.text()).toContain('Show spoiler');
+  });
+
+  it('shows the Release button when the puzzle is claimed by the current user', async () => {
+    const puzzleStore = usePuzzleStore();
+    const noteStore = useNoteStore();
+    const attemptStore = useAttemptStore();
+    const authStore = useAuthStore();
+    vi.spyOn(puzzleStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(noteStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(attemptStore, 'fetchAll').mockResolvedValue();
+    authStore.user = {
+      id: 'user-1',
+      username: 'alice',
+      email: 'alice@example.com',
+      isAdmin: false,
+      createdAt: '2025-01-01',
+    };
+    puzzleStore.current = { ...mockPuzzle, workingOnId: 'user-1' };
+
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles/pzl-1');
+
+    const wrapper = mount(PuzzleDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('Release');
+  });
+
+  it('calls puzzleStore.unclaim when clicking Release', async () => {
+    const puzzleStore = usePuzzleStore();
+    const noteStore = useNoteStore();
+    const attemptStore = useAttemptStore();
+    const authStore = useAuthStore();
+    vi.spyOn(puzzleStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(noteStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(attemptStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'unclaim').mockResolvedValue();
+    authStore.user = {
+      id: 'user-1',
+      username: 'alice',
+      email: 'alice@example.com',
+      isAdmin: false,
+      createdAt: '2025-01-01',
+    };
+    puzzleStore.current = { ...mockPuzzle, workingOnId: 'user-1' };
+
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles/pzl-1');
+
+    const wrapper = mount(PuzzleDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    const releaseBtn = wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Release');
+    await releaseBtn?.trigger('click');
+    await flushPromises();
+
+    expect(puzzleStore.unclaim).toHaveBeenCalledWith('col-1', 'pzl-1');
+  });
+
+  it('shows an edit form when clicking Edit on an own note', async () => {
+    const puzzleStore = usePuzzleStore();
+    const noteStore = useNoteStore();
+    const attemptStore = useAttemptStore();
+    const authStore = useAuthStore();
+    vi.spyOn(puzzleStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(noteStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(attemptStore, 'fetchAll').mockResolvedValue();
+    authStore.user = {
+      id: 'user-1',
+      username: 'alice',
+      email: 'alice@example.com',
+      isAdmin: false,
+      createdAt: '2025-01-01',
+    };
+    puzzleStore.current = mockPuzzle;
+    noteStore.notes = [mockNote];
+
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles/pzl-1');
+
+    const wrapper = mount(PuzzleDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    const editBtn = wrapper.findAll('button').find((b) => b.text() === 'Edit');
+    await editBtn?.trigger('click');
+    await flushPromises();
+
+    expect(wrapper.find('textarea').exists()).toBe(true);
+  });
+
+  it('calls noteStore.update when saving an edited note', async () => {
+    const puzzleStore = usePuzzleStore();
+    const noteStore = useNoteStore();
+    const attemptStore = useAttemptStore();
+    const authStore = useAuthStore();
+    vi.spyOn(puzzleStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(noteStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(attemptStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(noteStore, 'update').mockResolvedValue();
+    authStore.user = {
+      id: 'user-1',
+      username: 'alice',
+      email: 'alice@example.com',
+      isAdmin: false,
+      createdAt: '2025-01-01',
+    };
+    puzzleStore.current = mockPuzzle;
+    noteStore.notes = [mockNote];
+
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles/pzl-1');
+
+    const wrapper = mount(PuzzleDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    const editBtn = wrapper.findAll('button').find((b) => b.text() === 'Edit');
+    await editBtn?.trigger('click');
+    await flushPromises();
+
+    const saveBtn = wrapper.findAll('button').find((b) => b.text() === 'Save');
+    await saveBtn?.trigger('click');
+    await flushPromises();
+
+    expect(noteStore.update).toHaveBeenCalledWith(
+      'pzl-1',
+      'note-1',
+      expect.any(String),
+    );
+  });
+
+  it('calls noteStore.delete when clicking Delete on an own note', async () => {
+    const puzzleStore = usePuzzleStore();
+    const noteStore = useNoteStore();
+    const attemptStore = useAttemptStore();
+    const authStore = useAuthStore();
+    vi.spyOn(puzzleStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(noteStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(attemptStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(noteStore, 'delete').mockResolvedValue();
+    authStore.user = {
+      id: 'user-1',
+      username: 'alice',
+      email: 'alice@example.com',
+      isAdmin: false,
+      createdAt: '2025-01-01',
+    };
+    puzzleStore.current = mockPuzzle;
+    noteStore.notes = [mockNote];
+
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles/pzl-1');
+
+    const wrapper = mount(PuzzleDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    const deleteBtn = wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Delete');
+    await deleteBtn?.trigger('click');
+    await flushPromises();
+
+    expect(noteStore.delete).toHaveBeenCalledWith('pzl-1', 'note-1');
+  });
+
+  it('shows a note error when adding a note fails', async () => {
+    const puzzleStore = usePuzzleStore();
+    const noteStore = useNoteStore();
+    const attemptStore = useAttemptStore();
+    vi.spyOn(puzzleStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(noteStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(attemptStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(noteStore, 'add').mockRejectedValue(new Error('Server error'));
+    puzzleStore.current = mockPuzzle;
+
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles/pzl-1');
+
+    const wrapper = mount(PuzzleDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    await wrapper.find('textarea[placeholder="Add a note…"]').setValue('bad');
+    await wrapper.find('form[aria-label="Add note"]').trigger('submit');
+    await flushPromises();
+
+    expect(wrapper.find('[role="alert"]').text()).toContain('Server error');
+  });
+
+  it('shows an attempt error when recording an attempt fails', async () => {
+    const puzzleStore = usePuzzleStore();
+    const noteStore = useNoteStore();
+    const attemptStore = useAttemptStore();
+    vi.spyOn(puzzleStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(noteStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(attemptStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(attemptStore, 'add').mockRejectedValue(new Error('Duplicate'));
+    puzzleStore.current = mockPuzzle;
+
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles/pzl-1');
+
+    const wrapper = mount(PuzzleDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    const attemptsTab = wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Attempts');
+    await attemptsTab?.trigger('click');
+    await flushPromises();
+
+    await wrapper.find('input[placeholder="Value to test"]').setValue('bad');
+    await wrapper.find('form[aria-label="Record attempt"]').trigger('submit');
+    await flushPromises();
+
+    expect(wrapper.find('[role="alert"]').text()).toContain('Duplicate');
   });
 });

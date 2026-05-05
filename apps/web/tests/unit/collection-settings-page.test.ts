@@ -117,4 +117,83 @@ describe('CollectionSettingsPage', () => {
     expect(deleteSpy).toHaveBeenCalledWith('col-1');
     expect(router.currentRoute.value.path).toBe('/collections');
   });
+
+  it('calls fetchById when store.current is null on mount', async () => {
+    const store = useCollectionStore();
+    store.current = null;
+    const fetchSpy = vi
+      .spyOn(store, 'fetchById')
+      .mockImplementation(async () => {
+        store.current = mockCollection as never;
+      });
+    const router = makeRouter();
+    await router.push('/collections/col-1/settings');
+
+    mount(CollectionSettingsPage, { global: { plugins: [pinia, router] } });
+    await flushPromises();
+
+    expect(fetchSpy).toHaveBeenCalledWith('col-1');
+  });
+
+  it('shows an error when saving fails', async () => {
+    const store = useCollectionStore();
+    store.current = mockCollection as never;
+    vi.spyOn(store, 'fetchById').mockResolvedValue();
+    vi.spyOn(store, 'update').mockRejectedValue(new Error('Save failed'));
+    const router = makeRouter();
+    await router.push('/collections/col-1/settings');
+
+    const wrapper = mount(CollectionSettingsPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    expect(wrapper.find('[role="alert"]').text()).toContain('Save failed');
+  });
+
+  it('shows an error when deletion fails', async () => {
+    const store = useCollectionStore();
+    store.current = mockCollection as never;
+    vi.spyOn(store, 'fetchById').mockResolvedValue();
+    vi.spyOn(store, 'delete').mockRejectedValue(new Error('Delete failed'));
+    const router = makeRouter();
+    await router.push('/collections/col-1/settings');
+
+    const wrapper = mount(CollectionSettingsPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    await wrapper.find('button.border-destructive').trigger('click');
+    await wrapper.find('button.bg-destructive').trigger('click');
+    await flushPromises();
+
+    expect(wrapper.find('[role="alert"]').text()).toContain('Delete failed');
+  });
+
+  it('passes null description when the field is cleared', async () => {
+    const store = useCollectionStore();
+    store.current = mockCollection as never;
+    vi.spyOn(store, 'fetchById').mockResolvedValue();
+    const updateSpy = vi.spyOn(store, 'update').mockResolvedValue();
+    const router = makeRouter();
+    await router.push('/collections/col-1/settings');
+
+    const wrapper = mount(CollectionSettingsPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    await wrapper.find('textarea#description').setValue('');
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    expect(updateSpy).toHaveBeenCalledWith(
+      'col-1',
+      expect.objectContaining({ description: null }),
+    );
+  });
 });
