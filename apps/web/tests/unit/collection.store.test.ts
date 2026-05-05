@@ -186,5 +186,20 @@ describe('useCollectionStore', () => {
 
       expect(store.isOwner).toBe(false);
     });
+
+    it('returns true for a platform admin regardless of membership', () => {
+      const store = useCollectionStore();
+      const auth = useAuthStore();
+      auth.user = {
+        id: 'user-99',
+        username: 'superadmin',
+        email: 'admin@example.com',
+        isAdmin: true,
+        createdAt: '2025-01-01',
+      };
+      store.members = [mockMember];
+
+      expect(store.isOwner).toBe(true);
+    });
   });
 });

@@ -107,7 +107,7 @@ async function main(): Promise<void> {
 
     const puzzles = [
       {
-        id: 'sample-puzzle-1',
+        id: '10000000-0000-0000-0000-000000000001',
         title: 'The Old Mill',
         sortOrder: 1,
         gcCode: 'GC12345',
@@ -117,7 +117,7 @@ async function main(): Promise<void> {
         hint: 'Look under the big stone near the entrance.',
       },
       {
-        id: 'sample-puzzle-2',
+        id: '10000000-0000-0000-0000-000000000002',
         title: 'Forest Cipher',
         sortOrder: 2,
         gcCode: 'GC23456',
@@ -127,7 +127,7 @@ async function main(): Promise<void> {
         hint: 'Caesar never forgets his salad.',
       },
       {
-        id: 'sample-puzzle-3',
+        id: '10000000-0000-0000-0000-000000000003',
         title: 'The Invisible Ink',
         sortOrder: 3,
         gcCode: 'GC34567',

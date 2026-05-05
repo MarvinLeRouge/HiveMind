@@ -14,9 +14,10 @@ export const useCollectionStore = defineStore('collection', {
   }),
 
   getters: {
-    /** True when the authenticated user is an owner of the current collection. */
+    /** True when the authenticated user is an owner or a platform admin. */
     isOwner(state): boolean {
       const auth = useAuthStore();
+      if (auth.user?.isAdmin) return true;
       return state.members.some(
         (m) => m.userId === auth.user?.id && m.role === 'owner',
       );
