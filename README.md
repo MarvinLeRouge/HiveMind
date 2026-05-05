@@ -13,8 +13,8 @@
 [![Vue.js](https://img.shields.io/badge/vue-3-42b883?logo=vue.js)](https://vuejs.org)
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-336791?logo=postgresql)](https://www.postgresql.org)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![Codecov backend](https://codecov.io/gh/MarvinLeRouge/HiveMind/branch/main/graph/badge.svg?flag=backend)](https://codecov.io/gh/MarvinLeRouge/HiveMind)
-[![Codecov frontend](https://codecov.io/gh/MarvinLeRouge/HiveMind/branch/main/graph/badge.svg?flag=frontend)](https://codecov.io/gh/MarvinLeRouge/HiveMind)
+[![Backend coverage](https://img.shields.io/codecov/c/github/MarvinLeRouge/HiveMind/main?flag=backend&label=backend&logo=codecov)](https://app.codecov.io/gh/MarvinLeRouge/HiveMind)
+[![Frontend coverage](https://img.shields.io/codecov/c/github/MarvinLeRouge/HiveMind/main?flag=frontend&label=frontend&logo=codecov)](https://app.codecov.io/gh/MarvinLeRouge/HiveMind)
 
 ---
 
@@ -34,7 +34,7 @@ Each **Collection** contains **Puzzles**. Each puzzle can carry free-text **Note
 |--------|-------|
 | API endpoints | 30+ (auth, templates, collections, invitations, puzzles, notes, attempts, import) |
 | Backend test coverage | 98 % (261 tests) |
-| Frontend test coverage | 76 % (43 tests) |
+| Frontend test coverage | 81 % (43 tests) |
 | E2E spec files | — *(BLOCK-22)* |
 
 ---
