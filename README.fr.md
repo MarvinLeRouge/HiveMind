@@ -32,9 +32,9 @@ Chaque **Collection** contient des **Puzzles**. Chaque puzzle peut recevoir des 
 
 | Métrique | Valeur |
 |----------|--------|
-| Endpoints API | 30+ (auth, templates, collections, invitations, puzzles, notes, tentatives, import) |
+| Endpoints API | 38 (auth, templates, collections, invitations, puzzles, notes, tentatives, import) |
 | Couverture de tests backend | 98 % (261 tests) |
-| Couverture de tests frontend | 81 % (43 tests) |
+| Couverture de tests frontend | 91 % (140 tests) |
 | Fichiers de specs E2E | — *(BLOCK-22)* |
 
 ---
@@ -210,6 +210,7 @@ docker compose down
 | GET | /auth/me | ✓ | Retourner l'utilisateur courant |
 | GET | /templates | ✓ | Lister les templates |
 | POST | /templates | ✓ | Créer un template utilisateur |
+| GET | /templates/:id | ✓ | Obtenir un template par ID |
 | PATCH | /templates/:id | ✓ | Modifier son propre template |
 | DELETE | /templates/:id | ✓ | Supprimer son propre template |
 | GET | /collections | ✓ | Lister mes collections |
@@ -328,13 +329,13 @@ docker compose exec api npx prisma db seed
 
 ### V2 — Frontend
 
-- [ ] BLOCK-15 · Setup Vue 3 (routing, Pinia, Tailwind, ofetch)
-- [ ] BLOCK-16 · UI Authentification (login, register)
-- [ ] BLOCK-17 · UI Collections (liste, création, invitation)
-- [ ] BLOCK-18 · UI Puzzles (tableau, détail, notes, tentatives)
-- [ ] BLOCK-19 · UI Template builder
-- [ ] BLOCK-20 · Passe qualité frontend (couverture, a11y, responsive)
-- [ ] BLOCK-21 · Intégration CI frontend + finalisation CD
+- [x] BLOCK-15 · Setup Vue 3 (routing, Pinia, Tailwind, ofetch)
+- [x] BLOCK-16 · UI Authentification (login, register)
+- [x] BLOCK-17 · UI Collections (liste, création, invitation)
+- [x] BLOCK-18 · UI Puzzles (tableau, détail, notes, tentatives)
+- [x] BLOCK-19 · UI Template builder
+- [x] BLOCK-20 · Passe qualité frontend (couverture, a11y, responsive)
+- [x] BLOCK-21 · Intégration CI frontend + finalisation CD
 
 ### V3 — Qualité & Production
 

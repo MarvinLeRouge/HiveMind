@@ -32,9 +32,9 @@ Each **Collection** contains **Puzzles**. Each puzzle can carry free-text **Note
 
 | Metric | Value |
 |--------|-------|
-| API endpoints | 30+ (auth, templates, collections, invitations, puzzles, notes, attempts, import) |
+| API endpoints | 38 (auth, templates, collections, invitations, puzzles, notes, attempts, import) |
 | Backend test coverage | 98 % (261 tests) |
-| Frontend test coverage | 81 % (43 tests) |
+| Frontend test coverage | 91 % (140 tests) |
 | E2E spec files | — *(BLOCK-22)* |
 
 ---
@@ -210,6 +210,7 @@ docker compose down
 | GET | /auth/me | ✓ | Return current user |
 | GET | /templates | ✓ | List templates |
 | POST | /templates | ✓ | Create user template |
+| GET | /templates/:id | ✓ | Get template by ID |
 | PATCH | /templates/:id | ✓ | Update own template |
 | DELETE | /templates/:id | ✓ | Delete own template |
 | GET | /collections | ✓ | List my collections |
@@ -328,13 +329,13 @@ docker compose exec api npx prisma db seed
 
 ### V2 — Frontend
 
-- [ ] BLOCK-15 · Vue 3 project setup (routing, Pinia, Tailwind, ofetch)
-- [ ] BLOCK-16 · Auth UI (login, register)
-- [ ] BLOCK-17 · Collections UI (list, create, invite)
-- [ ] BLOCK-18 · Puzzles UI (table, detail, notes, attempts)
-- [ ] BLOCK-19 · Template builder UI
-- [ ] BLOCK-20 · Frontend quality pass (coverage, a11y, responsive)
-- [ ] BLOCK-21 · CI frontend integration + CD finalization
+- [x] BLOCK-15 · Vue 3 project setup (routing, Pinia, Tailwind, ofetch)
+- [x] BLOCK-16 · Auth UI (login, register)
+- [x] BLOCK-17 · Collections UI (list, create, invite)
+- [x] BLOCK-18 · Puzzles UI (table, detail, notes, attempts)
+- [x] BLOCK-19 · Template builder UI
+- [x] BLOCK-20 · Frontend quality pass (coverage, a11y, responsive)
+- [x] BLOCK-21 · CI frontend integration + CD finalization
 
 ### V3 — Quality & Production
 
