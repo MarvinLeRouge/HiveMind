@@ -18,7 +18,7 @@ flags:
       # Entry point and startup wiring — not unit-testable in isolation
       - "apps/api/src/index.ts"
       - "apps/api/src/config/env.ts"
-    carryforward: false
+    carryforward: true
   frontend:
     paths:
       - apps/web/src/
@@ -31,7 +31,7 @@ flags:
       - "apps/web/src/assets/**"
       - "apps/web/src/composables/**"
       - "apps/web/env.d.ts"
-    carryforward: false
+    carryforward: true
 
 coverage:
   status:
