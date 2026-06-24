@@ -4,8 +4,6 @@ services:
       context: .
       dockerfile: apps/api/Dockerfile
       target: dev
-    ports:
-      - "3000:3000"
     volumes:
       - ./apps/api/src:/app/apps/api/src
       - ./apps/api/tests:/app/apps/api/tests
@@ -17,19 +15,37 @@ services:
       db:
         condition: service_healthy
     restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-public"
+      - "traefik.http.routers.hivemind-api-dev.rule=Host(`hivemind.marvinlerouge.local`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.hivemind-api-dev.entrypoints=web"
+      - "traefik.http.routers.hivemind-api-dev.middlewares=hivemind-strip-api-dev"
+      - "traefik.http.routers.hivemind-api-dev.service=hivemind-backend-dev"
+      - "traefik.http.middlewares.hivemind-strip-api-dev.stripprefix.prefixes=/api"
+      - "traefik.http.services.hivemind-backend-dev.loadbalancer.server.port=3000"
+    networks:
+      - traefik-public
+      - internal
 
   frontend:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
       target: dev
-    ports:
-      - "5173:5173"
     volumes:
       - ./apps/web/src:/app/apps/web/src
     env_file:
       - ./apps/web/.env
     restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-public"
+      - "traefik.http.routers.hivemind-frontend-dev.rule=Host(`hivemind.marvinlerouge.local`)"
+      - "traefik.http.routers.hivemind-frontend-dev.entrypoints=web"
+      - "traefik.http.services.hivemind-frontend-dev.loadbalancer.server.port=5173"
+    networks:
+      - traefik-public
 
   db:
     image: postgres:16-alpine
@@ -38,7 +54,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: HiveMind
     ports:
-      - "5434:5432"
+      - "127.0.0.1:5434:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -47,6 +63,14 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
+    networks:
+      - internal
 
 volumes:
   pgdata:
+
+networks:
+  traefik-public:
+    external: true
+  internal:
+    driver: bridge
