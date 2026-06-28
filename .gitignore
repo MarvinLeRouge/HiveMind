@@ -43,7 +43,7 @@ Thumbs.db
 /.fleet
 
 # ─── Work in progress ──────────────────────────────────────────────────────────
-docs/work-in-progress/
+docs/ai/
 
 # ─── Claude Code ───────────────────────────────────────────────────────────────
 CLAUDE.md
