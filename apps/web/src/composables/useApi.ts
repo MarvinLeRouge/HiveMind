@@ -21,11 +21,12 @@ export function useApi() {
 
     onRequest({ options }) {
       if (auth.accessToken) {
-        const existing = (options.headers as Record<string, string>) ?? {};
+        const existing =
+          (options.headers as unknown as Record<string, string>) ?? {};
         options.headers = {
           ...existing,
           Authorization: `Bearer ${auth.accessToken}`,
-        };
+        } as unknown as Headers;
       }
     },
 
@@ -36,11 +37,12 @@ export function useApi() {
           const retryOptions: FetchOptions = {
             ...options,
             headers: {
-              ...(options.headers as Record<string, string>),
+              ...(options.headers as unknown as Record<string, string>),
               Authorization: `Bearer ${auth.accessToken}`,
             },
           };
-          return ofetch(request as string, retryOptions);
+          await ofetch(request as string, retryOptions);
+          return;
         }
         await router.push('/login');
       }

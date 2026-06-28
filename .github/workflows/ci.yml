@@ -102,6 +102,9 @@ jobs:
       - name: Lint
         run: pnpm --filter api lint
 
+      - name: Typecheck
+        run: pnpm --filter api typecheck
+
       - name: Test with coverage
         run: pnpm --filter api test:coverage
 
@@ -138,6 +141,9 @@ jobs:
 
       - name: Lint
         run: pnpm --filter web lint
+
+      - name: Typecheck
+        run: pnpm --filter web typecheck
 
       - name: Test with coverage
         run: pnpm --filter web test:coverage

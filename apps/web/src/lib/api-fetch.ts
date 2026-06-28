@@ -17,7 +17,7 @@ export async function apiFetch<T>(
     ...options,
     credentials: 'include',
     headers: {
-      ...(options?.headers as Record<string, string>),
+      ...(options?.headers as unknown as Record<string, string>),
       ...(auth.accessToken
         ? { Authorization: `Bearer ${auth.accessToken}` }
         : {}),
@@ -25,7 +25,7 @@ export async function apiFetch<T>(
   });
 
   try {
-    return await ofetch<T>(url, withAuth());
+    return await ofetch<T>(url, withAuth() as unknown as FetchOptions<'json'>);
   } catch (err: unknown) {
     const status =
       err && typeof err === 'object' && 'status' in err
@@ -34,7 +34,8 @@ export async function apiFetch<T>(
 
     if (status === 401) {
       const refreshed = await auth.refresh();
-      if (refreshed) return ofetch<T>(url, withAuth());
+      if (refreshed)
+        return ofetch<T>(url, withAuth() as unknown as FetchOptions<'json'>);
       auth.accessToken = null;
       auth.user = null;
     }

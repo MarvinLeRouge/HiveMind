@@ -1,4 +1,4 @@
-import type { PrismaClient, Puzzle } from '@prisma/client';
+import type { PrismaClient, Puzzle, Prisma } from '@prisma/client';
 
 /** Template flags needed for field-filtering puzzle responses. */
 type TemplateFlags = {
@@ -113,9 +113,12 @@ export class PuzzleRepository {
    */
   async create(data: CreatePuzzleData): Promise<PuzzleRow> {
     return this.prisma.puzzle.create({
-      data,
+      data: {
+        ...data,
+        customFields: data.customFields as Prisma.InputJsonValue | undefined,
+      },
       include: PUZZLE_INCLUDE,
-    }) as Promise<PuzzleRow>;
+    }) as unknown as Promise<PuzzleRow>;
   }
 
   /**
@@ -124,16 +127,27 @@ export class PuzzleRepository {
   async update(id: string, data: UpdatePuzzleData): Promise<PuzzleRow> {
     return this.prisma.puzzle.update({
       where: { id },
-      data,
+      data: {
+        ...data,
+        customFields: data.customFields as unknown as
+          | Prisma.NullableJsonNullValueInput
+          | Prisma.InputJsonValue
+          | undefined,
+      },
       include: PUZZLE_INCLUDE,
-    }) as Promise<PuzzleRow>;
+    }) as unknown as Promise<PuzzleRow>;
   }
 
   /**
    * Bulk-inserts multiple puzzles and returns the number created.
    */
   async createMany(data: CreatePuzzleData[]): Promise<number> {
-    const result = await this.prisma.puzzle.createMany({ data });
+    const result = await this.prisma.puzzle.createMany({
+      data: data.map(({ customFields, ...rest }) => ({
+        ...rest,
+        customFields: customFields as Prisma.InputJsonValue | undefined,
+      })),
+    });
     return result.count;
   }
 

@@ -1,5 +1,8 @@
 import { parse } from 'csv-parse/sync';
-import type { PuzzleRepository } from '../repositories/puzzle.repository.js';
+import type {
+  PuzzleRepository,
+  CreatePuzzleData,
+} from '../repositories/puzzle.repository.js';
 
 /** Maps a CSV column name to a target puzzle field name. */
 export type ColumnMapping = Record<string, string>;
@@ -87,8 +90,6 @@ export class CsvImportService {
 
     if (puzzles.length === 0) return 0;
 
-    return this.repo.createMany(
-      puzzles as Parameters<typeof this.repo.createMany>[0],
-    );
+    return this.repo.createMany(puzzles as unknown as CreatePuzzleData[]);
   }
 }
