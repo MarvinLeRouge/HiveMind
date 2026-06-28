@@ -251,6 +251,11 @@ docker compose down
 - Node.js 20 LTS
 - pnpm 9+
 - Docker + Docker Compose
+- Traefik running locally with a `traefik-public` Docker network
+- `hivemind.marvinlerouge.local` added to `/etc/hosts`:
+  ```
+  echo "127.0.0.1 hivemind.marvinlerouge.local" | sudo tee -a /etc/hosts
+  ```
 
 ### Local development
 
@@ -270,13 +275,13 @@ cp apps/web/.env.example apps/web/.env
 docker compose up -d
 
 # Apply migrations and seed the database
-docker compose exec api npx prisma migrate deploy
-docker compose exec api npx prisma db seed
+docker compose exec backend npx prisma migrate deploy
+docker compose exec backend npx prisma db seed
 
 # The app is now running:
-#   API:          http://localhost:3000
-#   Swagger UI:   http://localhost:3000/docs
-#   Frontend:     http://localhost:5173
+#   Frontend:     http://hivemind.marvinlerouge.local
+#   API:          http://hivemind.marvinlerouge.local/api
+#   Swagger UI:   http://hivemind.marvinlerouge.local/api/docs
 ```
 
 ---
