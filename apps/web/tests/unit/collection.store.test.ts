@@ -35,6 +35,7 @@ const mockTemplate = {
 
 const mockCollection = {
   id: 'col-1',
+  slug: 'test-collection',
   name: 'Test Collection',
   description: null,
   createdBy: 'user-1',

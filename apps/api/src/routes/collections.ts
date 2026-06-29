@@ -27,6 +27,7 @@ import {
 /** Serializes a CollectionRow to the API response shape. */
 function serializeCollection(c: {
   id: string;
+  slug: string;
   name: string;
   description: string | null;
   createdBy: string;

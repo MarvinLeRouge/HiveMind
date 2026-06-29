@@ -28,7 +28,7 @@ export const createPuzzleBodySchema = z.object({
   coords: z.string().optional(),
   hint: z.string().optional(),
   spoiler: z.string().optional(),
-  customFields: z.record(z.unknown()).optional(),
+  customFields: z.record(z.string(), z.unknown()).optional(),
 });
 
 /** Request body for partially updating a puzzle (at least one field required). */
@@ -43,7 +43,7 @@ export const updatePuzzleBodySchema = z
     coords: z.string().nullable().optional(),
     hint: z.string().nullable().optional(),
     spoiler: z.string().nullable().optional(),
-    customFields: z.record(z.unknown()).nullable().optional(),
+    customFields: z.record(z.string(), z.unknown()).nullable().optional(),
   })
   .refine((data) => Object.keys(data).length > 0, {
     message: 'At least one field must be provided',
