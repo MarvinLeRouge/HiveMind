@@ -9,7 +9,7 @@ import { useTemplateStore } from '../../src/stores/template';
 vi.mock('../../src/lib/api-fetch', () => ({ apiFetch: vi.fn() }));
 
 const mockTemplate = { id: 'tpl-1', name: 'Generic' };
-const mockCollection = { id: 'col-new', name: 'My Col' };
+const mockCollection = { id: 'col-new', slug: 'col-new', name: 'My Col' };
 
 function makeRouter() {
   return createRouter({

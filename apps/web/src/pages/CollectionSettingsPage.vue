@@ -100,7 +100,7 @@ const confirmDelete = ref(false);
 const error = ref('');
 
 onMounted(async () => {
-  if (!store.current || store.current.id !== route.params.id) {
+  if (!store.current || store.current.slug !== route.params.id) {
     await store.fetchById(route.params.id as string);
   }
   if (store.current) {
