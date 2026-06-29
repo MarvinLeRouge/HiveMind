@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-/** Route params containing a collection ID and a puzzle ID. */
+/** Route params containing a collection slug (or UUID) and a puzzle UUID. */
 export const puzzleParamsSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().min(1),
   pid: z.string().uuid(),
 });
 
