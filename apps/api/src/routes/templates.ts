@@ -66,7 +66,7 @@ export default async function templateRoutes(
       tags: ['templates'],
       summary: 'Get a template by ID',
       security: [{ bearerAuth: [] }],
-      params: templateIdParamSchema,
+      params: templateAnyIdParamSchema,
       response: { 200: templateSchema, 404: errorSchema },
     },
     preHandler: authenticate,
