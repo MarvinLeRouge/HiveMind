@@ -79,7 +79,7 @@ describe('useTemplateStore', () => {
   });
 
   describe('update', () => {
-    it('updates the template and syncs the list', async () => {
+    it('updates a user template via PATCH /templates/:id', async () => {
       const updated = { ...mockTemplate, name: 'Renamed' };
       mockFetch.mockResolvedValueOnce(updated);
       const store = useTemplateStore();
@@ -88,8 +88,34 @@ describe('useTemplateStore', () => {
 
       await store.update('tpl-1', { name: 'Renamed' });
 
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/templates/tpl-1'),
+        expect.objectContaining({ method: 'PATCH' }),
+      );
       expect(store.current?.name).toBe('Renamed');
       expect(store.templates[0].name).toBe('Renamed');
+    });
+
+    it('updates a system template via PATCH /templates/system/:id', async () => {
+      const systemTemplate = {
+        ...mockTemplate,
+        id: 'system-template-generic',
+        isSystem: true,
+        createdBy: null,
+      };
+      const updated = { ...systemTemplate, description: 'Updated' };
+      mockFetch.mockResolvedValueOnce(updated);
+      const store = useTemplateStore();
+      store.templates = [systemTemplate];
+      store.current = systemTemplate;
+
+      await store.update('system-template-generic', { description: 'Updated' });
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/templates/system/system-template-generic'),
+        expect.objectContaining({ method: 'PATCH' }),
+      );
+      expect(store.current?.description).toBe('Updated');
     });
   });
 
