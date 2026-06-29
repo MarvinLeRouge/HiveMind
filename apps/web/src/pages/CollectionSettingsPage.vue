@@ -2,7 +2,7 @@
   <div class="container max-w-lg py-8">
     <div class="mb-6 flex items-center gap-4">
       <RouterLink
-        :to="`/collections/${route.params.id}`"
+        :to="`/collections/${store.current?.slug ?? route.params.id}`"
         class="text-sm text-muted-foreground hover:text-foreground"
       >
         ← Collection
@@ -118,7 +118,7 @@ async function handleSave() {
       name: form.value.name,
       description: form.value.description || null,
     });
-    await router.push(`/collections/${route.params.id}`);
+    await router.push(`/collections/${store.current!.slug}`);
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Failed to save changes.';
   } finally {

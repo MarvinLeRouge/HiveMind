@@ -9,6 +9,7 @@ vi.mock('../../src/lib/api-fetch', () => ({ apiFetch: vi.fn() }));
 
 const mockCollection = {
   id: 'col-1',
+  slug: 'test-collection',
   name: 'Test Collection',
   description: 'A desc',
   createdBy: 'user-1',
@@ -76,6 +77,33 @@ describe('CollectionSettingsPage', () => {
       'col-1',
       expect.objectContaining({ name: 'Renamed' }),
     );
+  });
+
+  it('redirects to the new slug after rename', async () => {
+    const store = useCollectionStore();
+    store.current = mockCollection as never;
+    store.members = [];
+    vi.spyOn(store, 'fetchById').mockResolvedValue();
+    vi.spyOn(store, 'update').mockImplementation(async () => {
+      store.current = {
+        ...mockCollection,
+        name: 'Renamed',
+        slug: 'renamed',
+      } as never;
+    });
+    const router = makeRouter();
+    await router.push('/collections/test-collection/settings');
+
+    const wrapper = mount(CollectionSettingsPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    await wrapper.find('input#name').setValue('Renamed');
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    expect(router.currentRoute.value.path).toBe('/collections/renamed');
   });
 
   it('shows the delete confirmation when the delete button is clicked', async () => {
