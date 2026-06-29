@@ -34,9 +34,13 @@ export const useTemplateStore = defineStore('template', {
       return template;
     },
 
-    /** Updates an existing template. */
+    /** Updates an existing template, routing to the system endpoint when needed. */
     async update(id: string, data: Partial<Template>): Promise<void> {
-      const updated = await apiFetch<Template>(`${BASE_URL}/templates/${id}`, {
+      const isSystem = this.current?.isSystem ?? false;
+      const url = isSystem
+        ? `${BASE_URL}/templates/system/${id}`
+        : `${BASE_URL}/templates/${id}`;
+      const updated = await apiFetch<Template>(url, {
         method: 'PATCH',
         body: data,
       });

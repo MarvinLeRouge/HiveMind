@@ -112,7 +112,7 @@ async function handleSubmit() {
       description: form.value.description || undefined,
       templateId: form.value.templateId,
     });
-    await router.push(`/collections/${collection.id}`);
+    await router.push(`/collections/${collection.slug}`);
   } catch (e) {
     error.value =
       e instanceof Error ? e.message : 'Failed to create collection.';

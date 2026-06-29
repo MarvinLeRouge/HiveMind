@@ -141,6 +141,16 @@ describe('GET /templates/:id', () => {
     expect(res.json().id).toBe(id);
   });
 
+  it('returns a system template by slug ID', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/templates/system-template-generic',
+      headers: { authorization: `Bearer ${userToken}` },
+    });
+    expect(res.statusCode).toBe(200);
+    expect(res.json().isSystem).toBe(true);
+  });
+
   it('returns 404 for unknown ID', async () => {
     const res = await app.inject({
       method: 'GET',
