@@ -423,7 +423,7 @@ describe('Template snapshot isolation', () => {
       method: 'POST',
       url: '/templates',
       headers: { authorization: `Bearer ${userToken}` },
-      payload: { name: 'Ephemeral Template', useGcCode: true },
+      payload: { name: 'Ephemeral Template', gcCodeMode: 'optional' },
     });
     const templateId = tplRes.json().id as string;
 

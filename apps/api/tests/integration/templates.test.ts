@@ -270,12 +270,12 @@ describe('POST /templates/system', () => {
       method: 'POST',
       url: '/templates/system',
       headers: { authorization: `Bearer ${adminToken}` },
-      payload: { name: 'New System Template', useGcCode: true },
+      payload: { name: 'New System Template', gcCodeMode: 'optional' },
     });
     expect(res.statusCode).toBe(201);
     const body = res.json();
     expect(body.isSystem).toBe(true);
-    expect(body.useGcCode).toBe(true);
+    expect(body.gcCodeMode).toBe('optional');
   });
 
   it('returns 403 when caller is not admin', async () => {

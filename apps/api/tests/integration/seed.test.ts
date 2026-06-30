@@ -57,12 +57,12 @@ async function reseed(): Promise<void> {
       description: 'Template for geocaching mystery series.',
       isSystem: true,
       isPublic: true,
-      useGcCode: true,
-      useDifficulty: true,
-      useTerrain: true,
-      useCoords: true,
-      useHint: true,
-      useSpoiler: true,
+      gcCodeMode: 'optional',
+      difficultyMode: 'optional',
+      terrainMode: 'optional',
+      coordsMode: 'optional',
+      hintMode: 'optional',
+      spoilerMode: 'optional',
     },
   });
 
@@ -157,14 +157,13 @@ describe('Seed integrity — System templates', () => {
     expect(template!.name).toBe('Geocaching');
     expect(template!.isSystem).toBe(true);
     expect(template!.isPublic).toBe(true);
-    expect(template!.useGcCode).toBe(true);
-    expect(template!.useDifficulty).toBe(true);
-    expect(template!.useTerrain).toBe(true);
-    expect(template!.useCoords).toBe(true);
-    expect(template!.useHint).toBe(true);
-    expect(template!.useSpoiler).toBe(true);
-    // These should remain disabled in the geocaching template
-    expect(template!.useIndex).toBe(false);
+    expect(template!.gcCodeMode).toBe('optional');
+    expect(template!.difficultyMode).toBe('optional');
+    expect(template!.terrainMode).toBe('optional');
+    expect(template!.coordsMode).toBe('optional');
+    expect(template!.hintMode).toBe('optional');
+    expect(template!.spoilerMode).toBe('optional');
+    expect(template!.indexMode).toBe('disabled');
   });
 });
 
