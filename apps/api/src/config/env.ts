@@ -14,6 +14,13 @@ const envSchema = z.object({
   SEED_ADMIN_USERNAME: z.string().min(1).optional(),
   SEED_ADMIN_EMAIL: z.string().email().optional(),
   SEED_ADMIN_PASSWORD: z.string().min(8).optional(),
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.coerce.number().int().positive().default(587),
+  SMTP_SECURE: z.coerce.boolean().default(false),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  SMTP_FROM: z.string().optional(),
+  FRONTEND_BASE_URL: z.string().url().optional(),
 });
 
 /**
