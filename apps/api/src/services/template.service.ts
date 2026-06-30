@@ -87,14 +87,33 @@ export class TemplateService {
   }
 
   /**
-   * Deletes a user-owned template. Restricted to the creator.
-   * Throws 403 if caller is not the creator.
-   * Throws 404 if template does not exist.
+   * Deletes a user-owned template.
+   * Admins may delete any non-system template; regular users may only delete
+   * templates they created.
+   * Throws 403 if the caller lacks permission.
+   * Throws 404 if the template does not exist.
    */
-  async deleteUserTemplate(userId: string, id: string): Promise<void> {
+  async deleteUserTemplate(
+    userId: string,
+    isAdmin: boolean,
+    id: string,
+  ): Promise<void> {
     const template = await this.repo.findById(id);
     if (!template) throw this.notFound();
-    if (template.createdBy !== userId) throw this.forbidden();
+    if (template.isSystem) throw this.forbidden();
+    if (!isAdmin && template.createdBy !== userId) throw this.forbidden();
+    await this.repo.delete(id);
+  }
+
+  /**
+   * Deletes a system template. Restricted to platform admins.
+   * Throws 403 if caller is not admin.
+   * Throws 404 if the template does not exist.
+   */
+  async deleteSystemTemplate(isAdmin: boolean, id: string): Promise<void> {
+    if (!isAdmin) throw this.forbidden();
+    const template = await this.repo.findById(id);
+    if (!template) throw this.notFound();
     await this.repo.delete(id);
   }
 

@@ -120,7 +120,8 @@ export default async function templateRoutes(
   typed.delete('/:id', {
     schema: {
       tags: ['templates'],
-      summary: 'Delete own template',
+      summary:
+        'Delete own template (admins may delete any non-system template)',
       security: [{ bearerAuth: [] }],
       params: templateIdParamSchema,
       response: {
@@ -131,7 +132,34 @@ export default async function templateRoutes(
     },
     preHandler: authenticate,
     handler: async (request, reply) => {
-      await service.deleteUserTemplate(request.user.sub, request.params.id);
+      await service.deleteUserTemplate(
+        request.user.sub,
+        request.user.isAdmin,
+        request.params.id,
+      );
+      return reply.status(204).send({});
+    },
+  });
+
+  // ── DELETE /templates/system/:id ──────────────────────────────────────────
+  typed.delete('/system/:id', {
+    schema: {
+      tags: ['templates'],
+      summary: 'Delete a system template (admin only)',
+      security: [{ bearerAuth: [] }],
+      params: templateAnyIdParamSchema,
+      response: {
+        204: z.object({}),
+        403: errorSchema,
+        404: errorSchema,
+      },
+    },
+    preHandler: authenticate,
+    handler: async (request, reply) => {
+      await service.deleteSystemTemplate(
+        request.user.isAdmin,
+        request.params.id,
+      );
       return reply.status(204).send({});
     },
   });

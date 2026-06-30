@@ -49,9 +49,14 @@ export const useTemplateStore = defineStore('template', {
       if (idx !== -1) this.templates[idx] = updated;
     },
 
-    /** Deletes a template. */
+    /** Deletes a template, routing to the system endpoint when needed. */
     async delete(id: string): Promise<void> {
-      await apiFetch(`${BASE_URL}/templates/${id}`, { method: 'DELETE' });
+      const isSystem =
+        this.templates.find((t) => t.id === id)?.isSystem ?? false;
+      const url = isSystem
+        ? `${BASE_URL}/templates/system/${id}`
+        : `${BASE_URL}/templates/${id}`;
+      await apiFetch(url, { method: 'DELETE' });
       this.templates = this.templates.filter((t) => t.id !== id);
       if (this.current?.id === id) this.current = null;
     },

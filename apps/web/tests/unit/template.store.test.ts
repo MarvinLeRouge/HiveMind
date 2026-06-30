@@ -120,7 +120,7 @@ describe('useTemplateStore', () => {
   });
 
   describe('delete', () => {
-    it('removes the template from the list and clears current', async () => {
+    it('deletes a user template via DELETE /templates/:id', async () => {
       mockFetch.mockResolvedValueOnce(undefined);
       const store = useTemplateStore();
       store.templates = [mockTemplate];
@@ -128,8 +128,33 @@ describe('useTemplateStore', () => {
 
       await store.delete('tpl-1');
 
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/templates/tpl-1'),
+        expect.objectContaining({ method: 'DELETE' }),
+      );
       expect(store.templates).toHaveLength(0);
       expect(store.current).toBeNull();
+    });
+
+    it('deletes a system template via DELETE /templates/system/:id', async () => {
+      const systemTemplate = {
+        ...mockTemplate,
+        id: 'system-template-generic',
+        isSystem: true,
+        createdBy: null,
+      };
+      mockFetch.mockResolvedValueOnce(undefined);
+      const store = useTemplateStore();
+      store.templates = [systemTemplate];
+      store.current = systemTemplate;
+
+      await store.delete('system-template-generic');
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/templates/system/system-template-generic'),
+        expect.objectContaining({ method: 'DELETE' }),
+      );
+      expect(store.templates).toHaveLength(0);
     });
   });
 });
