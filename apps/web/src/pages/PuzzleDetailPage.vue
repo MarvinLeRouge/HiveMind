@@ -20,7 +20,7 @@
           </div>
         </div>
 
-        <!-- Status advance + claim/unclaim -->
+        <!-- Actions -->
         <div class="flex items-center gap-2">
           <button
             v-if="isClaimed"
@@ -47,54 +47,259 @@
           >
             {{ statusBusy ? '…' : `Mark as ${STATUS_LABELS[nextStatus]}` }}
           </button>
+
+          <button
+            v-if="!editing"
+            class="inline-flex h-9 items-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
+            @click="startEdit"
+          >
+            Edit
+          </button>
         </div>
       </div>
 
-      <!-- Fields grid -->
-      <div
-        class="mb-6 grid grid-cols-1 gap-x-8 gap-y-3 text-sm sm:grid-cols-2 md:grid-cols-3"
+      <!-- View mode -->
+      <template v-if="!editing">
+        <!-- Description -->
+        <div v-if="current.description" class="mb-4 text-sm">
+          <p class="font-medium text-muted-foreground">Description</p>
+          <p class="mt-1 whitespace-pre-wrap">{{ current.description }}</p>
+        </div>
+
+        <!-- Template-driven fields grid -->
+        <div
+          v-if="hasVisibleFields"
+          class="mb-6 grid grid-cols-1 gap-x-8 gap-y-3 text-sm sm:grid-cols-2 md:grid-cols-3"
+        >
+          <div v-if="current.gcCode">
+            <span class="font-medium text-muted-foreground">GC Code</span>
+            <p>{{ current.gcCode }}</p>
+          </div>
+          <div v-if="current.coords">
+            <span class="font-medium text-muted-foreground">Coords</span>
+            <p class="font-mono">{{ current.coords }}</p>
+          </div>
+          <div v-if="current.difficulty != null">
+            <span class="font-medium text-muted-foreground">Difficulty</span>
+            <p>{{ current.difficulty }} / 5</p>
+          </div>
+          <div v-if="current.terrain != null">
+            <span class="font-medium text-muted-foreground">Terrain</span>
+            <p>{{ current.terrain }} / 5</p>
+          </div>
+          <div v-if="current.checkerUrl">
+            <span class="font-medium text-muted-foreground">Checker</span>
+            <a
+              :href="current.checkerUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-primary underline hover:no-underline"
+            >
+              Open checker
+            </a>
+          </div>
+          <div v-if="current.hint">
+            <span class="font-medium text-muted-foreground">Hint</span>
+            <p>{{ current.hint }}</p>
+          </div>
+          <div v-if="current.spoiler">
+            <span class="font-medium text-muted-foreground">Spoiler</span>
+            <details>
+              <summary class="cursor-pointer text-muted-foreground">
+                Show spoiler
+              </summary>
+              <p class="mt-1">{{ current.spoiler }}</p>
+            </details>
+          </div>
+        </div>
+      </template>
+
+      <!-- Edit mode -->
+      <form
+        v-else
+        aria-label="Edit puzzle"
+        class="mb-6 space-y-4 rounded-md border p-4"
+        @submit.prevent="handleSaveEdit"
       >
-        <div v-if="current.gcCode">
-          <span class="font-medium text-muted-foreground">GC Code</span>
-          <p>{{ current.gcCode }}</p>
+        <!-- Title -->
+        <div class="space-y-1">
+          <label for="edit-title" class="text-sm font-medium">
+            Title <span class="text-destructive">*</span>
+          </label>
+          <input
+            id="edit-title"
+            v-model="editForm.title"
+            type="text"
+            required
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          />
         </div>
-        <div v-if="current.coords">
-          <span class="font-medium text-muted-foreground">Coords</span>
-          <p class="font-mono">{{ current.coords }}</p>
+
+        <!-- Description -->
+        <div class="space-y-1">
+          <label for="edit-description" class="text-sm font-medium">
+            Description
+          </label>
+          <textarea
+            id="edit-description"
+            v-model="editForm.description"
+            rows="3"
+            class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          />
         </div>
-        <div v-if="current.difficulty != null">
-          <span class="font-medium text-muted-foreground">Difficulty</span>
-          <p>{{ current.difficulty }} / 5</p>
+
+        <!-- Checker URL -->
+        <div class="space-y-1">
+          <label for="edit-checker" class="text-sm font-medium">
+            Checker URL
+          </label>
+          <input
+            id="edit-checker"
+            v-model="editForm.checkerUrl"
+            type="url"
+            placeholder="https://… (optional)"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          />
         </div>
-        <div v-if="current.terrain != null">
-          <span class="font-medium text-muted-foreground">Terrain</span>
-          <p>{{ current.terrain }} / 5</p>
-        </div>
-        <div v-if="current.checkerUrl">
-          <span class="font-medium text-muted-foreground">Checker</span>
-          <a
-            :href="current.checkerUrl"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-primary underline hover:no-underline"
+
+        <!-- Template-driven fields -->
+        <template v-if="template">
+          <div v-if="template.gcCodeMode !== 'disabled'" class="space-y-1">
+            <label for="edit-gc-code" class="text-sm font-medium">
+              GC code
+              <span
+                v-if="template.gcCodeMode === 'required'"
+                class="text-destructive"
+                >*</span
+              >
+            </label>
+            <input
+              id="edit-gc-code"
+              v-model="editForm.gcCode"
+              type="text"
+              :required="template.gcCodeMode === 'required'"
+              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+          </div>
+
+          <div v-if="template.difficultyMode !== 'disabled'" class="space-y-1">
+            <label for="edit-difficulty" class="text-sm font-medium">
+              Difficulty (1–5)
+              <span
+                v-if="template.difficultyMode === 'required'"
+                class="text-destructive"
+                >*</span
+              >
+            </label>
+            <input
+              id="edit-difficulty"
+              v-model.number="editForm.difficulty"
+              type="number"
+              min="1"
+              max="5"
+              step="0.5"
+              :required="template.difficultyMode === 'required'"
+              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+          </div>
+
+          <div v-if="template.terrainMode !== 'disabled'" class="space-y-1">
+            <label for="edit-terrain" class="text-sm font-medium">
+              Terrain (1–5)
+              <span
+                v-if="template.terrainMode === 'required'"
+                class="text-destructive"
+                >*</span
+              >
+            </label>
+            <input
+              id="edit-terrain"
+              v-model.number="editForm.terrain"
+              type="number"
+              min="1"
+              max="5"
+              step="0.5"
+              :required="template.terrainMode === 'required'"
+              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+          </div>
+
+          <div v-if="template.coordsMode !== 'disabled'" class="space-y-1">
+            <label for="edit-coords" class="text-sm font-medium">
+              Coordinates
+              <span
+                v-if="template.coordsMode === 'required'"
+                class="text-destructive"
+                >*</span
+              >
+            </label>
+            <input
+              id="edit-coords"
+              v-model="editForm.coords"
+              type="text"
+              :required="template.coordsMode === 'required'"
+              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+          </div>
+
+          <div v-if="template.hintMode !== 'disabled'" class="space-y-1">
+            <label for="edit-hint" class="text-sm font-medium">
+              Hint
+              <span
+                v-if="template.hintMode === 'required'"
+                class="text-destructive"
+                >*</span
+              >
+            </label>
+            <textarea
+              id="edit-hint"
+              v-model="editForm.hint"
+              rows="2"
+              :required="template.hintMode === 'required'"
+              class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+          </div>
+
+          <div v-if="template.spoilerMode !== 'disabled'" class="space-y-1">
+            <label for="edit-spoiler" class="text-sm font-medium">
+              Spoiler
+              <span
+                v-if="template.spoilerMode === 'required'"
+                class="text-destructive"
+                >*</span
+              >
+            </label>
+            <textarea
+              id="edit-spoiler"
+              v-model="editForm.spoiler"
+              rows="2"
+              :required="template.spoilerMode === 'required'"
+              class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+          </div>
+        </template>
+
+        <p v-if="editError" role="alert" class="text-sm text-destructive">
+          {{ editError }}
+        </p>
+
+        <div class="flex gap-3">
+          <button
+            type="submit"
+            :disabled="editSaving"
+            class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-50"
           >
-            Open checker
-          </a>
+            {{ editSaving ? 'Saving…' : 'Save' }}
+          </button>
+          <button
+            type="button"
+            class="inline-flex h-9 items-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
+            @click="editing = false"
+          >
+            Cancel
+          </button>
         </div>
-        <div v-if="current.hint">
-          <span class="font-medium text-muted-foreground">Hint</span>
-          <p>{{ current.hint }}</p>
-        </div>
-        <div v-if="current.spoiler">
-          <span class="font-medium text-muted-foreground">Spoiler</span>
-          <details>
-            <summary class="cursor-pointer text-muted-foreground">
-              Show spoiler
-            </summary>
-            <p class="mt-1">{{ current.spoiler }}</p>
-          </details>
-        </div>
-      </div>
+      </form>
 
       <!-- Tabs -->
       <div role="tablist" class="mb-4 flex gap-4 border-b">
@@ -315,6 +520,7 @@ import { usePuzzleStore } from '@/stores/puzzle';
 import { useNoteStore } from '@/stores/note';
 import { useAttemptStore } from '@/stores/attempt';
 import { useAuthStore } from '@/stores/auth';
+import { useCollectionStore } from '@/stores/collection';
 import PuzzleStatusBadge from '@/components/PuzzleStatusBadge.vue';
 import { STATUS_NEXT, STATUS_LABELS } from '@/types/puzzle';
 import type { Note } from '@/types/note';
@@ -327,16 +533,48 @@ const puzzleStore = usePuzzleStore();
 const noteStore = useNoteStore();
 const attemptStore = useAttemptStore();
 const authStore = useAuthStore();
+const collectionStore = useCollectionStore();
 
 const { current } = storeToRefs(puzzleStore);
+const { current: collection } = storeToRefs(collectionStore);
 const { notes } = storeToRefs(noteStore);
 const { attempts } = storeToRefs(attemptStore);
 const currentUserId = authStore.user?.id;
+
+const template = computed(() => collection.value?.templateSnapshot ?? null);
+
+const hasVisibleFields = computed(
+  () =>
+    !!(
+      current.value?.gcCode ||
+      current.value?.coords ||
+      current.value?.difficulty != null ||
+      current.value?.terrain != null ||
+      current.value?.checkerUrl ||
+      current.value?.hint ||
+      current.value?.spoiler
+    ),
+);
 
 const loadError = ref('');
 const activeTab = ref<'notes' | 'attempts'>('notes');
 const statusBusy = ref(false);
 const claimBusy = ref(false);
+
+const editing = ref(false);
+const editSaving = ref(false);
+const editError = ref('');
+const editForm = ref({
+  title: '',
+  description: '',
+  checkerUrl: '',
+  gcCode: '',
+  difficulty: null as number | null,
+  terrain: null as number | null,
+  coords: '',
+  hint: '',
+  spoiler: '',
+});
 
 const newNoteContent = ref('');
 const addingNote = ref(false);
@@ -362,11 +600,56 @@ onMounted(async () => {
       puzzleStore.fetchById(collectionId, puzzleId),
       noteStore.fetchAll(puzzleId),
       attemptStore.fetchAll(puzzleId),
+      collectionStore.fetchById(collectionId),
     ]);
   } catch (e) {
     loadError.value = e instanceof Error ? e.message : 'Failed to load puzzle.';
   }
 });
+
+/** Populates the edit form from the current puzzle and switches to edit mode. */
+function startEdit() {
+  if (!current.value) return;
+  const p = current.value;
+  editForm.value = {
+    title: p.title,
+    description: p.description ?? '',
+    checkerUrl: p.checkerUrl ?? '',
+    gcCode: p.gcCode ?? '',
+    difficulty: p.difficulty ?? null,
+    terrain: p.terrain ?? null,
+    coords: p.coords ?? '',
+    hint: p.hint ?? '',
+    spoiler: p.spoiler ?? '',
+  };
+  editing.value = true;
+  editError.value = '';
+}
+
+/** Saves the edit form. */
+async function handleSaveEdit() {
+  editError.value = '';
+  editSaving.value = true;
+  try {
+    const f = editForm.value;
+    await puzzleStore.update(collectionId, puzzleId, {
+      title: f.title,
+      description: f.description || null,
+      checkerUrl: f.checkerUrl || null,
+      gcCode: f.gcCode || null,
+      difficulty: f.difficulty,
+      terrain: f.terrain,
+      coords: f.coords || null,
+      hint: f.hint || null,
+      spoiler: f.spoiler || null,
+    });
+    editing.value = false;
+  } catch (e) {
+    editError.value = e instanceof Error ? e.message : 'Failed to save puzzle.';
+  } finally {
+    editSaving.value = false;
+  }
+}
 
 /** Advances the puzzle to the next status. */
 async function handleAdvanceStatus() {

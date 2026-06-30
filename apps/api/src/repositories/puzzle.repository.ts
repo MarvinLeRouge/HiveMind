@@ -1,16 +1,18 @@
 import type { PrismaClient, Puzzle, Prisma } from '@prisma/client';
 
-/** Template flags needed for field-filtering puzzle responses. */
+/** Template field modes needed for field-filtering puzzle responses. */
 type TemplateFlags = {
-  useIndex: boolean;
-  useGcCode: boolean;
-  useDifficulty: boolean;
-  useTerrain: boolean;
-  useCoords: boolean;
-  useHint: boolean;
-  useSpoiler: boolean;
+  indexMode: string;
+  gcCodeMode: string;
+  difficultyMode: string;
+  terrainMode: string;
+  coordsMode: string;
+  hintMode: string;
+  spoilerMode: string;
   customField1Label: string | null;
+  customField1Mode: string;
   customField2Label: string | null;
+  customField2Mode: string;
 };
 
 /** Puzzle row with the collection's template snapshot flags included. */
@@ -23,6 +25,7 @@ export interface CreatePuzzleData {
   collectionId: string;
   sortOrder: number;
   title: string;
+  description?: string;
   checkerUrl?: string;
   gcCode?: string;
   difficulty?: number;
@@ -36,6 +39,7 @@ export interface CreatePuzzleData {
 /** Input shape for updating a puzzle's mutable fields. */
 export interface UpdatePuzzleData {
   title?: string;
+  description?: string | null;
   status?: string;
   checkerUrl?: string | null;
   gcCode?: string | null;
@@ -49,15 +53,17 @@ export interface UpdatePuzzleData {
 
 const SNAPSHOT_SELECT = {
   select: {
-    useIndex: true,
-    useGcCode: true,
-    useDifficulty: true,
-    useTerrain: true,
-    useCoords: true,
-    useHint: true,
-    useSpoiler: true,
+    indexMode: true,
+    gcCodeMode: true,
+    difficultyMode: true,
+    terrainMode: true,
+    coordsMode: true,
+    hintMode: true,
+    spoilerMode: true,
     customField1Label: true,
+    customField1Mode: true,
     customField2Label: true,
+    customField2Mode: true,
   },
 } as const;
 

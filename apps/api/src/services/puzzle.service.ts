@@ -22,6 +22,7 @@ export type FilteredPuzzle = {
   collectionId: string;
   sortOrder: number;
   title: string;
+  description?: string | null;
   status: string;
   workingOnId: string | null;
   checkerUrl: string | null;
@@ -198,19 +199,23 @@ function filterPuzzleFields(puzzle: PuzzleRow): FilteredPuzzle {
     collectionId: puzzle.collectionId,
     sortOrder: puzzle.sortOrder,
     title: puzzle.title,
+    description: puzzle.description,
     status: puzzle.status,
     workingOnId: puzzle.workingOnId,
     checkerUrl: puzzle.checkerUrl,
     updatedAt: puzzle.updatedAt,
   };
 
-  if (snap.useGcCode) result.gcCode = puzzle.gcCode;
-  if (snap.useDifficulty) result.difficulty = puzzle.difficulty;
-  if (snap.useTerrain) result.terrain = puzzle.terrain;
-  if (snap.useCoords) result.coords = puzzle.coords;
-  if (snap.useHint) result.hint = puzzle.hint;
-  if (snap.useSpoiler) result.spoiler = puzzle.spoiler;
-  if (snap.customField1Label ?? snap.customField2Label)
+  if (snap.gcCodeMode !== 'disabled') result.gcCode = puzzle.gcCode;
+  if (snap.difficultyMode !== 'disabled') result.difficulty = puzzle.difficulty;
+  if (snap.terrainMode !== 'disabled') result.terrain = puzzle.terrain;
+  if (snap.coordsMode !== 'disabled') result.coords = puzzle.coords;
+  if (snap.hintMode !== 'disabled') result.hint = puzzle.hint;
+  if (snap.spoilerMode !== 'disabled') result.spoiler = puzzle.spoiler;
+  if (
+    snap.customField1Mode !== 'disabled' ||
+    snap.customField2Mode !== 'disabled'
+  )
     result.customFields = puzzle.customFields;
 
   return result;

@@ -509,11 +509,15 @@ describe('PuzzleDetailPage', () => {
     });
     await flushPromises();
 
-    const editBtn = wrapper.findAll('button').find((b) => b.text() === 'Edit');
-    await editBtn?.trigger('click');
+    const noteEditBtn = wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Edit' && b.classes().includes('text-xs'));
+    await noteEditBtn?.trigger('click');
     await flushPromises();
 
-    const saveBtn = wrapper.findAll('button').find((b) => b.text() === 'Save');
+    const saveBtn = wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Save' && b.classes().includes('text-xs'));
     await saveBtn?.trigger('click');
     await flushPromises();
 

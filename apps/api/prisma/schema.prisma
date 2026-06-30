@@ -32,15 +32,17 @@ model Template {
   isPublic         Boolean @default(false)
   createdBy        String?
   creator          User?   @relation(fields: [createdBy], references: [id])
-  useIndex         Boolean @default(false)
-  useGcCode        Boolean @default(false)
-  useDifficulty    Boolean @default(false)
-  useTerrain       Boolean @default(false)
-  useCoords        Boolean @default(false)
-  useHint          Boolean @default(false)
-  useSpoiler       Boolean @default(false)
+  indexMode         String  @default("disabled")
+  gcCodeMode        String  @default("disabled")
+  difficultyMode    String  @default("disabled")
+  terrainMode       String  @default("disabled")
+  coordsMode        String  @default("disabled")
+  hintMode          String  @default("disabled")
+  spoilerMode       String  @default("disabled")
   customField1Label String?
+  customField1Mode  String  @default("disabled")
   customField2Label String?
+  customField2Mode  String  @default("disabled")
   createdAt        DateTime @default(now())
 
   collections Collection[]
@@ -94,6 +96,7 @@ model Puzzle {
   title        String
   status       String   @default("open") // "open"|"in_progress"|"solved"|"verified"
   workingOnId  String?
+  description  String?
   checkerUrl   String?
   gcCode       String?
   difficulty   Float?

@@ -13,15 +13,17 @@ const userId = 'user-uuid-1';
 const otherId = 'user-uuid-2';
 
 const allFlags = {
-  useIndex: true,
-  useGcCode: true,
-  useDifficulty: true,
-  useTerrain: true,
-  useCoords: true,
-  useHint: true,
-  useSpoiler: true,
+  indexMode: 'optional',
+  gcCodeMode: 'optional',
+  difficultyMode: 'optional',
+  terrainMode: 'optional',
+  coordsMode: 'optional',
+  hintMode: 'optional',
+  spoilerMode: 'optional',
   customField1Label: 'Field 1',
+  customField1Mode: 'optional',
   customField2Label: null,
+  customField2Mode: 'disabled',
 };
 
 function makePuzzle(overrides: Partial<PuzzleRow> = {}): PuzzleRow {
@@ -77,7 +79,11 @@ describe('PuzzleService.list', () => {
   it('omits fields disabled in the template snapshot', async () => {
     const puzzle = makePuzzle({
       collection: {
-        templateSnapshot: { ...allFlags, useGcCode: false, useHint: false },
+        templateSnapshot: {
+          ...allFlags,
+          gcCodeMode: 'disabled',
+          hintMode: 'disabled',
+        },
       },
     });
     const repo = makeRepo({

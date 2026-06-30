@@ -30,36 +30,185 @@
       <form
         v-if="showAddForm"
         aria-label="Add puzzle"
-        class="mb-6 flex flex-col gap-3 rounded-md border p-4 sm:flex-row sm:flex-wrap"
+        class="mb-6 space-y-3 rounded-md border p-4"
         @submit.prevent="handleAdd"
       >
-        <label for="new-puzzle-title" class="sr-only">Puzzle title</label>
-        <input
-          id="new-puzzle-title"
-          v-model="newTitle"
-          type="text"
-          required
-          placeholder="Puzzle title"
-          class="flex h-9 flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-        />
-        <label for="new-puzzle-checker" class="sr-only">Checker URL</label>
-        <input
-          id="new-puzzle-checker"
-          v-model="newCheckerUrl"
-          type="url"
-          placeholder="Checker URL (optional)"
-          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring sm:w-64"
-        />
-        <button
-          type="submit"
-          :disabled="adding"
-          class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-50"
-        >
-          {{ adding ? 'Adding…' : 'Add' }}
-        </button>
-        <p v-if="addError" role="alert" class="text-sm text-destructive">
-          {{ addError }}
-        </p>
+        <!-- Title (always required) -->
+        <div class="space-y-1">
+          <label for="new-puzzle-title" class="text-sm font-medium">
+            Title <span class="text-destructive">*</span>
+          </label>
+          <input
+            id="new-puzzle-title"
+            v-model="newForm.title"
+            type="text"
+            required
+            placeholder="Puzzle title"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          />
+        </div>
+
+        <!-- Description (always present) -->
+        <div class="space-y-1">
+          <label for="new-puzzle-description" class="text-sm font-medium">
+            Description
+          </label>
+          <textarea
+            id="new-puzzle-description"
+            v-model="newForm.description"
+            rows="2"
+            placeholder="Brief description…"
+            class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          />
+        </div>
+
+        <!-- Checker URL (always optional) -->
+        <div class="space-y-1">
+          <label for="new-puzzle-checker" class="text-sm font-medium">
+            Checker URL
+          </label>
+          <input
+            id="new-puzzle-checker"
+            v-model="newForm.checkerUrl"
+            type="url"
+            placeholder="https://… (optional)"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          />
+        </div>
+
+        <!-- Template-driven fields -->
+        <template v-if="template">
+          <div v-if="template.gcCodeMode !== 'disabled'" class="space-y-1">
+            <label for="new-gc-code" class="text-sm font-medium">
+              GC code
+              <span
+                v-if="template.gcCodeMode === 'required'"
+                class="text-destructive"
+                >*</span
+              >
+            </label>
+            <input
+              id="new-gc-code"
+              v-model="newForm.gcCode"
+              type="text"
+              :required="template.gcCodeMode === 'required'"
+              placeholder="GC12345"
+              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+          </div>
+
+          <div v-if="template.difficultyMode !== 'disabled'" class="space-y-1">
+            <label for="new-difficulty" class="text-sm font-medium">
+              Difficulty (1–5)
+              <span
+                v-if="template.difficultyMode === 'required'"
+                class="text-destructive"
+                >*</span
+              >
+            </label>
+            <input
+              id="new-difficulty"
+              v-model.number="newForm.difficulty"
+              type="number"
+              min="1"
+              max="5"
+              step="0.5"
+              :required="template.difficultyMode === 'required'"
+              placeholder="e.g. 2.5"
+              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+          </div>
+
+          <div v-if="template.terrainMode !== 'disabled'" class="space-y-1">
+            <label for="new-terrain" class="text-sm font-medium">
+              Terrain (1–5)
+              <span
+                v-if="template.terrainMode === 'required'"
+                class="text-destructive"
+                >*</span
+              >
+            </label>
+            <input
+              id="new-terrain"
+              v-model.number="newForm.terrain"
+              type="number"
+              min="1"
+              max="5"
+              step="0.5"
+              :required="template.terrainMode === 'required'"
+              placeholder="e.g. 1.5"
+              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+          </div>
+
+          <div v-if="template.coordsMode !== 'disabled'" class="space-y-1">
+            <label for="new-coords" class="text-sm font-medium">
+              Coordinates
+              <span
+                v-if="template.coordsMode === 'required'"
+                class="text-destructive"
+                >*</span
+              >
+            </label>
+            <input
+              id="new-coords"
+              v-model="newForm.coords"
+              type="text"
+              :required="template.coordsMode === 'required'"
+              placeholder="N 48° 51.500 E 002° 21.000"
+              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+          </div>
+
+          <div v-if="template.hintMode !== 'disabled'" class="space-y-1">
+            <label for="new-hint" class="text-sm font-medium">
+              Hint
+              <span
+                v-if="template.hintMode === 'required'"
+                class="text-destructive"
+                >*</span
+              >
+            </label>
+            <textarea
+              id="new-hint"
+              v-model="newForm.hint"
+              rows="2"
+              :required="template.hintMode === 'required'"
+              class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+          </div>
+
+          <div v-if="template.spoilerMode !== 'disabled'" class="space-y-1">
+            <label for="new-spoiler" class="text-sm font-medium">
+              Spoiler
+              <span
+                v-if="template.spoilerMode === 'required'"
+                class="text-destructive"
+                >*</span
+              >
+            </label>
+            <textarea
+              id="new-spoiler"
+              v-model="newForm.spoiler"
+              rows="2"
+              :required="template.spoilerMode === 'required'"
+              class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+          </div>
+        </template>
+
+        <div class="flex items-center gap-3 pt-1">
+          <button
+            type="submit"
+            :disabled="adding"
+            class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-50"
+          >
+            {{ adding ? 'Adding…' : 'Add' }}
+          </button>
+          <p v-if="addError" role="alert" class="text-sm text-destructive">
+            {{ addError }}
+          </p>
+        </div>
       </form>
 
       <!-- Puzzle list -->
@@ -121,7 +270,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { usePuzzleStore } from '@/stores/puzzle';
@@ -137,16 +286,28 @@ const collectionStore = useCollectionStore();
 const authStore = useAuthStore();
 
 const { puzzles } = storeToRefs(puzzleStore);
-const { isOwner } = storeToRefs(collectionStore);
+const { isOwner, current: collection } = storeToRefs(collectionStore);
 const currentUserId = authStore.user?.id;
+
+const template = computed(() => collection.value?.templateSnapshot ?? null);
 
 const loading = ref(true);
 const loadError = ref('');
 const showAddForm = ref(false);
-const newTitle = ref('');
-const newCheckerUrl = ref('');
 const adding = ref(false);
 const addError = ref('');
+
+const newForm = ref({
+  title: '',
+  description: '',
+  checkerUrl: '',
+  gcCode: '',
+  difficulty: null as number | null,
+  terrain: null as number | null,
+  coords: '',
+  hint: '',
+  spoiler: '',
+});
 
 let draggedIndex: number | null = null;
 
@@ -196,12 +357,29 @@ async function handleAdd() {
   addError.value = '';
   adding.value = true;
   try {
+    const f = newForm.value;
     await puzzleStore.create(collectionId, {
-      title: newTitle.value,
-      ...(newCheckerUrl.value ? { checkerUrl: newCheckerUrl.value } : {}),
+      title: f.title,
+      ...(f.description ? { description: f.description } : {}),
+      ...(f.checkerUrl ? { checkerUrl: f.checkerUrl } : {}),
+      ...(f.gcCode ? { gcCode: f.gcCode } : {}),
+      ...(f.difficulty != null ? { difficulty: f.difficulty } : {}),
+      ...(f.terrain != null ? { terrain: f.terrain } : {}),
+      ...(f.coords ? { coords: f.coords } : {}),
+      ...(f.hint ? { hint: f.hint } : {}),
+      ...(f.spoiler ? { spoiler: f.spoiler } : {}),
     });
-    newTitle.value = '';
-    newCheckerUrl.value = '';
+    newForm.value = {
+      title: '',
+      description: '',
+      checkerUrl: '',
+      gcCode: '',
+      difficulty: null,
+      terrain: null,
+      coords: '',
+      hint: '',
+      spoiler: '',
+    };
     showAddForm.value = false;
   } catch (e) {
     addError.value = e instanceof Error ? e.message : 'Failed to add puzzle.';

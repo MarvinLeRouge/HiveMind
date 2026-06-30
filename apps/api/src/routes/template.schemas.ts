@@ -1,20 +1,27 @@
 import { z } from 'zod';
 
+// ── Shared ────────────────────────────────────────────────────────────────────
+
+/** Valid values for a template field mode. */
+export const fieldModeSchema = z.enum(['disabled', 'optional', 'required']);
+
 // ── Shared field definitions ─────────────────────────────────────────────────
 
 const templateFields = {
   name: z.string().min(1).max(64),
   description: z.string().max(256).optional(),
   isPublic: z.boolean().optional(),
-  useIndex: z.boolean().optional(),
-  useGcCode: z.boolean().optional(),
-  useDifficulty: z.boolean().optional(),
-  useTerrain: z.boolean().optional(),
-  useCoords: z.boolean().optional(),
-  useHint: z.boolean().optional(),
-  useSpoiler: z.boolean().optional(),
+  indexMode: fieldModeSchema.optional(),
+  gcCodeMode: fieldModeSchema.optional(),
+  difficultyMode: fieldModeSchema.optional(),
+  terrainMode: fieldModeSchema.optional(),
+  coordsMode: fieldModeSchema.optional(),
+  hintMode: fieldModeSchema.optional(),
+  spoilerMode: fieldModeSchema.optional(),
   customField1Label: z.string().max(32).optional(),
+  customField1Mode: fieldModeSchema.optional(),
   customField2Label: z.string().max(32).optional(),
+  customField2Mode: fieldModeSchema.optional(),
 };
 
 // ── Request schemas ──────────────────────────────────────────────────────────
@@ -50,15 +57,17 @@ export const templateSchema = z.object({
   isSystem: z.boolean(),
   isPublic: z.boolean(),
   createdBy: z.string().nullable(),
-  useIndex: z.boolean(),
-  useGcCode: z.boolean(),
-  useDifficulty: z.boolean(),
-  useTerrain: z.boolean(),
-  useCoords: z.boolean(),
-  useHint: z.boolean(),
-  useSpoiler: z.boolean(),
+  indexMode: z.string(),
+  gcCodeMode: z.string(),
+  difficultyMode: z.string(),
+  terrainMode: z.string(),
+  coordsMode: z.string(),
+  hintMode: z.string(),
+  spoilerMode: z.string(),
   customField1Label: z.string().nullable(),
+  customField1Mode: z.string(),
   customField2Label: z.string().nullable(),
+  customField2Mode: z.string(),
   createdAt: z.string(),
 });
 

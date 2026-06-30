@@ -74,12 +74,12 @@ async function main(): Promise<void> {
         'Template for geocaching mystery series. Includes GC code, difficulty/terrain ratings, coordinates, hints, and spoilers.',
       isSystem: true,
       isPublic: true,
-      useGcCode: true,
-      useDifficulty: true,
-      useTerrain: true,
-      useCoords: true,
-      useHint: true,
-      useSpoiler: true,
+      gcCodeMode: 'optional',
+      difficultyMode: 'optional',
+      terrainMode: 'optional',
+      coordsMode: 'optional',
+      hintMode: 'optional',
+      spoilerMode: 'optional',
     },
   });
   console.log(`✔ System template: ${geocachingTemplate.name}`);

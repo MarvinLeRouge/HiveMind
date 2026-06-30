@@ -21,6 +21,7 @@ export const reorderBodySchema = z.object({
 /** Request body for creating a puzzle. */
 export const createPuzzleBodySchema = z.object({
   title: z.string().min(1).max(255),
+  description: z.string().optional(),
   checkerUrl: z.string().url().optional(),
   gcCode: z.string().optional(),
   difficulty: z.number().min(1).max(5).optional(),
@@ -35,6 +36,7 @@ export const createPuzzleBodySchema = z.object({
 export const updatePuzzleBodySchema = z
   .object({
     title: z.string().min(1).max(255).optional(),
+    description: z.string().nullable().optional(),
     status: z.enum(['open', 'in_progress', 'solved', 'verified']).optional(),
     checkerUrl: z.string().url().nullable().optional(),
     gcCode: z.string().nullable().optional(),
@@ -55,6 +57,7 @@ export const puzzleSchema = z.object({
   collectionId: z.string(),
   sortOrder: z.number(),
   title: z.string(),
+  description: z.string().nullable().optional(),
   status: z.string(),
   workingOnId: z.string().nullable(),
   checkerUrl: z.string().nullable(),
