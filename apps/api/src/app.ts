@@ -41,6 +41,7 @@ export async function buildApp(options?: AppOptions): Promise<FastifyInstance> {
       host: env.SMTP_HOST,
       port: env.SMTP_PORT,
       secure: env.SMTP_SECURE,
+      ignoreTLS: env.SMTP_IGNORE_TLS,
       user: env.SMTP_USER,
       pass: env.SMTP_PASS,
       from: env.SMTP_FROM,

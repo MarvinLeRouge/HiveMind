@@ -16,7 +16,10 @@ const envSchema = z.object({
   SEED_ADMIN_PASSWORD: z.string().min(8).optional(),
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.coerce.number().int().positive().default(587),
-  SMTP_SECURE: z.coerce.boolean().default(false),
+  SMTP_SECURE: z.preprocess((v) => v === 'true', z.boolean()).default(false),
+  SMTP_IGNORE_TLS: z
+    .preprocess((v) => v === 'true', z.boolean())
+    .default(false),
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
   SMTP_FROM: z.string().optional(),

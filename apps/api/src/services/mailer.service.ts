@@ -19,6 +19,7 @@ interface SmtpConfig {
   host: string;
   port: number;
   secure: boolean;
+  ignoreTLS: boolean;
   user: string;
   pass: string;
   from: string;
@@ -50,7 +51,8 @@ export class NodemailerMailerService implements MailerService {
       host,
       port: port ?? 587,
       secure: secure ?? false,
-      auth: { user, pass },
+      ignoreTLS: this.config.ignoreTLS ?? false,
+      auth: user && pass ? { user, pass } : undefined,
     });
 
     const acceptUrl = `${frontendBaseUrl}/invitations/${opts.invitationId}`;
