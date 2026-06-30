@@ -64,6 +64,11 @@ const router = createRouter({
       component: () => import('@/pages/TemplateEditPage.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/invitations/:id',
+      component: () => import('@/pages/InvitationPage.vue'),
+      meta: { requiresAuth: true },
+    },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
 });
