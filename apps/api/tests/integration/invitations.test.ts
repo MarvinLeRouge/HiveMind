@@ -158,6 +158,20 @@ describe('POST /collections/:id/invitations', () => {
     expect(res.statusCode).toBe(400);
   });
 
+  it('creates an invitation when using the collection slug', async () => {
+    const collectionId = await createCollection(userToken);
+    const collection = await prisma.collection.findUnique({
+      where: { id: collectionId },
+    });
+    const res = await sendInvitation(
+      userToken,
+      collection!.slug,
+      'user2@example.com',
+    );
+    expect(res.statusCode).toBe(201);
+    expect(res.json().inviteeEmail).toBe('user2@example.com');
+  });
+
   it('returns 401 without token', async () => {
     const collectionId = await createCollection(userToken);
     const res = await app.inject({

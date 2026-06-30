@@ -26,6 +26,8 @@ export async function requireMember(
     return;
   }
 
+  request.resolvedCollectionId = collection.id;
+
   const membership = await request.server.prisma.collectionMember.findUnique({
     where: {
       collectionId_userId: {

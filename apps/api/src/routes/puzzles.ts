@@ -59,7 +59,7 @@ export default async function puzzleRoutes(
     },
     preHandler: [authenticate, requireMember],
     handler: async (request, reply) => {
-      const puzzles = await service.list(request.params.id);
+      const puzzles = await service.list(request.resolvedCollectionId!);
       return reply.send(puzzles.map(serializePuzzle));
     },
   });
@@ -76,7 +76,7 @@ export default async function puzzleRoutes(
     preHandler: [authenticate, requireMember],
     handler: async (request, reply) => {
       const puzzle = await service.getById(
-        request.params.id,
+        request.resolvedCollectionId!,
         request.params.pid,
       );
       return reply.send(serializePuzzle(puzzle));
@@ -95,7 +95,10 @@ export default async function puzzleRoutes(
     },
     preHandler: [authenticate, requireOwner],
     handler: async (request, reply) => {
-      const puzzle = await service.create(request.params.id, request.body);
+      const puzzle = await service.create(
+        request.resolvedCollectionId!,
+        request.body,
+      );
       return reply.status(201).send(serializePuzzle(puzzle));
     },
   });
@@ -114,7 +117,10 @@ export default async function puzzleRoutes(
     },
     preHandler: [authenticate, requireOwner],
     handler: async (request, reply) => {
-      await service.reorder(request.params.id, request.body.puzzles);
+      await service.reorder(
+        request.resolvedCollectionId!,
+        request.body.puzzles,
+      );
       return reply.status(204).send({});
     },
   });
@@ -137,7 +143,7 @@ export default async function puzzleRoutes(
     preHandler: [authenticate, requireMember],
     handler: async (request, reply) => {
       const puzzle = await service.update(
-        request.params.id,
+        request.resolvedCollectionId!,
         request.params.pid,
         request.body,
       );
@@ -156,7 +162,7 @@ export default async function puzzleRoutes(
     },
     preHandler: [authenticate, requireOwner],
     handler: async (request, reply) => {
-      await service.delete(request.params.id, request.params.pid);
+      await service.delete(request.resolvedCollectionId!, request.params.pid);
       return reply.status(204).send({});
     },
   });
@@ -178,7 +184,7 @@ export default async function puzzleRoutes(
     preHandler: [authenticate, requireMember],
     handler: async (request, reply) => {
       await service.claim(
-        request.params.id,
+        request.resolvedCollectionId!,
         request.params.pid,
         request.user.sub,
       );
@@ -202,7 +208,7 @@ export default async function puzzleRoutes(
     preHandler: [authenticate, requireMember],
     handler: async (request, reply) => {
       await service.unclaim(
-        request.params.id,
+        request.resolvedCollectionId!,
         request.params.pid,
         request.user.sub,
       );

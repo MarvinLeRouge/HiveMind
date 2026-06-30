@@ -8,9 +8,9 @@ export const collectionIdParamSchema = z.object({
   id: z.string().min(1),
 });
 
-/** Route params containing a collection ID and a member user ID. */
+/** Route params containing a collection slug (or UUID) and a member user ID. */
 export const memberParamSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().min(1),
   userId: z.string().uuid(),
 });
 

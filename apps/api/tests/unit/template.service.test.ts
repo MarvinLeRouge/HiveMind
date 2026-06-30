@@ -180,18 +180,38 @@ describe('TemplateService.deleteUserTemplate', () => {
     const repo = makeRepo({ findById: vi.fn().mockResolvedValue(template) });
     const service = new TemplateService(repo);
 
-    await service.deleteUserTemplate(userId, template.id);
+    await service.deleteUserTemplate(userId, false, template.id);
 
     expect(repo.delete).toHaveBeenCalledWith(template.id);
   });
 
-  it('throws 403 when caller is not the creator', async () => {
+  it('allows admin to delete a template they did not create', async () => {
+    const template = makeTemplate({ createdBy: 'other-user' });
+    const repo = makeRepo({ findById: vi.fn().mockResolvedValue(template) });
+    const service = new TemplateService(repo);
+
+    await service.deleteUserTemplate(adminId, true, template.id);
+
+    expect(repo.delete).toHaveBeenCalledWith(template.id);
+  });
+
+  it('throws 403 when non-admin caller is not the creator', async () => {
     const template = makeTemplate({ createdBy: 'other-user' });
     const repo = makeRepo({ findById: vi.fn().mockResolvedValue(template) });
     const service = new TemplateService(repo);
 
     await expect(
-      service.deleteUserTemplate(userId, template.id),
+      service.deleteUserTemplate(userId, false, template.id),
+    ).rejects.toMatchObject({ statusCode: 403 });
+  });
+
+  it('throws 403 when admin tries to delete a system template via user route', async () => {
+    const template = makeTemplate({ isSystem: true, createdBy: null });
+    const repo = makeRepo({ findById: vi.fn().mockResolvedValue(template) });
+    const service = new TemplateService(repo);
+
+    await expect(
+      service.deleteUserTemplate(adminId, true, template.id),
     ).rejects.toMatchObject({ statusCode: 403 });
   });
 
@@ -199,19 +219,37 @@ describe('TemplateService.deleteUserTemplate', () => {
     const service = new TemplateService(makeRepo());
 
     await expect(
-      service.deleteUserTemplate(userId, 'unknown-id'),
+      service.deleteUserTemplate(userId, false, 'unknown-id'),
     ).rejects.toMatchObject({ statusCode: 404 });
   });
 });
 
-describe('Permission — admin cannot delete system template via user route', () => {
-  it('throws 403 when admin tries to delete a system template via user route', async () => {
+describe('TemplateService.deleteSystemTemplate', () => {
+  it('deletes a system template when caller is admin', async () => {
+    const template = makeTemplate({ isSystem: true, createdBy: null });
+    const repo = makeRepo({ findById: vi.fn().mockResolvedValue(template) });
+    const service = new TemplateService(repo);
+
+    await service.deleteSystemTemplate(true, template.id);
+
+    expect(repo.delete).toHaveBeenCalledWith(template.id);
+  });
+
+  it('throws 403 when caller is not admin', async () => {
     const template = makeTemplate({ isSystem: true, createdBy: null });
     const repo = makeRepo({ findById: vi.fn().mockResolvedValue(template) });
     const service = new TemplateService(repo);
 
     await expect(
-      service.deleteUserTemplate(adminId, template.id),
+      service.deleteSystemTemplate(false, template.id),
     ).rejects.toMatchObject({ statusCode: 403 });
+  });
+
+  it('throws 404 when template does not exist', async () => {
+    const service = new TemplateService(makeRepo());
+
+    await expect(
+      service.deleteSystemTemplate(true, 'unknown-id'),
+    ).rejects.toMatchObject({ statusCode: 404 });
   });
 });

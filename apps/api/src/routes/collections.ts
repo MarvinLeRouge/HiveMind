@@ -219,7 +219,7 @@ export default async function collectionRoutes(
     preHandler: [authenticate, requireOwner],
     handler: async (request, reply) => {
       const invitation = await invitationService.sendInvitation(
-        request.params.id,
+        request.resolvedCollectionId!,
         request.user.sub,
         request.body.email,
       );
