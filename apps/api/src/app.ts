@@ -19,12 +19,34 @@ import invitationRoutes from './routes/invitations.js';
 import puzzleRoutes from './routes/puzzles.js';
 import notesAttemptsRoutes from './routes/notes-attempts.js';
 import importRoutes from './routes/import.js';
+import {
+  NodemailerMailerService,
+  type MailerService,
+} from './services/mailer.service.js';
+
+/** Options accepted by {@link buildApp}. */
+export interface AppOptions {
+  /** Override the email delivery service (useful in tests). */
+  mailer?: MailerService;
+}
 
 /**
  * Builds and configures the Fastify application instance.
  * Exported separately from the entry point to enable testing via fastify.inject().
  */
-export async function buildApp(): Promise<FastifyInstance> {
+export async function buildApp(options?: AppOptions): Promise<FastifyInstance> {
+  const mailer =
+    options?.mailer ??
+    new NodemailerMailerService({
+      host: env.SMTP_HOST,
+      port: env.SMTP_PORT,
+      secure: env.SMTP_SECURE,
+      ignoreTLS: env.SMTP_IGNORE_TLS,
+      user: env.SMTP_USER,
+      pass: env.SMTP_PASS,
+      from: env.SMTP_FROM,
+      frontendBaseUrl: env.FRONTEND_BASE_URL,
+    });
   const app = fastify({
     logger: env.NODE_ENV !== 'test',
   });
@@ -62,6 +84,8 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(multipart, { limits: { fileSize: 10 * 1024 * 1024 } });
 
   await app.register(prismaPlugin);
+
+  app.decorate('mailer', mailer);
 
   // ── Routes ─────────────────────────────────────────────────────────────────
   await app.register(authRoutes, { prefix: '/auth' });

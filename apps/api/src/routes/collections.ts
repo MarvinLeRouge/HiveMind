@@ -77,6 +77,7 @@ export default async function collectionRoutes(
   );
   const invitationService = new InvitationService(
     new InvitationRepository(app.prisma),
+    app.mailer,
   );
 
   // ── GET /collections ──────────────────────────────────────────────────────
@@ -220,10 +221,15 @@ export default async function collectionRoutes(
     },
     preHandler: [authenticate, requireOwner],
     handler: async (request, reply) => {
+      const collection = await app.prisma.collection.findUnique({
+        where: { id: request.resolvedCollectionId! },
+        select: { name: true },
+      });
       const invitation = await invitationService.sendInvitation(
         request.resolvedCollectionId!,
         request.user.sub,
         request.body.email,
+        { collectionName: collection!.name, inviterEmail: request.user.email },
       );
       return reply.status(201).send({
         ...invitation,

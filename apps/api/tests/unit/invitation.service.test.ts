@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { Invitation } from '@prisma/client';
 import { InvitationService } from '../../src/services/invitation.service.js';
 import type { InvitationRepository } from '../../src/repositories/invitation.repository.js';
+import type { MailerService } from '../../src/services/mailer.service.js';
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -11,6 +12,7 @@ const collectionId = 'col-uuid-1';
 const invId = 'inv-uuid-1';
 const userEmail = 'user1@example.com';
 const otherEmail = 'user2@example.com';
+const context = { collectionName: 'My Collection', inviterEmail: userEmail };
 
 const futureDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 const pastDate = new Date(Date.now() - 1000);
@@ -28,7 +30,7 @@ function makeInvitation(overrides: Partial<Invitation> = {}): Invitation {
   };
 }
 
-// ── Mock factory ──────────────────────────────────────────────────────────────
+// ── Mock factories ────────────────────────────────────────────────────────────
 
 function makeRepo(
   overrides: Partial<InvitationRepository> = {},
@@ -44,14 +46,21 @@ function makeRepo(
   } as unknown as InvitationRepository;
 }
 
+function makeMailer(overrides: Partial<MailerService> = {}): MailerService {
+  return {
+    sendInvitationEmail: vi.fn().mockResolvedValue(undefined),
+    ...overrides,
+  };
+}
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 describe('InvitationService.sendInvitation', () => {
   it('creates an invitation when all checks pass', async () => {
     const repo = makeRepo();
-    const service = new InvitationService(repo);
+    const service = new InvitationService(repo, makeMailer());
 
-    await service.sendInvitation(collectionId, userId, otherEmail);
+    await service.sendInvitation(collectionId, userId, otherEmail, context);
 
     expect(repo.create).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -62,12 +71,45 @@ describe('InvitationService.sendInvitation', () => {
     );
   });
 
-  it('throws 409 when the invitee is already a member', async () => {
-    const repo = makeRepo({ isMemberByEmail: vi.fn().mockResolvedValue(true) });
-    const service = new InvitationService(repo);
+  it('sends an invitation email after creating the record', async () => {
+    const repo = makeRepo();
+    const mailer = makeMailer();
+    const service = new InvitationService(repo, mailer);
+
+    await service.sendInvitation(collectionId, userId, otherEmail, context);
+
+    expect(mailer.sendInvitationEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: otherEmail,
+        invitationId: invId,
+        collectionName: context.collectionName,
+        inviterEmail: context.inviterEmail,
+      }),
+    );
+  });
+
+  it('propagates mailer errors (email failure blocks the invitation)', async () => {
+    const repo = makeRepo();
+    const mailer = makeMailer({
+      sendInvitationEmail: vi
+        .fn()
+        .mockRejectedValue(
+          Object.assign(new Error('SMTP error'), { statusCode: 502 }),
+        ),
+    });
+    const service = new InvitationService(repo, mailer);
 
     await expect(
-      service.sendInvitation(collectionId, userId, otherEmail),
+      service.sendInvitation(collectionId, userId, otherEmail, context),
+    ).rejects.toMatchObject({ statusCode: 502 });
+  });
+
+  it('throws 409 when the invitee is already a member', async () => {
+    const repo = makeRepo({ isMemberByEmail: vi.fn().mockResolvedValue(true) });
+    const service = new InvitationService(repo, makeMailer());
+
+    await expect(
+      service.sendInvitation(collectionId, userId, otherEmail, context),
     ).rejects.toMatchObject({ statusCode: 409 });
   });
 
@@ -77,10 +119,10 @@ describe('InvitationService.sendInvitation', () => {
         .fn()
         .mockResolvedValue(makeInvitation()),
     });
-    const service = new InvitationService(repo);
+    const service = new InvitationService(repo, makeMailer());
 
     await expect(
-      service.sendInvitation(collectionId, userId, otherEmail),
+      service.sendInvitation(collectionId, userId, otherEmail, context),
     ).rejects.toMatchObject({ statusCode: 409 });
   });
 });
@@ -89,7 +131,7 @@ describe('InvitationService.getById', () => {
   it('returns the invitation when found', async () => {
     const invitation = makeInvitation();
     const repo = makeRepo({ findById: vi.fn().mockResolvedValue(invitation) });
-    const service = new InvitationService(repo);
+    const service = new InvitationService(repo, makeMailer());
 
     const result = await service.getById(invId);
 
@@ -97,7 +139,7 @@ describe('InvitationService.getById', () => {
   });
 
   it('throws 404 when the invitation does not exist', async () => {
-    const service = new InvitationService(makeRepo());
+    const service = new InvitationService(makeRepo(), makeMailer());
 
     await expect(service.getById('unknown-id')).rejects.toMatchObject({
       statusCode: 404,
@@ -111,7 +153,7 @@ describe('InvitationService.accept', () => {
     const repo = makeRepo({
       findById: vi.fn().mockResolvedValue(invitation),
     });
-    const service = new InvitationService(repo);
+    const service = new InvitationService(repo, makeMailer());
 
     await service.accept(invId, otherId, otherEmail);
 
@@ -123,7 +165,7 @@ describe('InvitationService.accept', () => {
   });
 
   it('throws 404 when the invitation does not exist', async () => {
-    const service = new InvitationService(makeRepo());
+    const service = new InvitationService(makeRepo(), makeMailer());
 
     await expect(
       service.accept('unknown-id', otherId, otherEmail),
@@ -135,7 +177,7 @@ describe('InvitationService.accept', () => {
     const repo = makeRepo({
       findById: vi.fn().mockResolvedValue(invitation),
     });
-    const service = new InvitationService(repo);
+    const service = new InvitationService(repo, makeMailer());
 
     await expect(
       service.accept(invId, userId, userEmail),
@@ -147,7 +189,7 @@ describe('InvitationService.accept', () => {
     const repo = makeRepo({
       findById: vi.fn().mockResolvedValue(invitation),
     });
-    const service = new InvitationService(repo);
+    const service = new InvitationService(repo, makeMailer());
 
     await expect(
       service.accept(invId, otherId, otherEmail),
@@ -159,7 +201,7 @@ describe('InvitationService.accept', () => {
     const repo = makeRepo({
       findById: vi.fn().mockResolvedValue(invitation),
     });
-    const service = new InvitationService(repo);
+    const service = new InvitationService(repo, makeMailer());
 
     await expect(
       service.accept(invId, otherId, otherEmail),
@@ -173,7 +215,7 @@ describe('InvitationService.decline', () => {
     const repo = makeRepo({
       findById: vi.fn().mockResolvedValue(invitation),
     });
-    const service = new InvitationService(repo);
+    const service = new InvitationService(repo, makeMailer());
 
     await service.decline(invId, otherId, otherEmail);
 
@@ -181,7 +223,7 @@ describe('InvitationService.decline', () => {
   });
 
   it('throws 404 when the invitation does not exist', async () => {
-    const service = new InvitationService(makeRepo());
+    const service = new InvitationService(makeRepo(), makeMailer());
 
     await expect(
       service.decline('unknown-id', otherId, otherEmail),
@@ -193,7 +235,7 @@ describe('InvitationService.decline', () => {
     const repo = makeRepo({
       findById: vi.fn().mockResolvedValue(invitation),
     });
-    const service = new InvitationService(repo);
+    const service = new InvitationService(repo, makeMailer());
 
     await expect(
       service.decline(invId, userId, userEmail),
@@ -205,7 +247,7 @@ describe('InvitationService.decline', () => {
     const repo = makeRepo({
       findById: vi.fn().mockResolvedValue(invitation),
     });
-    const service = new InvitationService(repo);
+    const service = new InvitationService(repo, makeMailer());
 
     await expect(
       service.decline(invId, otherId, otherEmail),
@@ -217,7 +259,7 @@ describe('InvitationService.decline', () => {
     const repo = makeRepo({
       findById: vi.fn().mockResolvedValue(invitation),
     });
-    const service = new InvitationService(repo);
+    const service = new InvitationService(repo, makeMailer());
 
     await expect(
       service.decline(invId, otherId, otherEmail),

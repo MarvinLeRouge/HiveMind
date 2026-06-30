@@ -3,6 +3,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 import { PrismaClient } from '@prisma/client';
 import { buildApp } from '../../src/app.js';
+import { NoopMailerService } from '../../src/services/mailer.service.js';
 
 const prisma = new PrismaClient({
   datasourceUrl: process.env['DATABASE_URL'],
@@ -18,7 +19,7 @@ let systemTemplateId: string;
 // ── Setup ─────────────────────────────────────────────────────────────────────
 
 beforeAll(async () => {
-  app = await buildApp();
+  app = await buildApp({ mailer: new NoopMailerService() });
   await app.ready();
 
   const bcryptHash = await bcrypt.hash('change_me_admin', 1);

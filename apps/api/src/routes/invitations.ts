@@ -35,7 +35,10 @@ export default async function invitationRoutes(
   app: FastifyInstance,
 ): Promise<void> {
   const typed = app.withTypeProvider<ZodTypeProvider>();
-  const service = new InvitationService(new InvitationRepository(app.prisma));
+  const service = new InvitationService(
+    new InvitationRepository(app.prisma),
+    app.mailer,
+  );
 
   // ── GET /invitations/:id ──────────────────────────────────────────────────
   typed.get('/:id', {

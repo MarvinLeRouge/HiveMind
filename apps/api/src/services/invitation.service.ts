@@ -1,5 +1,6 @@
 import type { Invitation } from '@prisma/client';
 import type { InvitationRepository } from '../repositories/invitation.repository.js';
+import type { MailerService } from './mailer.service.js';
 
 const EXPIRY_DAYS = 7;
 
@@ -16,16 +17,21 @@ const EXPIRY_DAYS = 7;
  * - On accept, the invitee is joined as a member (role: "member").
  */
 export class InvitationService {
-  constructor(private readonly repo: InvitationRepository) {}
+  constructor(
+    private readonly repo: InvitationRepository,
+    private readonly mailer: MailerService,
+  ) {}
 
   /**
-   * Creates a pending invitation for the given email.
+   * Creates a pending invitation and sends an email to the invitee.
    * Throws 409 if the email is already a member or has a pending invitation.
+   * Throws 502 if the email service is not configured or delivery fails.
    */
   async sendInvitation(
     collectionId: string,
     invitedBy: string,
     inviteeEmail: string,
+    context: { collectionName: string; inviterEmail: string },
   ): Promise<Invitation> {
     const alreadyMember = await this.repo.isMemberByEmail(
       collectionId,
@@ -50,12 +56,22 @@ export class InvitationService {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + EXPIRY_DAYS);
 
-    return this.repo.create({
+    const invitation = await this.repo.create({
       collectionId,
       invitedBy,
       inviteeEmail,
       expiresAt,
     });
+
+    await this.mailer.sendInvitationEmail({
+      to: inviteeEmail,
+      invitationId: invitation.id,
+      collectionName: context.collectionName,
+      inviterEmail: context.inviterEmail,
+      expiresAt: invitation.expiresAt,
+    });
+
+    return invitation;
   }
 
   /**
