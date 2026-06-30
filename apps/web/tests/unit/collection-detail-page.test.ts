@@ -1,12 +1,15 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { mount, flushPromises } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import CollectionDetailPage from '../../src/pages/CollectionDetailPage.vue';
 import { useCollectionStore } from '../../src/stores/collection';
+import { usePuzzleStore } from '../../src/stores/puzzle';
 import { useAuthStore } from '../../src/stores/auth';
 
 vi.mock('../../src/lib/api-fetch', () => ({ apiFetch: vi.fn() }));
+
+// ── Fixtures ──────────────────────────────────────────────────────────────────
 
 const mockTemplate = { id: 'tpl-1', name: 'Generic' };
 const mockCollection = {
@@ -25,6 +28,16 @@ const mockMember = {
   role: 'owner',
   joinedAt: '2025-01-01',
 };
+const mockPuzzle = {
+  id: 'puz-1',
+  title: 'First Puzzle',
+  status: 'unsolved',
+  sortOrder: 1,
+  workingOnId: null,
+  gcCode: null,
+};
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function makeRouter() {
   return createRouter({
@@ -32,10 +45,21 @@ function makeRouter() {
     routes: [
       { path: '/collections/:id', component: CollectionDetailPage },
       { path: '/collections', component: { template: '<div/>' } },
-      { path: '/collections/:id/settings', component: { template: '<div/>' } },
-      { path: '/collections/:id/puzzles', component: { template: '<div/>' } },
+      {
+        path: '/collections/:id/settings',
+        component: { template: '<div/>' },
+      },
+      {
+        path: '/collections/:id/puzzles/:pid',
+        component: { template: '<div/>' },
+      },
     ],
   });
+}
+
+/** Opens the desktop members panel by setting localStorage before mount. */
+function openMembersPanel(userId = 'guest') {
+  localStorage.setItem(`hm:members-panel:${userId}`, 'true');
 }
 
 let pinia: ReturnType<typeof createPinia>;
@@ -44,14 +68,24 @@ beforeEach(() => {
   pinia = createPinia();
   setActivePinia(pinia);
   vi.clearAllMocks();
+  localStorage.clear();
 });
 
+afterEach(() => {
+  localStorage.clear();
+});
+
+// ── Tests ─────────────────────────────────────────────────────────────────────
+
 describe('CollectionDetailPage', () => {
-  it('renders collection name and members after loading', async () => {
-    const store = useCollectionStore();
-    vi.spyOn(store, 'fetchById').mockResolvedValue();
-    store.current = mockCollection as never;
-    store.members = [mockMember as never];
+  it('renders the collection name and puzzle list after loading', async () => {
+    const collectionStore = useCollectionStore();
+    const puzzleStore = usePuzzleStore();
+    vi.spyOn(collectionStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'fetchAll').mockResolvedValue();
+    collectionStore.current = mockCollection as never;
+    collectionStore.members = [mockMember as never];
+    puzzleStore.puzzles = [mockPuzzle as never];
     const router = makeRouter();
     await router.push('/collections/col-1');
 
@@ -61,14 +95,42 @@ describe('CollectionDetailPage', () => {
     await flushPromises();
 
     expect(wrapper.text()).toContain('Test Collection');
+    expect(wrapper.text()).toContain('First Puzzle');
+  });
+
+  it('shows the members panel when the toggle is clicked', async () => {
+    const collectionStore = useCollectionStore();
+    const puzzleStore = usePuzzleStore();
+    vi.spyOn(collectionStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'fetchAll').mockResolvedValue();
+    collectionStore.current = mockCollection as never;
+    collectionStore.members = [mockMember as never];
+    puzzleStore.puzzles = [];
+    const router = makeRouter();
+    await router.push('/collections/col-1');
+
+    const wrapper = mount(CollectionDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    // Panel is closed by default — toggle it
+    const toggleBtn = wrapper
+      .findAll('button')
+      .find((b) => b.text().includes('Members'));
+    await toggleBtn!.trigger('click');
+
     expect(wrapper.text()).toContain('alice');
   });
 
-  it('shows the invite form when the user is an owner', async () => {
-    const store = useCollectionStore();
-    vi.spyOn(store, 'fetchById').mockResolvedValue();
-    store.current = mockCollection as never;
-    store.members = [mockMember as never];
+  it('shows the invite form in the panel when the user is an owner', async () => {
+    const collectionStore = useCollectionStore();
+    const puzzleStore = usePuzzleStore();
+    vi.spyOn(collectionStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'fetchAll').mockResolvedValue();
+    collectionStore.current = mockCollection as never;
+    collectionStore.members = [mockMember as never];
+    puzzleStore.puzzles = [];
     const auth = useAuthStore();
     auth.user = {
       id: 'user-1',
@@ -77,6 +139,7 @@ describe('CollectionDetailPage', () => {
       isAdmin: false,
       createdAt: '2025-01-01',
     };
+    openMembersPanel('user-1');
     const router = makeRouter();
     await router.push('/collections/col-1');
 
@@ -89,8 +152,12 @@ describe('CollectionDetailPage', () => {
   });
 
   it('shows an error when loading fails', async () => {
-    const store = useCollectionStore();
-    vi.spyOn(store, 'fetchById').mockRejectedValue(new Error('Not found'));
+    const collectionStore = useCollectionStore();
+    const puzzleStore = usePuzzleStore();
+    vi.spyOn(collectionStore, 'fetchById').mockRejectedValue(
+      new Error('Not found'),
+    );
+    vi.spyOn(puzzleStore, 'fetchAll').mockResolvedValue();
     const router = makeRouter();
     await router.push('/collections/col-1');
 
@@ -103,11 +170,14 @@ describe('CollectionDetailPage', () => {
   });
 
   it('calls store.invite when the invite form is submitted', async () => {
-    const store = useCollectionStore();
-    vi.spyOn(store, 'fetchById').mockResolvedValue();
-    store.current = mockCollection as never;
-    store.members = [mockMember as never];
-    const inviteSpy = vi.spyOn(store, 'invite').mockResolvedValue();
+    const collectionStore = useCollectionStore();
+    const puzzleStore = usePuzzleStore();
+    vi.spyOn(collectionStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'fetchAll').mockResolvedValue();
+    collectionStore.current = mockCollection as never;
+    collectionStore.members = [mockMember as never];
+    puzzleStore.puzzles = [];
+    const inviteSpy = vi.spyOn(collectionStore, 'invite').mockResolvedValue();
     const auth = useAuthStore();
     auth.user = {
       id: 'user-1',
@@ -116,6 +186,7 @@ describe('CollectionDetailPage', () => {
       isAdmin: false,
       createdAt: '2025-01-01',
     };
+    openMembersPanel('user-1');
     const router = makeRouter();
     await router.push('/collections/col-1');
 
@@ -124,18 +195,24 @@ describe('CollectionDetailPage', () => {
     });
     await flushPromises();
 
-    await wrapper.find('input[type="email"]').setValue('bob@example.com');
-    await wrapper.find('form').trigger('submit');
+    await wrapper.find('#panel-invite-email').setValue('bob@example.com');
+    await wrapper.find('form[class*="flex-col"]').trigger('submit');
     await flushPromises();
 
     expect(inviteSpy).toHaveBeenCalledWith('col-1', 'bob@example.com');
   });
 
-  it('does not render the description paragraph when description is null', async () => {
-    const store = useCollectionStore();
-    vi.spyOn(store, 'fetchById').mockResolvedValue();
-    store.current = { ...mockCollection, description: null } as never;
-    store.members = [mockMember as never];
+  it('does not render the description when it is null', async () => {
+    const collectionStore = useCollectionStore();
+    const puzzleStore = usePuzzleStore();
+    vi.spyOn(collectionStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'fetchAll').mockResolvedValue();
+    collectionStore.current = {
+      ...mockCollection,
+      description: null,
+    } as never;
+    collectionStore.members = [];
+    puzzleStore.puzzles = [];
     const router = makeRouter();
     await router.push('/collections/col-1');
 
@@ -149,11 +226,13 @@ describe('CollectionDetailPage', () => {
   });
 
   it('shows the Remove button for owners viewing other members', async () => {
-    const store = useCollectionStore();
+    const collectionStore = useCollectionStore();
+    const puzzleStore = usePuzzleStore();
     const auth = useAuthStore();
-    vi.spyOn(store, 'fetchById').mockResolvedValue();
-    store.current = mockCollection as never;
-    store.members = [
+    vi.spyOn(collectionStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'fetchAll').mockResolvedValue();
+    collectionStore.current = mockCollection as never;
+    collectionStore.members = [
       mockMember as never,
       {
         userId: 'user-2',
@@ -163,6 +242,7 @@ describe('CollectionDetailPage', () => {
         joinedAt: '2025-01-01',
       } as never,
     ];
+    puzzleStore.puzzles = [];
     auth.user = {
       id: 'user-1',
       username: 'alice',
@@ -170,6 +250,7 @@ describe('CollectionDetailPage', () => {
       isAdmin: false,
       createdAt: '2025-01-01',
     };
+    openMembersPanel('user-1');
     const router = makeRouter();
     await router.push('/collections/col-1');
 
@@ -182,12 +263,14 @@ describe('CollectionDetailPage', () => {
   });
 
   it('calls store.removeMember when the Remove button is clicked', async () => {
-    const store = useCollectionStore();
+    const collectionStore = useCollectionStore();
+    const puzzleStore = usePuzzleStore();
     const auth = useAuthStore();
-    vi.spyOn(store, 'fetchById').mockResolvedValue();
-    vi.spyOn(store, 'removeMember').mockResolvedValue();
-    store.current = mockCollection as never;
-    store.members = [
+    vi.spyOn(collectionStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(collectionStore, 'removeMember').mockResolvedValue();
+    collectionStore.current = mockCollection as never;
+    collectionStore.members = [
       mockMember as never,
       {
         userId: 'user-2',
@@ -197,6 +280,7 @@ describe('CollectionDetailPage', () => {
         joinedAt: '2025-01-01',
       } as never,
     ];
+    puzzleStore.puzzles = [];
     auth.user = {
       id: 'user-1',
       username: 'alice',
@@ -204,6 +288,7 @@ describe('CollectionDetailPage', () => {
       isAdmin: false,
       createdAt: '2025-01-01',
     };
+    openMembersPanel('user-1');
     const router = makeRouter();
     await router.push('/collections/col-1');
 
@@ -215,16 +300,24 @@ describe('CollectionDetailPage', () => {
     await wrapper.find('button.text-destructive').trigger('click');
     await flushPromises();
 
-    expect(store.removeMember).toHaveBeenCalledWith('col-1', 'user-2');
+    expect(collectionStore.removeMember).toHaveBeenCalledWith(
+      'col-1',
+      'user-2',
+    );
   });
 
   it('shows an invite error when the invitation fails', async () => {
-    const store = useCollectionStore();
+    const collectionStore = useCollectionStore();
+    const puzzleStore = usePuzzleStore();
     const auth = useAuthStore();
-    vi.spyOn(store, 'fetchById').mockResolvedValue();
-    vi.spyOn(store, 'invite').mockRejectedValue(new Error('Already a member'));
-    store.current = mockCollection as never;
-    store.members = [mockMember as never];
+    vi.spyOn(collectionStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(collectionStore, 'invite').mockRejectedValue(
+      new Error('Already a member'),
+    );
+    collectionStore.current = mockCollection as never;
+    collectionStore.members = [mockMember as never];
+    puzzleStore.puzzles = [];
     auth.user = {
       id: 'user-1',
       username: 'alice',
@@ -232,6 +325,7 @@ describe('CollectionDetailPage', () => {
       isAdmin: false,
       createdAt: '2025-01-01',
     };
+    openMembersPanel('user-1');
     const router = makeRouter();
     await router.push('/collections/col-1');
 
@@ -240,10 +334,37 @@ describe('CollectionDetailPage', () => {
     });
     await flushPromises();
 
-    await wrapper.find('input[type="email"]').setValue('bob@example.com');
-    await wrapper.find('form').trigger('submit');
+    await wrapper.find('#panel-invite-email').setValue('bob@example.com');
+    await wrapper.find('form[class*="flex-col"]').trigger('submit');
     await flushPromises();
 
     expect(wrapper.find('[role="alert"]').text()).toContain('Already a member');
+  });
+
+  it('persists the members panel state in localStorage', async () => {
+    const collectionStore = useCollectionStore();
+    const puzzleStore = usePuzzleStore();
+    vi.spyOn(collectionStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'fetchAll').mockResolvedValue();
+    collectionStore.current = mockCollection as never;
+    collectionStore.members = [];
+    puzzleStore.puzzles = [];
+    const router = makeRouter();
+    await router.push('/collections/col-1');
+
+    const wrapper = mount(CollectionDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    const toggleBtn = wrapper
+      .findAll('button')
+      .find((b) => b.text().includes('Members'));
+    await toggleBtn!.trigger('click');
+
+    expect(localStorage.getItem('hm:members-panel:guest')).toBe('true');
+
+    await toggleBtn!.trigger('click');
+    expect(localStorage.getItem('hm:members-panel:guest')).toBe('false');
   });
 });
