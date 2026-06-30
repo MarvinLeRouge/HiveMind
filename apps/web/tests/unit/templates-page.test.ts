@@ -15,15 +15,17 @@ const mockTemplate = {
   isSystem: false,
   isPublic: false,
   createdBy: 'user-1',
-  useIndex: false,
-  useGcCode: true,
-  useDifficulty: false,
-  useTerrain: false,
-  useCoords: false,
-  useHint: false,
-  useSpoiler: false,
+  indexMode: 'disabled' as const,
+  gcCodeMode: 'optional' as const,
+  difficultyMode: 'disabled' as const,
+  terrainMode: 'disabled' as const,
+  coordsMode: 'disabled' as const,
+  hintMode: 'disabled' as const,
+  spoilerMode: 'disabled' as const,
   customField1Label: null,
+  customField1Mode: 'disabled' as const,
   customField2Label: null,
+  customField2Mode: 'disabled' as const,
   createdAt: '2025-01-01T00:00:00.000Z',
 };
 
@@ -181,7 +183,13 @@ describe('TemplatesPage', () => {
   it('shows the active field list for a template', async () => {
     const store = useTemplateStore();
     vi.spyOn(store, 'fetchAll').mockResolvedValue();
-    store.templates = [{ ...mockTemplate, useGcCode: true, useHint: true }];
+    store.templates = [
+      {
+        ...mockTemplate,
+        gcCodeMode: 'optional' as const,
+        hintMode: 'required' as const,
+      },
+    ];
 
     const router = makeRouter();
     await router.push('/templates');

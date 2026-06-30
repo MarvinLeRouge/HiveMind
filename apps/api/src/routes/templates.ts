@@ -22,15 +22,17 @@ function serializeTemplate(t: {
   isSystem: boolean;
   isPublic: boolean;
   createdBy: string | null;
-  useIndex: boolean;
-  useGcCode: boolean;
-  useDifficulty: boolean;
-  useTerrain: boolean;
-  useCoords: boolean;
-  useHint: boolean;
-  useSpoiler: boolean;
+  indexMode: string;
+  gcCodeMode: string;
+  difficultyMode: string;
+  terrainMode: string;
+  coordsMode: string;
+  hintMode: string;
+  spoilerMode: string;
   customField1Label: string | null;
+  customField1Mode: string;
   customField2Label: string | null;
+  customField2Mode: string;
   createdAt: Date;
 }) {
   return { ...t, createdAt: t.createdAt.toISOString() };

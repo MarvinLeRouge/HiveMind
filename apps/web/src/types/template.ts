@@ -1,3 +1,6 @@
+/** Valid values for a template field mode. */
+export type FieldMode = 'disabled' | 'optional' | 'required';
+
 /** A template resource as returned by the API. */
 export interface Template {
   id: string;
@@ -6,14 +9,16 @@ export interface Template {
   isSystem: boolean;
   isPublic: boolean;
   createdBy: string | null;
-  useIndex: boolean;
-  useGcCode: boolean;
-  useDifficulty: boolean;
-  useTerrain: boolean;
-  useCoords: boolean;
-  useHint: boolean;
-  useSpoiler: boolean;
+  indexMode: FieldMode;
+  gcCodeMode: FieldMode;
+  difficultyMode: FieldMode;
+  terrainMode: FieldMode;
+  coordsMode: FieldMode;
+  hintMode: FieldMode;
+  spoilerMode: FieldMode;
   customField1Label: string | null;
+  customField1Mode: FieldMode;
   customField2Label: string | null;
+  customField2Mode: FieldMode;
   createdAt: string;
 }

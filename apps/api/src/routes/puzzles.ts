@@ -23,6 +23,7 @@ function serializePuzzle(p: {
   collectionId: string;
   sortOrder: number;
   title: string;
+  description?: string | null;
   status: string;
   workingOnId: string | null;
   checkerUrl: string | null;

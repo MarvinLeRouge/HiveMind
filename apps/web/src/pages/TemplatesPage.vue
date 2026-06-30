@@ -112,20 +112,24 @@ function canEdit(t: Template): boolean {
   return t.createdBy === auth.user?.id;
 }
 
-/** Returns the list of active boolean field labels for display. */
+/** Returns the list of enabled field labels for display. */
 function activeFields(t: Template): string[] {
   const map: [keyof Template, string][] = [
-    ['useIndex', 'Index'],
-    ['useGcCode', 'GC code'],
-    ['useDifficulty', 'Difficulty'],
-    ['useTerrain', 'Terrain'],
-    ['useCoords', 'Coords'],
-    ['useHint', 'Hint'],
-    ['useSpoiler', 'Spoiler'],
+    ['indexMode', 'Index'],
+    ['gcCodeMode', 'GC code'],
+    ['difficultyMode', 'Difficulty'],
+    ['terrainMode', 'Terrain'],
+    ['coordsMode', 'Coords'],
+    ['hintMode', 'Hint'],
+    ['spoilerMode', 'Spoiler'],
   ];
-  const fields = map.filter(([key]) => t[key]).map(([, label]) => label);
-  if (t.customField1Label) fields.push(t.customField1Label);
-  if (t.customField2Label) fields.push(t.customField2Label);
+  const fields = map
+    .filter(([key]) => t[key] !== 'disabled')
+    .map(([, label]) => label);
+  if (t.customField1Label && t.customField1Mode !== 'disabled')
+    fields.push(t.customField1Label);
+  if (t.customField2Label && t.customField2Mode !== 'disabled')
+    fields.push(t.customField2Label);
   return fields;
 }
 

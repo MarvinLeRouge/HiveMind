@@ -52,58 +52,50 @@
         </label>
       </div>
 
-      <!-- Fields -->
+      <!-- Puzzle fields -->
       <fieldset class="space-y-3 rounded-md border p-4">
         <legend class="px-1 text-sm font-medium">Puzzle fields</legend>
 
         <div
-          v-for="field in booleanFields"
+          v-for="field in modeFields"
           :key="field.key"
-          class="flex items-center gap-2"
+          class="flex items-center justify-between gap-4"
         >
-          <input
+          <label :for="field.key" class="text-sm">{{ field.label }}</label>
+          <select
             :id="field.key"
             v-model="form[field.key]"
-            type="checkbox"
-            class="h-4 w-4 rounded border-input"
-          />
-          <label :for="field.key" class="text-sm">{{ field.label }}</label>
+            class="h-8 rounded-md border border-input bg-transparent px-2 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          >
+            <option value="disabled">Disabled</option>
+            <option value="optional">Optional</option>
+            <option value="required">Required</option>
+          </select>
         </div>
 
-        <!-- Custom field labels -->
-        <div class="pt-2 space-y-2">
-          <div class="space-y-1">
-            <label
-              for="customField1Label"
-              class="text-xs font-medium text-muted-foreground"
-            >
-              Custom field 1 label (optional, max 32 chars)
-            </label>
-            <input
-              id="customField1Label"
-              v-model="form.customField1Label"
-              type="text"
-              maxlength="32"
-              placeholder="e.g. Zone"
-              class="flex h-8 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-            />
-          </div>
-          <div class="space-y-1">
-            <label
-              for="customField2Label"
-              class="text-xs font-medium text-muted-foreground"
-            >
-              Custom field 2 label (optional, max 32 chars)
-            </label>
-            <input
-              id="customField2Label"
-              v-model="form.customField2Label"
-              type="text"
-              maxlength="32"
-              placeholder="e.g. Reference"
-              class="flex h-8 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-            />
-          </div>
+        <!-- Custom fields -->
+        <div
+          v-for="cf in customFields"
+          :key="cf.labelKey"
+          class="flex flex-wrap items-center gap-2 border-t pt-3"
+        >
+          <label :for="cf.labelKey" class="w-24 text-sm">{{ cf.label }}</label>
+          <input
+            :id="cf.labelKey"
+            v-model="form[cf.labelKey]"
+            type="text"
+            maxlength="32"
+            :placeholder="`Label (e.g. ${cf.placeholder})`"
+            class="flex h-8 flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          />
+          <select
+            v-model="form[cf.modeKey]"
+            class="h-8 rounded-md border border-input bg-transparent px-2 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          >
+            <option value="disabled">Disabled</option>
+            <option value="optional">Optional</option>
+            <option value="required">Required</option>
+          </select>
         </div>
       </fieldset>
 
@@ -134,6 +126,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useTemplateStore } from '@/stores/template';
+import type { FieldMode } from '@/types/template';
 
 const router = useRouter();
 const store = useTemplateStore();
@@ -141,29 +134,80 @@ const store = useTemplateStore();
 const saving = ref(false);
 const error = ref('');
 
-const form = ref({
+type FormShape = {
+  name: string;
+  description: string;
+  isPublic: boolean;
+  indexMode: FieldMode;
+  gcCodeMode: FieldMode;
+  difficultyMode: FieldMode;
+  terrainMode: FieldMode;
+  coordsMode: FieldMode;
+  hintMode: FieldMode;
+  spoilerMode: FieldMode;
+  customField1Label: string;
+  customField1Mode: FieldMode;
+  customField2Label: string;
+  customField2Mode: FieldMode;
+};
+
+const form = ref<FormShape>({
   name: '',
   description: '',
   isPublic: false,
-  useIndex: false,
-  useGcCode: false,
-  useDifficulty: false,
-  useTerrain: false,
-  useCoords: false,
-  useHint: false,
-  useSpoiler: false,
+  indexMode: 'disabled',
+  gcCodeMode: 'disabled',
+  difficultyMode: 'disabled',
+  terrainMode: 'disabled',
+  coordsMode: 'disabled',
+  hintMode: 'disabled',
+  spoilerMode: 'disabled',
   customField1Label: '',
+  customField1Mode: 'disabled',
   customField2Label: '',
+  customField2Mode: 'disabled',
 });
 
-const booleanFields = [
-  { key: 'useIndex' as const, label: 'Index number' },
-  { key: 'useGcCode' as const, label: 'GC code' },
-  { key: 'useDifficulty' as const, label: 'Difficulty rating' },
-  { key: 'useTerrain' as const, label: 'Terrain rating' },
-  { key: 'useCoords' as const, label: 'Coordinates' },
-  { key: 'useHint' as const, label: 'Hint' },
-  { key: 'useSpoiler' as const, label: 'Spoiler' },
+const modeFields: {
+  key: keyof Pick<
+    FormShape,
+    | 'indexMode'
+    | 'gcCodeMode'
+    | 'difficultyMode'
+    | 'terrainMode'
+    | 'coordsMode'
+    | 'hintMode'
+    | 'spoilerMode'
+  >;
+  label: string;
+}[] = [
+  { key: 'indexMode', label: 'Index number' },
+  { key: 'gcCodeMode', label: 'GC code' },
+  { key: 'difficultyMode', label: 'Difficulty rating' },
+  { key: 'terrainMode', label: 'Terrain rating' },
+  { key: 'coordsMode', label: 'Coordinates' },
+  { key: 'hintMode', label: 'Hint' },
+  { key: 'spoilerMode', label: 'Spoiler' },
+];
+
+const customFields: {
+  label: string;
+  labelKey: 'customField1Label' | 'customField2Label';
+  modeKey: 'customField1Mode' | 'customField2Mode';
+  placeholder: string;
+}[] = [
+  {
+    label: 'Custom field 1',
+    labelKey: 'customField1Label',
+    modeKey: 'customField1Mode',
+    placeholder: 'Zone',
+  },
+  {
+    label: 'Custom field 2',
+    labelKey: 'customField2Label',
+    modeKey: 'customField2Mode',
+    placeholder: 'Reference',
+  },
 ];
 
 /** Submits the create form. */
@@ -171,27 +215,27 @@ async function handleSubmit() {
   error.value = '';
   saving.value = true;
   try {
-    const payload = {
-      name: form.value.name,
-      ...(form.value.description
-        ? { description: form.value.description }
+    const f = form.value;
+    await store.create({
+      name: f.name,
+      ...(f.description ? { description: f.description } : {}),
+      isPublic: f.isPublic,
+      indexMode: f.indexMode,
+      gcCodeMode: f.gcCodeMode,
+      difficultyMode: f.difficultyMode,
+      terrainMode: f.terrainMode,
+      coordsMode: f.coordsMode,
+      hintMode: f.hintMode,
+      spoilerMode: f.spoilerMode,
+      ...(f.customField1Label
+        ? { customField1Label: f.customField1Label }
         : {}),
-      isPublic: form.value.isPublic,
-      useIndex: form.value.useIndex,
-      useGcCode: form.value.useGcCode,
-      useDifficulty: form.value.useDifficulty,
-      useTerrain: form.value.useTerrain,
-      useCoords: form.value.useCoords,
-      useHint: form.value.useHint,
-      useSpoiler: form.value.useSpoiler,
-      ...(form.value.customField1Label
-        ? { customField1Label: form.value.customField1Label }
+      customField1Mode: f.customField1Mode,
+      ...(f.customField2Label
+        ? { customField2Label: f.customField2Label }
         : {}),
-      ...(form.value.customField2Label
-        ? { customField2Label: form.value.customField2Label }
-        : {}),
-    };
-    await store.create(payload);
+      customField2Mode: f.customField2Mode,
+    });
     router.push('/templates');
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Failed to create template.';
