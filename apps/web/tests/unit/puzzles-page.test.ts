@@ -130,6 +130,7 @@ describe('PuzzlesPage', () => {
       username: 'alice',
       email: 'alice@example.com',
       isAdmin: false,
+      language: 'en',
       createdAt: '2025-01-01',
     };
     collectionStore.members = [
@@ -169,6 +170,7 @@ describe('PuzzlesPage', () => {
       username: 'alice',
       email: 'alice@example.com',
       isAdmin: true,
+      language: 'en',
       createdAt: '2025-01-01',
     };
 
@@ -207,6 +209,7 @@ describe('PuzzlesPage', () => {
       username: 'alice',
       email: 'alice@example.com',
       isAdmin: true,
+      language: 'en',
       createdAt: '2025-01-01',
     };
 

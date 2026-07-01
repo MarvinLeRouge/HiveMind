@@ -64,6 +64,7 @@ describe('apiFetch', () => {
       username: 'u',
       email: 'e',
       isAdmin: false,
+      language: 'en',
       createdAt: '',
     };
     vi.spyOn(auth, 'refresh').mockResolvedValueOnce(false);

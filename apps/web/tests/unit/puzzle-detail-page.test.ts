@@ -399,6 +399,7 @@ describe('PuzzleDetailPage', () => {
       username: 'alice',
       email: 'alice@example.com',
       isAdmin: false,
+      language: 'en',
       createdAt: '2025-01-01',
     };
     puzzleStore.current = { ...mockPuzzle, workingOnId: 'user-1' };
@@ -428,6 +429,7 @@ describe('PuzzleDetailPage', () => {
       username: 'alice',
       email: 'alice@example.com',
       isAdmin: false,
+      language: 'en',
       createdAt: '2025-01-01',
     };
     puzzleStore.current = { ...mockPuzzle, workingOnId: 'user-1' };
@@ -462,6 +464,7 @@ describe('PuzzleDetailPage', () => {
       username: 'alice',
       email: 'alice@example.com',
       isAdmin: false,
+      language: 'en',
       createdAt: '2025-01-01',
     };
     puzzleStore.current = mockPuzzle;
@@ -496,6 +499,7 @@ describe('PuzzleDetailPage', () => {
       username: 'alice',
       email: 'alice@example.com',
       isAdmin: false,
+      language: 'en',
       createdAt: '2025-01-01',
     };
     puzzleStore.current = mockPuzzle;
@@ -542,6 +546,7 @@ describe('PuzzleDetailPage', () => {
       username: 'alice',
       email: 'alice@example.com',
       isAdmin: false,
+      language: 'en',
       createdAt: '2025-01-01',
     };
     puzzleStore.current = mockPuzzle;

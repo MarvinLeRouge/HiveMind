@@ -100,6 +100,7 @@ describe('TemplatesPage', () => {
       username: 'alice',
       email: 'alice@example.com',
       isAdmin: false,
+      language: 'en',
       createdAt: '2025-01-01',
     };
 
@@ -125,6 +126,7 @@ describe('TemplatesPage', () => {
       username: 'bob',
       email: 'bob@example.com',
       isAdmin: false,
+      language: 'en',
       createdAt: '2025-01-01',
     };
 
@@ -150,6 +152,7 @@ describe('TemplatesPage', () => {
       username: 'admin',
       email: 'admin@example.com',
       isAdmin: true,
+      language: 'en',
       createdAt: '2025-01-01',
     };
 
@@ -214,6 +217,7 @@ describe('TemplatesPage', () => {
       username: 'alice',
       email: 'alice@example.com',
       isAdmin: false,
+      language: 'en',
       createdAt: '2025-01-01',
     };
 
@@ -242,6 +246,7 @@ describe('TemplatesPage', () => {
       username: 'alice',
       email: 'alice@example.com',
       isAdmin: false,
+      language: 'en',
       createdAt: '2025-01-01',
     };
 

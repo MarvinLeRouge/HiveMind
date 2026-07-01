@@ -168,6 +168,7 @@ describe('useCollectionStore', () => {
         username: 'alice',
         email: 'alice@example.com',
         isAdmin: false,
+        language: 'en',
         createdAt: '2025-01-01',
       };
       store.members = [mockMember];
@@ -183,6 +184,7 @@ describe('useCollectionStore', () => {
         username: 'bob',
         email: 'bob@example.com',
         isAdmin: false,
+        language: 'en',
         createdAt: '2025-01-01',
       };
       store.members = [mockMember];
@@ -198,6 +200,7 @@ describe('useCollectionStore', () => {
         username: 'superadmin',
         email: 'admin@example.com',
         isAdmin: true,
+        language: 'en',
         createdAt: '2025-01-01',
       };
       store.members = [mockMember];
