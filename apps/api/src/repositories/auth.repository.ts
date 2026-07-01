@@ -31,4 +31,11 @@ export class AuthRepository {
   }): Promise<User> {
     return this.prisma.user.create({ data });
   }
+
+  /**
+   * Updates the preferred language for a user. Returns the updated user.
+   */
+  async updateLanguage(id: string, language: string): Promise<User> {
+    return this.prisma.user.update({ where: { id }, data: { language } });
+  }
 }

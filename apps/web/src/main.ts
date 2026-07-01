@@ -1,6 +1,7 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import { useAuthStore } from '@/stores/auth';
+import i18n from '@/i18n';
 import App from './App.vue';
 import router from './router/index';
 import './assets/main.css';
@@ -8,6 +9,7 @@ import './assets/main.css';
 const app = createApp(App);
 const pinia = createPinia();
 app.use(pinia);
+app.use(i18n);
 
 // Restore session from httpOnly refresh cookie before the router guard fires.
 // Without this, Pinia starts with accessToken=null on every page reload and

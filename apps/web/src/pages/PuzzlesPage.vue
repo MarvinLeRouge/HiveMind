@@ -12,9 +12,9 @@
             :to="`/collections/${collectionId}`"
             class="text-sm text-muted-foreground hover:text-foreground"
           >
-            ← Collection
+            {{ t('collection.back') }}
           </RouterLink>
-          <h1 class="mt-1 text-2xl font-bold">Puzzles</h1>
+          <h1 class="mt-1 text-2xl font-bold">{{ t('collection.puzzles') }}</h1>
         </div>
 
         <button
@@ -22,7 +22,7 @@
           class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90"
           @click="showAddForm = !showAddForm"
         >
-          + Add puzzle
+          {{ t('puzzle.add') }}
         </button>
       </div>
 
@@ -36,7 +36,7 @@
         <!-- Title (always required) -->
         <div class="space-y-1">
           <label for="new-puzzle-title" class="text-sm font-medium">
-            Title <span class="text-destructive">*</span>
+            {{ t('puzzle.title') }} <span class="text-destructive">*</span>
           </label>
           <input
             id="new-puzzle-title"
@@ -51,7 +51,7 @@
         <!-- Description (always present) -->
         <div class="space-y-1">
           <label for="new-puzzle-description" class="text-sm font-medium">
-            Description
+            {{ t('puzzle.description') }}
           </label>
           <textarea
             id="new-puzzle-description"
@@ -65,7 +65,7 @@
         <!-- Checker URL (always optional) -->
         <div class="space-y-1">
           <label for="new-puzzle-checker" class="text-sm font-medium">
-            Checker URL
+            {{ t('puzzle.checkerUrl') }}
           </label>
           <input
             id="new-puzzle-checker"
@@ -80,7 +80,7 @@
         <template v-if="template">
           <div v-if="template.gcCodeMode !== 'disabled'" class="space-y-1">
             <label for="new-gc-code" class="text-sm font-medium">
-              GC code
+              {{ t('puzzle.gcCode') }}
               <span
                 v-if="template.gcCodeMode === 'required'"
                 class="text-destructive"
@@ -99,7 +99,7 @@
 
           <div v-if="template.difficultyMode !== 'disabled'" class="space-y-1">
             <label for="new-difficulty" class="text-sm font-medium">
-              Difficulty (1–5)
+              {{ t('puzzle.difficulty') }}
               <span
                 v-if="template.difficultyMode === 'required'"
                 class="text-destructive"
@@ -121,7 +121,7 @@
 
           <div v-if="template.terrainMode !== 'disabled'" class="space-y-1">
             <label for="new-terrain" class="text-sm font-medium">
-              Terrain (1–5)
+              {{ t('puzzle.terrain') }}
               <span
                 v-if="template.terrainMode === 'required'"
                 class="text-destructive"
@@ -143,7 +143,7 @@
 
           <div v-if="template.coordsMode !== 'disabled'" class="space-y-1">
             <label for="new-coords" class="text-sm font-medium">
-              Coordinates
+              {{ t('puzzle.coords') }}
               <span
                 v-if="template.coordsMode === 'required'"
                 class="text-destructive"
@@ -162,7 +162,7 @@
 
           <div v-if="template.hintMode !== 'disabled'" class="space-y-1">
             <label for="new-hint" class="text-sm font-medium">
-              Hint
+              {{ t('puzzle.hint') }}
               <span
                 v-if="template.hintMode === 'required'"
                 class="text-destructive"
@@ -180,7 +180,7 @@
 
           <div v-if="template.spoilerMode !== 'disabled'" class="space-y-1">
             <label for="new-spoiler" class="text-sm font-medium">
-              Spoiler
+              {{ t('puzzle.spoiler') }}
               <span
                 v-if="template.spoilerMode === 'required'"
                 class="text-destructive"
@@ -203,7 +203,7 @@
             :disabled="adding"
             class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-50"
           >
-            {{ adding ? 'Adding…' : 'Add' }}
+            {{ adding ? '…' : t('common.add') }}
           </button>
           <p v-if="addError" role="alert" class="text-sm text-destructive">
             {{ addError }}
@@ -213,7 +213,7 @@
 
       <!-- Puzzle list -->
       <div v-if="puzzles.length === 0" class="text-sm text-muted-foreground">
-        No puzzles yet.
+        {{ t('puzzle.noItems') }}
       </div>
 
       <ul v-else aria-label="Puzzle list" class="space-y-2">
@@ -252,7 +252,11 @@
             v-if="puzzle.workingOnId"
             class="rounded bg-blue-50 px-2 py-0.5 text-xs text-blue-600"
           >
-            {{ puzzle.workingOnId === currentUserId ? 'You' : 'Claimed' }}
+            {{
+              puzzle.workingOnId === currentUserId
+                ? t('puzzle.you')
+                : t('puzzle.claimed')
+            }}
           </span>
 
           <!-- GC code -->
@@ -264,13 +268,14 @@
     </template>
 
     <p v-if="!loadError && loading" class="text-sm text-muted-foreground">
-      Loading…
+      {{ t('common.loading') }}
     </p>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { usePuzzleStore } from '@/stores/puzzle';
@@ -278,6 +283,7 @@ import { useCollectionStore } from '@/stores/collection';
 import { useAuthStore } from '@/stores/auth';
 import PuzzleStatusBadge from '@/components/PuzzleStatusBadge.vue';
 
+const { t } = useI18n();
 const route = useRoute();
 const collectionId = route.params.id as string;
 

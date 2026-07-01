@@ -1,12 +1,12 @@
 <template>
   <div class="container py-8">
     <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
-      <h1 class="text-2xl font-bold">Collections</h1>
+      <h1 class="text-2xl font-bold">{{ t('collection.title') }}</h1>
       <RouterLink
         to="/collections/new"
         class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90"
       >
-        New collection
+        {{ t('collection.new') }}
       </RouterLink>
     </div>
 
@@ -14,15 +14,17 @@
       {{ error }}
     </p>
 
-    <p v-else-if="loading" class="text-sm text-muted-foreground">Loading…</p>
+    <p v-else-if="loading" class="text-sm text-muted-foreground">
+      {{ t('common.loading') }}
+    </p>
 
     <p
       v-else-if="collections.length === 0"
       class="text-sm text-muted-foreground"
     >
-      You have no collections yet.
+      {{ t('collection.noItems') }}
       <RouterLink to="/collections/new" class="text-primary hover:underline">
-        Create your first one.
+        {{ t('collection.noItemsCreate') }}
       </RouterLink>
     </p>
 
@@ -50,9 +52,11 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useCollectionStore } from '@/stores/collection';
 import { storeToRefs } from 'pinia';
 
+const { t } = useI18n();
 const store = useCollectionStore();
 const { collections } = storeToRefs(store);
 const loading = ref(true);

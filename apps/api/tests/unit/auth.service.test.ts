@@ -13,6 +13,7 @@ const mockUser: User = {
   email: 'alice@example.com',
   passwordHash: bcrypt.hashSync('password123', 1),
   isAdmin: false,
+  language: 'en',
   createdAt: new Date('2025-01-01T00:00:00Z'),
 };
 
@@ -23,6 +24,7 @@ function makeRepo(overrides: Partial<AuthRepository> = {}): AuthRepository {
     findByEmail: vi.fn().mockResolvedValue(null),
     findById: vi.fn().mockResolvedValue(null),
     create: vi.fn().mockResolvedValue(mockUser),
+    updateLanguage: vi.fn().mockResolvedValue(mockUser),
     ...overrides,
   } as unknown as AuthRepository;
 }
@@ -154,6 +156,7 @@ describe('AuthService.me', () => {
 
     expect(result.id).toBe(mockUser.id);
     expect(result.email).toBe(mockUser.email);
+    expect(result.language).toBe('en');
   });
 
   it('throws 401 if user does not exist', async () => {
@@ -163,5 +166,30 @@ describe('AuthService.me', () => {
     await expect(service.me('unknown-id')).rejects.toMatchObject({
       statusCode: 401,
     });
+  });
+});
+
+describe('AuthService.updateLanguage', () => {
+  it('calls updateLanguage on the repo and returns the updated user', async () => {
+    const updatedUser = { ...mockUser, language: 'fr' };
+    const repo = makeRepo({
+      findById: vi.fn().mockResolvedValue(mockUser),
+      updateLanguage: vi.fn().mockResolvedValue(updatedUser),
+    });
+    const service = new AuthService(repo, makeApp());
+
+    const result = await service.updateLanguage(mockUser.id, 'fr');
+
+    expect(repo.updateLanguage).toHaveBeenCalledWith(mockUser.id, 'fr');
+    expect(result.language).toBe('fr');
+  });
+
+  it('throws 401 if user does not exist', async () => {
+    const repo = makeRepo({ findById: vi.fn().mockResolvedValue(null) });
+    const service = new AuthService(repo, makeApp());
+
+    await expect(
+      service.updateLanguage('unknown-id', 'fr'),
+    ).rejects.toMatchObject({ statusCode: 401 });
   });
 });

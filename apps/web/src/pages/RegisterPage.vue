@@ -3,7 +3,9 @@
     <div class="w-full max-w-sm space-y-8">
       <div class="text-center">
         <h1 class="text-2xl font-bold tracking-tight">HiveMind</h1>
-        <p class="mt-2 text-sm text-muted-foreground">Create your account</p>
+        <p class="mt-2 text-sm text-muted-foreground">
+          {{ t('auth.registerSubtitle') }}
+        </p>
       </div>
 
       <form class="space-y-4" @submit.prevent="handleSubmit">
@@ -16,9 +18,9 @@
         </div>
 
         <div class="space-y-2">
-          <label for="username" class="text-sm font-medium leading-none"
-            >Username</label
-          >
+          <label for="username" class="text-sm font-medium leading-none">
+            {{ t('auth.username') }}
+          </label>
           <input
             id="username"
             v-model="form.username"
@@ -31,9 +33,9 @@
         </div>
 
         <div class="space-y-2">
-          <label for="email" class="text-sm font-medium leading-none"
-            >Email</label
-          >
+          <label for="email" class="text-sm font-medium leading-none">
+            {{ t('auth.email') }}
+          </label>
           <input
             id="email"
             v-model="form.email"
@@ -46,9 +48,9 @@
         </div>
 
         <div class="space-y-2">
-          <label for="password" class="text-sm font-medium leading-none"
-            >Password</label
-          >
+          <label for="password" class="text-sm font-medium leading-none">
+            {{ t('auth.password') }}
+          </label>
           <input
             id="password"
             v-model="form.password"
@@ -64,17 +66,17 @@
           :disabled="loading"
           class="inline-flex h-9 w-full items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {{ loading ? 'Creating account…' : 'Create account' }}
+          {{ loading ? t('auth.creatingAccount') : t('auth.createAccount') }}
         </button>
       </form>
 
       <p class="text-center text-sm text-muted-foreground">
-        Already have an account?
+        {{ t('auth.haveAccount') }}
         <RouterLink
           to="/login"
           class="font-medium text-primary hover:underline"
         >
-          Sign in
+          {{ t('auth.signIn') }}
         </RouterLink>
       </p>
     </div>
@@ -83,9 +85,11 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 
+const { t } = useI18n();
 const router = useRouter();
 const auth = useAuthStore();
 

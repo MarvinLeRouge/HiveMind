@@ -137,6 +137,7 @@ describe('CollectionDetailPage', () => {
       username: 'alice',
       email: 'alice@example.com',
       isAdmin: false,
+      language: 'en',
       createdAt: '2025-01-01',
     };
     openMembersPanel('user-1');
@@ -184,6 +185,7 @@ describe('CollectionDetailPage', () => {
       username: 'alice',
       email: 'alice@example.com',
       isAdmin: false,
+      language: 'en',
       createdAt: '2025-01-01',
     };
     openMembersPanel('user-1');
@@ -248,6 +250,7 @@ describe('CollectionDetailPage', () => {
       username: 'alice',
       email: 'alice@example.com',
       isAdmin: false,
+      language: 'en',
       createdAt: '2025-01-01',
     };
     openMembersPanel('user-1');
@@ -286,6 +289,7 @@ describe('CollectionDetailPage', () => {
       username: 'alice',
       email: 'alice@example.com',
       isAdmin: false,
+      language: 'en',
       createdAt: '2025-01-01',
     };
     openMembersPanel('user-1');
@@ -323,6 +327,7 @@ describe('CollectionDetailPage', () => {
       username: 'alice',
       email: 'alice@example.com',
       isAdmin: false,
+      language: 'en',
       createdAt: '2025-01-01',
     };
     openMembersPanel('user-1');

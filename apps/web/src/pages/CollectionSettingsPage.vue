@@ -5,9 +5,9 @@
         :to="`/collections/${store.current?.slug ?? route.params.id}`"
         class="text-sm text-muted-foreground hover:text-foreground"
       >
-        ← Collection
+        {{ t('collection.back') }}
       </RouterLink>
-      <h1 class="text-2xl font-bold">Settings</h1>
+      <h1 class="text-2xl font-bold">{{ t('common.settings') }}</h1>
     </div>
 
     <form class="space-y-5" @submit.prevent="handleSave">
@@ -20,7 +20,9 @@
       </p>
 
       <div class="space-y-2">
-        <label for="name" class="text-sm font-medium">Name</label>
+        <label for="name" class="text-sm font-medium">
+          {{ t('collection.name') }}
+        </label>
         <input
           id="name"
           v-model="form.name"
@@ -32,7 +34,8 @@
 
       <div class="space-y-2">
         <label for="description" class="text-sm font-medium">
-          Description <span class="text-muted-foreground">(optional)</span>
+          {{ t('collection.description') }}
+          <span class="text-muted-foreground">{{ t('common.optional') }}</span>
         </label>
         <textarea
           id="description"
@@ -47,37 +50,39 @@
         :disabled="saving"
         class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {{ saving ? 'Saving…' : 'Save changes' }}
+        {{ saving ? t('collection.saving') : t('collection.saveChanges') }}
       </button>
     </form>
 
     <!-- Danger zone -->
     <div class="mt-10 rounded-md border border-destructive/40 p-5">
-      <h2 class="mb-2 font-semibold text-destructive">Danger zone</h2>
+      <h2 class="mb-2 font-semibold text-destructive">
+        {{ t('collection.dangerZone') }}
+      </h2>
       <p class="mb-4 text-sm text-muted-foreground">
-        Deleting a collection is permanent and cannot be undone.
+        {{ t('collection.deleteWarning') }}
       </p>
       <button
         v-if="!confirmDelete"
         class="inline-flex h-9 items-center rounded-md border border-destructive px-4 text-sm font-medium text-destructive hover:bg-destructive/10"
         @click="confirmDelete = true"
       >
-        Delete collection
+        {{ t('collection.delete') }}
       </button>
       <div v-else class="flex items-center gap-3">
-        <span class="text-sm">Are you sure?</span>
+        <span class="text-sm">{{ t('collection.confirmDelete') }}</span>
         <button
           :disabled="deleting"
           class="inline-flex h-9 items-center rounded-md bg-destructive px-4 text-sm font-medium text-white hover:bg-destructive/90 disabled:opacity-50"
           @click="handleDelete"
         >
-          {{ deleting ? 'Deleting…' : 'Yes, delete' }}
+          {{ deleting ? t('collection.deleting') : t('collection.yesDelete') }}
         </button>
         <button
           class="text-sm text-muted-foreground hover:text-foreground"
           @click="confirmDelete = false"
         >
-          Cancel
+          {{ t('common.cancel') }}
         </button>
       </div>
     </div>
@@ -86,9 +91,11 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useCollectionStore } from '@/stores/collection';
 
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const store = useCollectionStore();

@@ -5,9 +5,9 @@
         to="/collections"
         class="text-sm text-muted-foreground hover:text-foreground"
       >
-        ← Collections
+        {{ t('collection.back') }}
       </RouterLink>
-      <h1 class="text-2xl font-bold">New collection</h1>
+      <h1 class="text-2xl font-bold">{{ t('collection.new') }}</h1>
     </div>
 
     <form class="space-y-5" @submit.prevent="handleSubmit">
@@ -20,7 +20,9 @@
       </p>
 
       <div class="space-y-2">
-        <label for="name" class="text-sm font-medium">Name</label>
+        <label for="name" class="text-sm font-medium">
+          {{ t('collection.name') }}
+        </label>
         <input
           id="name"
           v-model="form.name"
@@ -33,7 +35,8 @@
 
       <div class="space-y-2">
         <label for="description" class="text-sm font-medium">
-          Description <span class="text-muted-foreground">(optional)</span>
+          {{ t('collection.description') }}
+          <span class="text-muted-foreground">{{ t('common.optional') }}</span>
         </label>
         <textarea
           id="description"
@@ -45,7 +48,9 @@
       </div>
 
       <div class="space-y-2">
-        <label for="template" class="text-sm font-medium">Template</label>
+        <label for="template" class="text-sm font-medium">
+          {{ t('collection.template') }}
+        </label>
         <select
           id="template"
           v-model="form.templateId"
@@ -53,8 +58,8 @@
           class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
         >
           <option value="" disabled>Select a template…</option>
-          <option v-for="t in templates" :key="t.id" :value="t.id">
-            {{ t.name }}
+          <option v-for="tmpl in templates" :key="tmpl.id" :value="tmpl.id">
+            {{ tmpl.name }}
           </option>
         </select>
       </div>
@@ -64,14 +69,14 @@
           to="/collections"
           class="inline-flex h-9 items-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
         >
-          Cancel
+          {{ t('common.cancel') }}
         </RouterLink>
         <button
           type="submit"
           :disabled="loading"
           class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {{ loading ? 'Creating…' : 'Create collection' }}
+          {{ loading ? t('collection.creating') : t('collection.create') }}
         </button>
       </div>
     </form>
@@ -80,11 +85,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useCollectionStore } from '@/stores/collection';
 import { useTemplateStore } from '@/stores/template';
 import { storeToRefs } from 'pinia';
 
+const { t } = useI18n();
 const router = useRouter();
 const collectionStore = useCollectionStore();
 const templateStore = useTemplateStore();
