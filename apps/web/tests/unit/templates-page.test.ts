@@ -235,6 +235,42 @@ describe('TemplatesPage', () => {
     expect(store.delete).toHaveBeenCalledWith('tpl-1');
   });
 
+  it('shows all active field labels including custom fields', async () => {
+    const store = useTemplateStore();
+    vi.spyOn(store, 'fetchAll').mockResolvedValue();
+    store.templates = [
+      {
+        ...mockTemplate,
+        indexMode: 'optional' as const,
+        gcCodeMode: 'optional' as const,
+        difficultyMode: 'required' as const,
+        terrainMode: 'optional' as const,
+        coordsMode: 'optional' as const,
+        hintMode: 'required' as const,
+        spoilerMode: 'optional' as const,
+        customField1Label: 'Zone',
+        customField1Mode: 'optional' as const,
+        customField2Label: 'Reference',
+        customField2Mode: 'required' as const,
+      },
+    ];
+
+    const router = makeRouter();
+    await router.push('/templates');
+
+    const wrapper = mount(TemplatesPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('Difficulty rating');
+    expect(wrapper.text()).toContain('Terrain rating');
+    expect(wrapper.text()).toContain('Coordinates');
+    expect(wrapper.text()).toContain('Spoiler');
+    expect(wrapper.text()).toContain('Zone');
+    expect(wrapper.text()).toContain('Reference');
+  });
+
   it('shows a delete error when deletion fails', async () => {
     const store = useTemplateStore();
     const auth = useAuthStore();

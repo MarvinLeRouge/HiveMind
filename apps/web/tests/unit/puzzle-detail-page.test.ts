@@ -175,6 +175,46 @@ describe('PuzzleDetailPage', () => {
     expect(wrapper.text()).toContain('Mark as In progress');
   });
 
+  it('shows the "Mark as Solved" button for in_progress puzzle', async () => {
+    const puzzleStore = usePuzzleStore();
+    const noteStore = useNoteStore();
+    const attemptStore = useAttemptStore();
+    vi.spyOn(puzzleStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(noteStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(attemptStore, 'fetchAll').mockResolvedValue();
+    puzzleStore.current = { ...mockPuzzle, status: 'in_progress' };
+
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles/pzl-1');
+
+    const wrapper = mount(PuzzleDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('Mark as Solved');
+  });
+
+  it('shows the "Mark as Verified" button for solved puzzle', async () => {
+    const puzzleStore = usePuzzleStore();
+    const noteStore = useNoteStore();
+    const attemptStore = useAttemptStore();
+    vi.spyOn(puzzleStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(noteStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(attemptStore, 'fetchAll').mockResolvedValue();
+    puzzleStore.current = { ...mockPuzzle, status: 'solved' };
+
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles/pzl-1');
+
+    const wrapper = mount(PuzzleDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('Mark as Verified');
+  });
+
   it('does not show a status button for verified puzzles', async () => {
     const puzzleStore = usePuzzleStore();
     const noteStore = useNoteStore();

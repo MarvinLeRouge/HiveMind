@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useAuthStore } from '../../src/stores/auth';
+import i18n from '../../src/i18n';
 
 // ── Mock ofetch ───────────────────────────────────────────────────────────────
 
@@ -141,6 +142,45 @@ describe('useAuthStore', () => {
       await auth.init();
 
       expect(auth.isAuthenticated).toBe(false);
+    });
+  });
+
+  describe('setLanguage', () => {
+    it('patches the API, updates user.language, and syncs the locale', async () => {
+      const auth = useAuthStore();
+      auth.accessToken = 'token-abc';
+      auth.user = { ...mockUser };
+      mockFetch.mockResolvedValueOnce({ ...mockUser, language: 'fr' });
+
+      await auth.setLanguage('fr');
+
+      expect(auth.user?.language).toBe('fr');
+      expect(i18n.global.locale.value).toBe('fr');
+    });
+
+    it('still syncs locale when user is null', async () => {
+      const auth = useAuthStore();
+      auth.accessToken = 'token-abc';
+      auth.user = null;
+      mockFetch.mockResolvedValueOnce({ ...mockUser, language: 'fr' });
+
+      await auth.setLanguage('fr');
+
+      expect(i18n.global.locale.value).toBe('fr');
+    });
+  });
+
+  describe('syncLocale', () => {
+    it('sets locale to fr for a supported language', () => {
+      const auth = useAuthStore();
+      auth.syncLocale('fr');
+      expect(i18n.global.locale.value).toBe('fr');
+    });
+
+    it('falls back to en for an unsupported language', () => {
+      const auth = useAuthStore();
+      auth.syncLocale('de');
+      expect(i18n.global.locale.value).toBe('en');
     });
   });
 });

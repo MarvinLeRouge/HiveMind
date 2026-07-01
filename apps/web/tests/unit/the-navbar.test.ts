@@ -67,4 +67,25 @@ describe('TheNavbar', () => {
     expect(auth.logout).toHaveBeenCalledOnce();
     expect(router.currentRoute.value.path).toBe('/login');
   });
+
+  it('calls auth.setLanguage when a language button is clicked', async () => {
+    const router = makeRouter();
+    const auth = useAuthStore();
+    auth.user = {
+      id: 'u1',
+      username: 'alice',
+      email: 'alice@example.com',
+      isAdmin: false,
+      language: 'en',
+      createdAt: '2025-01-01',
+    };
+    vi.spyOn(auth, 'setLanguage').mockResolvedValue();
+
+    const wrapper = mount(TheNavbar, { global: { plugins: [pinia, router] } });
+    const frBtn = wrapper.findAll('button').find((b) => b.text() === 'FR');
+    await frBtn!.trigger('click');
+    await flushPromises();
+
+    expect(auth.setLanguage).toHaveBeenCalledWith('fr');
+  });
 });
