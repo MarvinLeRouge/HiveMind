@@ -1,6 +1,7 @@
 import type {
   PuzzleRepository,
   PuzzleRow,
+  WorkerSummary,
   CreatePuzzleData,
   UpdatePuzzleData,
 } from '../repositories/puzzle.repository.js';
@@ -24,7 +25,7 @@ export type FilteredPuzzle = {
   title: string;
   description?: string | null;
   status: string;
-  workingOnId: string | null;
+  workers: WorkerSummary[];
   checkerUrl: string | null;
   updatedAt: Date;
   gcCode?: string | null;
@@ -141,9 +142,8 @@ export class PuzzleService {
   }
 
   /**
-   * Claims a puzzle for the current user (sets workingOnId).
+   * Marks the current user as working on a puzzle (idempotent, non-exclusive).
    * Throws 404 if the puzzle does not exist.
-   * Throws 409 if the puzzle is already claimed by someone.
    */
   async claim(
     collectionId: string,
@@ -152,20 +152,12 @@ export class PuzzleService {
   ): Promise<void> {
     const puzzle = await this.repo.findById(collectionId, puzzleId);
     if (!puzzle) throw this.notFound();
-
-    if (puzzle.workingOnId !== null) {
-      throw Object.assign(new Error('Puzzle is already claimed'), {
-        statusCode: 409,
-      });
-    }
-
-    await this.repo.setClaim(puzzleId, userId);
+    await this.repo.addWorker(puzzleId, userId);
   }
 
   /**
-   * Releases the claim on a puzzle (clears workingOnId).
+   * Removes the current user from the puzzle's workers list.
    * Throws 404 if the puzzle does not exist.
-   * Throws 403 if the current user is not the claimant.
    */
   async unclaim(
     collectionId: string,
@@ -174,14 +166,7 @@ export class PuzzleService {
   ): Promise<void> {
     const puzzle = await this.repo.findById(collectionId, puzzleId);
     if (!puzzle) throw this.notFound();
-
-    if (puzzle.workingOnId !== userId) {
-      throw Object.assign(new Error('Puzzle is not claimed by you'), {
-        statusCode: 403,
-      });
-    }
-
-    await this.repo.setClaim(puzzleId, null);
+    await this.repo.removeWorker(puzzleId, userId);
   }
 
   // ── Private helpers ────────────────────────────────────────────────────────
@@ -201,7 +186,7 @@ function filterPuzzleFields(puzzle: PuzzleRow): FilteredPuzzle {
     title: puzzle.title,
     description: puzzle.description,
     status: puzzle.status,
-    workingOnId: puzzle.workingOnId,
+    workers: puzzle.workers.map((w) => w.user),
     checkerUrl: puzzle.checkerUrl,
     updatedAt: puzzle.updatedAt,
   };

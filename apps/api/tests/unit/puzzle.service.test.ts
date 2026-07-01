@@ -33,7 +33,7 @@ function makePuzzle(overrides: Partial<PuzzleRow> = {}): PuzzleRow {
     sortOrder: 0,
     title: 'Test Puzzle',
     status: 'open',
-    workingOnId: null,
+    workers: [],
     checkerUrl: null,
     gcCode: 'GC12345',
     difficulty: 3,
@@ -59,7 +59,8 @@ function makeRepo(overrides: Partial<PuzzleRepository> = {}): PuzzleRepository {
     update: vi.fn().mockResolvedValue(makePuzzle()),
     delete: vi.fn().mockResolvedValue(undefined),
     reorder: vi.fn().mockResolvedValue(undefined),
-    setClaim: vi.fn().mockResolvedValue(undefined),
+    addWorker: vi.fn().mockResolvedValue(undefined),
+    removeWorker: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   } as unknown as PuzzleRepository;
 }
@@ -229,24 +230,26 @@ describe('PuzzleService.reorder', () => {
 // ── PuzzleService.claim ───────────────────────────────────────────────────────
 
 describe('PuzzleService.claim', () => {
-  it('sets workingOnId when the puzzle is unclaimed', async () => {
-    const puzzle = makePuzzle({ workingOnId: null });
+  it('adds the user as a worker (non-exclusive)', async () => {
+    const puzzle = makePuzzle({ workers: [] });
     const repo = makeRepo({ findById: vi.fn().mockResolvedValue(puzzle) });
     const service = new PuzzleService(repo);
 
     await service.claim(collectionId, puzzleId, userId);
 
-    expect(repo.setClaim).toHaveBeenCalledWith(puzzleId, userId);
+    expect(repo.addWorker).toHaveBeenCalledWith(puzzleId, userId);
   });
 
-  it('throws 409 when the puzzle is already claimed', async () => {
-    const puzzle = makePuzzle({ workingOnId: otherId });
+  it('allows multiple users to claim the same puzzle', async () => {
+    const puzzle = makePuzzle({
+      workers: [{ user: { id: otherId, username: 'bob' } }],
+    });
     const repo = makeRepo({ findById: vi.fn().mockResolvedValue(puzzle) });
     const service = new PuzzleService(repo);
 
-    await expect(
-      service.claim(collectionId, puzzleId, userId),
-    ).rejects.toMatchObject({ statusCode: 409 });
+    await service.claim(collectionId, puzzleId, userId);
+
+    expect(repo.addWorker).toHaveBeenCalledWith(puzzleId, userId);
   });
 
   it('throws 404 when the puzzle does not exist', async () => {
@@ -263,24 +266,28 @@ describe('PuzzleService.claim', () => {
 // ── PuzzleService.unclaim ─────────────────────────────────────────────────────
 
 describe('PuzzleService.unclaim', () => {
-  it('clears workingOnId when the current user is the claimant', async () => {
-    const puzzle = makePuzzle({ workingOnId: userId });
+  it('removes the user from workers', async () => {
+    const puzzle = makePuzzle({
+      workers: [{ user: { id: userId, username: 'alice' } }],
+    });
     const repo = makeRepo({ findById: vi.fn().mockResolvedValue(puzzle) });
     const service = new PuzzleService(repo);
 
     await service.unclaim(collectionId, puzzleId, userId);
 
-    expect(repo.setClaim).toHaveBeenCalledWith(puzzleId, null);
+    expect(repo.removeWorker).toHaveBeenCalledWith(puzzleId, userId);
   });
 
-  it('throws 403 when the current user is not the claimant', async () => {
-    const puzzle = makePuzzle({ workingOnId: otherId });
+  it('allows any user to unclaim (no ownership check)', async () => {
+    const puzzle = makePuzzle({
+      workers: [{ user: { id: otherId, username: 'bob' } }],
+    });
     const repo = makeRepo({ findById: vi.fn().mockResolvedValue(puzzle) });
     const service = new PuzzleService(repo);
 
-    await expect(
-      service.unclaim(collectionId, puzzleId, userId),
-    ).rejects.toMatchObject({ statusCode: 403 });
+    await service.unclaim(collectionId, puzzleId, userId);
+
+    expect(repo.removeWorker).toHaveBeenCalledWith(puzzleId, userId);
   });
 
   it('throws 404 when the puzzle does not exist', async () => {

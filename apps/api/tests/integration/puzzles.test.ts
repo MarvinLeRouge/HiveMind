@@ -441,7 +441,7 @@ describe('PATCH /collections/:id/puzzles/reorder', () => {
 // ── POST /collections/:id/puzzles/:pid/claim ──────────────────────────────────
 
 describe('POST /collections/:id/puzzles/:pid/claim', () => {
-  it('claims a puzzle and returns 204', async () => {
+  it('adds the user to workers and returns 204', async () => {
     const collectionId = await createCollection(userToken);
     const puzzleId = (await createPuzzle(userToken, collectionId)).json()
       .id as string;
@@ -454,30 +454,55 @@ describe('POST /collections/:id/puzzles/:pid/claim', () => {
 
     expect(res.statusCode).toBe(204);
 
-    const puzzle = await prisma.puzzle.findUnique({ where: { id: puzzleId } });
-    expect(puzzle!.workingOnId).toBe(userId);
+    const worker = await prisma.puzzleWorker.findUnique({
+      where: { puzzleId_userId: { puzzleId, userId } },
+    });
+    expect(worker).not.toBeNull();
   });
 
-  it('returns 409 when already claimed', async () => {
+  it('is idempotent when called twice by the same user', async () => {
     const collectionId = await createCollection(userToken);
     const puzzleId = (await createPuzzle(userToken, collectionId)).json()
       .id as string;
 
-    // First claim
     await app.inject({
       method: 'POST',
       url: `/collections/${collectionId}/puzzles/${puzzleId}/claim`,
       headers: { authorization: `Bearer ${userToken}` },
     });
 
-    // Second claim attempt
     const res = await app.inject({
       method: 'POST',
       url: `/collections/${collectionId}/puzzles/${puzzleId}/claim`,
       headers: { authorization: `Bearer ${userToken}` },
     });
 
-    expect(res.statusCode).toBe(409);
+    expect(res.statusCode).toBe(204);
+    const count = await prisma.puzzleWorker.count({ where: { puzzleId } });
+    expect(count).toBe(1);
+  });
+
+  it('allows multiple users to claim the same puzzle', async () => {
+    const collectionId = await createCollection(userToken);
+    await prisma.collectionMember.create({
+      data: { collectionId, userId: otherUserId, role: 'member' },
+    });
+    const puzzleId = (await createPuzzle(userToken, collectionId)).json()
+      .id as string;
+
+    await app.inject({
+      method: 'POST',
+      url: `/collections/${collectionId}/puzzles/${puzzleId}/claim`,
+      headers: { authorization: `Bearer ${userToken}` },
+    });
+    await app.inject({
+      method: 'POST',
+      url: `/collections/${collectionId}/puzzles/${puzzleId}/claim`,
+      headers: { authorization: `Bearer ${otherToken}` },
+    });
+
+    const count = await prisma.puzzleWorker.count({ where: { puzzleId } });
+    expect(count).toBe(2);
   });
 
   it('returns 403 for a non-member', async () => {
@@ -511,12 +536,11 @@ describe('POST /collections/:id/puzzles/:pid/claim', () => {
 // ── DELETE /collections/:id/puzzles/:pid/claim ────────────────────────────────
 
 describe('DELETE /collections/:id/puzzles/:pid/claim', () => {
-  it('releases the claim and returns 204', async () => {
+  it('removes the user from workers and returns 204', async () => {
     const collectionId = await createCollection(userToken);
     const puzzleId = (await createPuzzle(userToken, collectionId)).json()
       .id as string;
 
-    // Claim first
     await app.inject({
       method: 'POST',
       url: `/collections/${collectionId}/puzzles/${puzzleId}/claim`,
@@ -531,13 +555,14 @@ describe('DELETE /collections/:id/puzzles/:pid/claim', () => {
 
     expect(res.statusCode).toBe(204);
 
-    const puzzle = await prisma.puzzle.findUnique({ where: { id: puzzleId } });
-    expect(puzzle!.workingOnId).toBeNull();
+    const worker = await prisma.puzzleWorker.findUnique({
+      where: { puzzleId_userId: { puzzleId, userId } },
+    });
+    expect(worker).toBeNull();
   });
 
-  it('returns 403 when the user is not the claimant', async () => {
+  it('any member can unclaim independently (non-exclusive)', async () => {
     const collectionId = await createCollection(userToken);
-    // Add user2 as member
     await prisma.collectionMember.create({
       data: { collectionId, userId: otherUserId, role: 'member' },
     });
@@ -551,14 +576,17 @@ describe('DELETE /collections/:id/puzzles/:pid/claim', () => {
       headers: { authorization: `Bearer ${userToken}` },
     });
 
-    // user2 tries to unclaim
+    // user2 removes themselves (no-op — not in workers)
     const res = await app.inject({
       method: 'DELETE',
       url: `/collections/${collectionId}/puzzles/${puzzleId}/claim`,
       headers: { authorization: `Bearer ${otherToken}` },
     });
 
-    expect(res.statusCode).toBe(403);
+    expect(res.statusCode).toBe(204);
+    // user1 is still a worker
+    const count = await prisma.puzzleWorker.count({ where: { puzzleId } });
+    expect(count).toBe(1);
   });
 
   it('returns 401 without token', async () => {

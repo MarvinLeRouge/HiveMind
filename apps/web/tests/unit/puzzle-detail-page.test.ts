@@ -16,7 +16,7 @@ const mockPuzzle = {
   sortOrder: 1,
   title: 'Mystery #1',
   status: 'open',
-  workingOnId: null,
+  workers: [] as { id: string; username: string }[],
   checkerUrl: 'https://checker.example.com',
   gcCode: 'GC12345',
   updatedAt: '2025-01-01T00:00:00.000Z',
@@ -442,7 +442,10 @@ describe('PuzzleDetailPage', () => {
       language: 'en',
       createdAt: '2025-01-01',
     };
-    puzzleStore.current = { ...mockPuzzle, workingOnId: 'user-1' };
+    puzzleStore.current = {
+      ...mockPuzzle,
+      workers: [{ id: 'user-1', username: 'alice' }],
+    };
 
     const router = makeRouter();
     await router.push('/collections/col-1/puzzles/pzl-1');
@@ -472,7 +475,10 @@ describe('PuzzleDetailPage', () => {
       language: 'en',
       createdAt: '2025-01-01',
     };
-    puzzleStore.current = { ...mockPuzzle, workingOnId: 'user-1' };
+    puzzleStore.current = {
+      ...mockPuzzle,
+      workers: [{ id: 'user-1', username: 'alice' }],
+    };
 
     const router = makeRouter();
     await router.push('/collections/col-1/puzzles/pzl-1');

@@ -33,7 +33,7 @@ const mockPuzzle = {
   title: 'First Puzzle',
   status: 'unsolved',
   sortOrder: 1,
-  workingOnId: null,
+  workers: [] as { id: string; username: string }[],
   gcCode: null,
 };
 

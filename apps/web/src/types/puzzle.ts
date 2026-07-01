@@ -6,7 +6,7 @@ export interface Puzzle {
   title: string;
   description?: string | null;
   status: string;
-  workingOnId: string | null;
+  workers: { id: string; username: string }[];
   checkerUrl: string | null;
   updatedAt: string;
   gcCode?: string | null;

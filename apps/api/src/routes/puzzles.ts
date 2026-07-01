@@ -25,7 +25,7 @@ function serializePuzzle(p: {
   title: string;
   description?: string | null;
   status: string;
-  workingOnId: string | null;
+  workers: { id: string; username: string }[];
   checkerUrl: string | null;
   updatedAt: Date;
   gcCode?: string | null;
@@ -179,7 +179,6 @@ export default async function puzzleRoutes(
         204: z.object({}),
         403: errorSchema,
         404: errorSchema,
-        409: errorSchema,
       },
     },
     preHandler: [authenticate, requireMember],

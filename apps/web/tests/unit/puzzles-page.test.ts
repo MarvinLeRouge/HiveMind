@@ -15,7 +15,7 @@ const mockPuzzle = {
   sortOrder: 1,
   title: 'Mystery #1',
   status: 'open',
-  workingOnId: null,
+  workers: [] as { id: string; username: string }[],
   checkerUrl: null,
   updatedAt: '2025-01-01T00:00:00.000Z',
 };
@@ -105,7 +105,9 @@ describe('PuzzlesPage', () => {
     const collectionStore = useCollectionStore();
     vi.spyOn(puzzleStore, 'fetchAll').mockResolvedValue();
     vi.spyOn(collectionStore, 'fetchById').mockResolvedValue();
-    puzzleStore.puzzles = [{ ...mockPuzzle, workingOnId: 'user-99' }];
+    puzzleStore.puzzles = [
+      { ...mockPuzzle, workers: [{ id: 'user-99', username: 'bob' }] },
+    ];
 
     const router = makeRouter();
     await router.push('/collections/col-1/puzzles');

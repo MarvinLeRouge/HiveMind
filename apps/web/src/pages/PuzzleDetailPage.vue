@@ -9,10 +9,10 @@
       <div class="mb-6 flex flex-wrap items-start justify-between gap-3">
         <div>
           <RouterLink
-            :to="`/collections/${collectionId}/puzzles`"
+            :to="`/collections/${collectionId}`"
             class="text-sm text-muted-foreground hover:text-foreground"
           >
-            {{ t('puzzle.back') }}
+            ← {{ collection?.name ?? t('puzzle.back') }}
           </RouterLink>
           <div class="mt-1 flex items-center gap-3">
             <h1 class="text-2xl font-bold">{{ current.title }}</h1>
@@ -31,7 +31,7 @@
             {{ claimBusy ? '…' : t('puzzle.release') }}
           </button>
           <button
-            v-else-if="!current.workingOnId"
+            v-else
             class="inline-flex h-9 items-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
             :disabled="claimBusy"
             @click="handleClaim"
@@ -629,7 +629,11 @@ const nextStatusLabel = computed(() => {
   return key ? t(key) : nextStatus.value;
 });
 
-const isClaimed = computed(() => current.value?.workingOnId === currentUserId);
+const isClaimed = computed(
+  () =>
+    !!currentUserId &&
+    (current.value?.workers.some((w) => w.id === currentUserId) ?? false),
+);
 
 onMounted(async () => {
   try {
