@@ -41,8 +41,7 @@ const router = createRouter({
     },
     {
       path: '/collections/:id/puzzles',
-      component: () => import('@/pages/PuzzlesPage.vue'),
-      meta: { requiresAuth: true },
+      redirect: (to) => `/collections/${to.params.id}`,
     },
     {
       path: '/collections/:id/puzzles/:pid',

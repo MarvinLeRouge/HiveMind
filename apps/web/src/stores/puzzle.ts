@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { apiFetch } from '@/lib/api-fetch';
+import { useAuthStore } from '@/stores/auth';
 import type { Puzzle } from '@/types/puzzle';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -75,24 +76,40 @@ export const usePuzzleStore = defineStore('puzzle', {
       );
     },
 
-    /** Claims the puzzle for the current user. */
+    /** Marks the current user as working on the puzzle. */
     async claim(collectionId: string, puzzleId: string): Promise<void> {
       await apiFetch(
         `${BASE_URL}/collections/${collectionId}/puzzles/${puzzleId}/claim`,
         { method: 'POST' },
       );
+      const auth = useAuthStore();
+      const me = auth.user
+        ? { id: auth.user.id, username: auth.user.username }
+        : null;
+      if (!me) return;
+      const addWorker = (p: Puzzle) => {
+        if (!p.workers.some((w) => w.id === me.id)) p.workers.push(me);
+      };
       const puzzle = this.puzzles.find((p) => p.id === puzzleId);
-      if (puzzle) puzzle.workingOnId = '__claimed__';
+      if (puzzle) addWorker(puzzle);
+      if (this.current?.id === puzzleId) addWorker(this.current);
     },
 
-    /** Releases the claim on a puzzle. */
+    /** Removes the current user from the puzzle's workers list. */
     async unclaim(collectionId: string, puzzleId: string): Promise<void> {
       await apiFetch(
         `${BASE_URL}/collections/${collectionId}/puzzles/${puzzleId}/claim`,
         { method: 'DELETE' },
       );
+      const auth = useAuthStore();
+      const userId = auth.user?.id;
+      if (!userId) return;
+      const removeWorker = (p: Puzzle) => {
+        p.workers = p.workers.filter((w) => w.id !== userId);
+      };
       const puzzle = this.puzzles.find((p) => p.id === puzzleId);
-      if (puzzle) puzzle.workingOnId = null;
+      if (puzzle) removeWorker(puzzle);
+      if (this.current?.id === puzzleId) removeWorker(this.current);
     },
   },
 });

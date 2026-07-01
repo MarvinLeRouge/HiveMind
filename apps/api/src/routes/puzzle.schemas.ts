@@ -59,7 +59,7 @@ export const puzzleSchema = z.object({
   title: z.string(),
   description: z.string().nullable().optional(),
   status: z.string(),
-  workingOnId: z.string().nullable(),
+  workers: z.array(z.object({ id: z.string(), username: z.string() })),
   checkerUrl: z.string().nullable(),
   updatedAt: z.string(),
   gcCode: z.string().nullable().optional(),

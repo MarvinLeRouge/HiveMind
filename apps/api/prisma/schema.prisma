@@ -22,7 +22,7 @@ model User {
   templates          Template[]
   notes              Note[]
   attempts           Attempt[]
-  workingOn          Puzzle[]           @relation("PuzzleWorker")
+  puzzleWorkers      PuzzleWorker[]
 }
 
 model Template {
@@ -96,7 +96,6 @@ model Puzzle {
   sortOrder    Int
   title        String
   status       String   @default("open") // "open"|"in_progress"|"solved"|"verified"
-  workingOnId  String?
   description  String?
   checkerUrl   String?
   gcCode       String?
@@ -108,10 +107,21 @@ model Puzzle {
   customFields Json?
   updatedAt    DateTime @updatedAt
 
-  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
-  worker     User?      @relation("PuzzleWorker", fields: [workingOnId], references: [id])
+  collection Collection    @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  workers    PuzzleWorker[]
   notes      Note[]
   attempts   Attempt[]
+}
+
+model PuzzleWorker {
+  puzzleId String
+  userId   String
+  joinedAt DateTime @default(now())
+
+  puzzle Puzzle @relation(fields: [puzzleId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([puzzleId, userId])
 }
 
 model Note {

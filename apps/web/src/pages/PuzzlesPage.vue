@@ -249,11 +249,11 @@
 
           <!-- Claim indicator -->
           <span
-            v-if="puzzle.workingOnId"
+            v-if="puzzle.workers.length > 0"
             class="rounded bg-blue-50 px-2 py-0.5 text-xs text-blue-600"
           >
             {{
-              puzzle.workingOnId === currentUserId
+              puzzle.workers.some((w) => w.id === currentUserId)
                 ? t('puzzle.you')
                 : t('puzzle.claimed')
             }}

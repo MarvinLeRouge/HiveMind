@@ -1,4 +1,4 @@
-import type { PrismaClient, Puzzle, Prisma } from '@prisma/client';
+import type { PrismaClient, Puzzle, Prisma, User } from '@prisma/client';
 
 /** Template field modes needed for field-filtering puzzle responses. */
 type TemplateFlags = {
@@ -15,9 +15,13 @@ type TemplateFlags = {
   customField2Mode: string;
 };
 
-/** Puzzle row with the collection's template snapshot flags included. */
+/** Worker summary included in puzzle responses. */
+export type WorkerSummary = Pick<User, 'id' | 'username'>;
+
+/** Puzzle row with the collection's template snapshot flags and workers included. */
 export type PuzzleRow = Puzzle & {
   collection: { templateSnapshot: TemplateFlags };
+  workers: { user: WorkerSummary }[];
 };
 
 /** Input shape for creating a puzzle. */
@@ -67,8 +71,13 @@ const SNAPSHOT_SELECT = {
   },
 } as const;
 
+const WORKERS_INCLUDE = {
+  select: { user: { select: { id: true, username: true } } },
+} as const;
+
 const PUZZLE_INCLUDE = {
   collection: { select: { templateSnapshot: SNAPSHOT_SELECT } },
+  workers: WORKERS_INCLUDE,
 } as const;
 
 /**
@@ -183,12 +192,22 @@ export class PuzzleRepository {
   }
 
   /**
-   * Sets (or clears) the workingOnId field to claim / unclaim a puzzle.
+   * Marks the user as working on the puzzle (idempotent).
    */
-  async setClaim(id: string, userId: string | null): Promise<void> {
-    await this.prisma.puzzle.update({
-      where: { id },
-      data: { workingOnId: userId },
+  async addWorker(puzzleId: string, userId: string): Promise<void> {
+    await this.prisma.puzzleWorker.upsert({
+      where: { puzzleId_userId: { puzzleId, userId } },
+      create: { puzzleId, userId },
+      update: {},
+    });
+  }
+
+  /**
+   * Removes the user from the puzzle's workers list (no-op if not present).
+   */
+  async removeWorker(puzzleId: string, userId: string): Promise<void> {
+    await this.prisma.puzzleWorker.deleteMany({
+      where: { puzzleId, userId },
     });
   }
 }

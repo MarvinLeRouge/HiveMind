@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { usePuzzleStore } from '../../src/stores/puzzle';
+import { useAuthStore } from '../../src/stores/auth';
 
 vi.mock('../../src/lib/api-fetch', () => ({
   apiFetch: vi.fn(),
@@ -15,7 +16,7 @@ const mockPuzzle = {
   sortOrder: 1,
   title: 'Mystery #1',
   status: 'open',
-  workingOnId: null,
+  workers: [] as { id: string; username: string }[],
   checkerUrl: null,
   updatedAt: '2025-01-01T00:00:00.000Z',
 };
@@ -105,26 +106,135 @@ describe('usePuzzleStore', () => {
   });
 
   describe('claim', () => {
-    it('sets workingOnId to a truthy sentinel', async () => {
+    it('does nothing when auth.user is null', async () => {
       mockFetch.mockResolvedValueOnce(undefined);
       const store = usePuzzleStore();
-      store.puzzles = [mockPuzzle];
+      store.puzzles = [{ ...mockPuzzle, workers: [] }];
+      // auth.user remains null by default
 
       await store.claim('col-1', 'pzl-1');
 
-      expect(store.puzzles[0].workingOnId).toBeTruthy();
+      expect(store.puzzles[0].workers).toHaveLength(0);
+    });
+
+    it('also updates current when it matches the puzzle', async () => {
+      mockFetch.mockResolvedValueOnce(undefined);
+      const store = usePuzzleStore();
+      store.puzzles = [];
+      store.current = { ...mockPuzzle, workers: [] };
+      const auth = useAuthStore();
+      auth.user = {
+        id: 'user-1',
+        username: 'alice',
+        email: 'alice@example.com',
+        isAdmin: false,
+        language: 'en',
+        createdAt: '',
+      };
+
+      await store.claim('col-1', 'pzl-1');
+
+      expect(store.current.workers).toHaveLength(1);
+    });
+
+    it('adds the current user to workers', async () => {
+      mockFetch.mockResolvedValueOnce(undefined);
+      const store = usePuzzleStore();
+      store.puzzles = [{ ...mockPuzzle, workers: [] }];
+      const auth = useAuthStore();
+      auth.user = {
+        id: 'user-1',
+        username: 'alice',
+        email: 'alice@example.com',
+        isAdmin: false,
+        language: 'en',
+        createdAt: '',
+      };
+
+      await store.claim('col-1', 'pzl-1');
+
+      expect(store.puzzles[0].workers).toHaveLength(1);
+      expect(store.puzzles[0].workers[0].id).toBe('user-1');
+    });
+
+    it('is idempotent when the user is already a worker', async () => {
+      mockFetch.mockResolvedValueOnce(undefined);
+      const store = usePuzzleStore();
+      store.puzzles = [
+        { ...mockPuzzle, workers: [{ id: 'user-1', username: 'alice' }] },
+      ];
+      const auth = useAuthStore();
+      auth.user = {
+        id: 'user-1',
+        username: 'alice',
+        email: 'alice@example.com',
+        isAdmin: false,
+        language: 'en',
+        createdAt: '',
+      };
+
+      await store.claim('col-1', 'pzl-1');
+
+      expect(store.puzzles[0].workers).toHaveLength(1);
     });
   });
 
   describe('unclaim', () => {
-    it('clears workingOnId', async () => {
+    it('does nothing when auth.user is null', async () => {
       mockFetch.mockResolvedValueOnce(undefined);
       const store = usePuzzleStore();
-      store.puzzles = [{ ...mockPuzzle, workingOnId: 'user-1' }];
+      store.puzzles = [
+        { ...mockPuzzle, workers: [{ id: 'user-1', username: 'alice' }] },
+      ];
+      // auth.user remains null by default
 
       await store.unclaim('col-1', 'pzl-1');
 
-      expect(store.puzzles[0].workingOnId).toBeNull();
+      expect(store.puzzles[0].workers).toHaveLength(1);
+    });
+
+    it('also updates current when it matches the puzzle', async () => {
+      mockFetch.mockResolvedValueOnce(undefined);
+      const store = usePuzzleStore();
+      store.puzzles = [];
+      store.current = {
+        ...mockPuzzle,
+        workers: [{ id: 'user-1', username: 'alice' }],
+      };
+      const auth = useAuthStore();
+      auth.user = {
+        id: 'user-1',
+        username: 'alice',
+        email: 'alice@example.com',
+        isAdmin: false,
+        language: 'en',
+        createdAt: '',
+      };
+
+      await store.unclaim('col-1', 'pzl-1');
+
+      expect(store.current.workers).toHaveLength(0);
+    });
+
+    it('removes the current user from workers', async () => {
+      mockFetch.mockResolvedValueOnce(undefined);
+      const store = usePuzzleStore();
+      store.puzzles = [
+        { ...mockPuzzle, workers: [{ id: 'user-1', username: 'alice' }] },
+      ];
+      const auth = useAuthStore();
+      auth.user = {
+        id: 'user-1',
+        username: 'alice',
+        email: 'alice@example.com',
+        isAdmin: false,
+        language: 'en',
+        createdAt: '',
+      };
+
+      await store.unclaim('col-1', 'pzl-1');
+
+      expect(store.puzzles[0].workers).toHaveLength(0);
     });
   });
 });
