@@ -372,4 +372,67 @@ describe('CollectionDetailPage', () => {
     await toggleBtn!.trigger('click');
     expect(localStorage.getItem('hm:members-panel:guest')).toBe('false');
   });
+
+  it('shows "You" badge when the current user is in the puzzle workers', async () => {
+    const collectionStore = useCollectionStore();
+    const puzzleStore = usePuzzleStore();
+    const auth = useAuthStore();
+    vi.spyOn(collectionStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'fetchAll').mockResolvedValue();
+    collectionStore.current = mockCollection as never;
+    collectionStore.members = [mockMember as never];
+    auth.user = {
+      id: 'user-1',
+      username: 'alice',
+      email: 'alice@example.com',
+      isAdmin: false,
+      language: 'en',
+      createdAt: '2025-01-01',
+    };
+    puzzleStore.puzzles = [
+      {
+        ...mockPuzzle,
+        workers: [{ id: 'user-1', username: 'alice' }],
+      } as never,
+    ];
+    const router = makeRouter();
+    await router.push('/collections/col-1');
+
+    const wrapper = mount(CollectionDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('You');
+  });
+
+  it('shows "active" badge when another user is in the puzzle workers', async () => {
+    const collectionStore = useCollectionStore();
+    const puzzleStore = usePuzzleStore();
+    const auth = useAuthStore();
+    vi.spyOn(collectionStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'fetchAll').mockResolvedValue();
+    collectionStore.current = mockCollection as never;
+    collectionStore.members = [mockMember as never];
+    auth.user = {
+      id: 'user-1',
+      username: 'alice',
+      email: 'alice@example.com',
+      isAdmin: false,
+      language: 'en',
+      createdAt: '2025-01-01',
+    };
+    puzzleStore.puzzles = [
+      { ...mockPuzzle, workers: [{ id: 'user-99', username: 'bob' }] } as never,
+    ];
+    const router = makeRouter();
+    await router.push('/collections/col-1');
+
+    const wrapper = mount(CollectionDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    expect(wrapper.text()).not.toContain('You');
+  });
 });

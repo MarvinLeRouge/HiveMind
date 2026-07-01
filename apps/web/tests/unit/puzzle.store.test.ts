@@ -106,6 +106,37 @@ describe('usePuzzleStore', () => {
   });
 
   describe('claim', () => {
+    it('does nothing when auth.user is null', async () => {
+      mockFetch.mockResolvedValueOnce(undefined);
+      const store = usePuzzleStore();
+      store.puzzles = [{ ...mockPuzzle, workers: [] }];
+      // auth.user remains null by default
+
+      await store.claim('col-1', 'pzl-1');
+
+      expect(store.puzzles[0].workers).toHaveLength(0);
+    });
+
+    it('also updates current when it matches the puzzle', async () => {
+      mockFetch.mockResolvedValueOnce(undefined);
+      const store = usePuzzleStore();
+      store.puzzles = [];
+      store.current = { ...mockPuzzle, workers: [] };
+      const auth = useAuthStore();
+      auth.user = {
+        id: 'user-1',
+        username: 'alice',
+        email: 'alice@example.com',
+        isAdmin: false,
+        language: 'en',
+        createdAt: '',
+      };
+
+      await store.claim('col-1', 'pzl-1');
+
+      expect(store.current.workers).toHaveLength(1);
+    });
+
     it('adds the current user to workers', async () => {
       mockFetch.mockResolvedValueOnce(undefined);
       const store = usePuzzleStore();
@@ -149,6 +180,42 @@ describe('usePuzzleStore', () => {
   });
 
   describe('unclaim', () => {
+    it('does nothing when auth.user is null', async () => {
+      mockFetch.mockResolvedValueOnce(undefined);
+      const store = usePuzzleStore();
+      store.puzzles = [
+        { ...mockPuzzle, workers: [{ id: 'user-1', username: 'alice' }] },
+      ];
+      // auth.user remains null by default
+
+      await store.unclaim('col-1', 'pzl-1');
+
+      expect(store.puzzles[0].workers).toHaveLength(1);
+    });
+
+    it('also updates current when it matches the puzzle', async () => {
+      mockFetch.mockResolvedValueOnce(undefined);
+      const store = usePuzzleStore();
+      store.puzzles = [];
+      store.current = {
+        ...mockPuzzle,
+        workers: [{ id: 'user-1', username: 'alice' }],
+      };
+      const auth = useAuthStore();
+      auth.user = {
+        id: 'user-1',
+        username: 'alice',
+        email: 'alice@example.com',
+        isAdmin: false,
+        language: 'en',
+        createdAt: '',
+      };
+
+      await store.unclaim('col-1', 'pzl-1');
+
+      expect(store.current.workers).toHaveLength(0);
+    });
+
     it('removes the current user from workers', async () => {
       mockFetch.mockResolvedValueOnce(undefined);
       const store = usePuzzleStore();

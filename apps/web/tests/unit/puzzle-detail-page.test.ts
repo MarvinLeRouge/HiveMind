@@ -497,6 +497,41 @@ describe('PuzzleDetailPage', () => {
     expect(puzzleStore.unclaim).toHaveBeenCalledWith('col-1', 'pzl-1');
   });
 
+  it('shows the "I\'m on it" button when user is authenticated but not in workers', async () => {
+    const puzzleStore = usePuzzleStore();
+    const noteStore = useNoteStore();
+    const attemptStore = useAttemptStore();
+    const authStore = useAuthStore();
+    vi.spyOn(puzzleStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(noteStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(attemptStore, 'fetchAll').mockResolvedValue();
+    authStore.user = {
+      id: 'user-1',
+      username: 'alice',
+      email: 'alice@example.com',
+      isAdmin: false,
+      language: 'en',
+      createdAt: '2025-01-01',
+    };
+    puzzleStore.current = {
+      ...mockPuzzle,
+      workers: [{ id: 'user-99', username: 'bob' }],
+    };
+
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles/pzl-1');
+
+    const wrapper = mount(PuzzleDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    const claimBtn = wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Claim');
+    expect(claimBtn).toBeDefined();
+  });
+
   it('shows an edit form when clicking Edit on an own note', async () => {
     const puzzleStore = usePuzzleStore();
     const noteStore = useNoteStore();

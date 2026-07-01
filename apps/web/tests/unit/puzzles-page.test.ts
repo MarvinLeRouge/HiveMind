@@ -120,6 +120,35 @@ describe('PuzzlesPage', () => {
     expect(wrapper.text()).toContain('Claimed');
   });
 
+  it('shows "You" badge when the current user is in the puzzle workers', async () => {
+    const puzzleStore = usePuzzleStore();
+    const collectionStore = useCollectionStore();
+    const authStore = useAuthStore();
+    vi.spyOn(puzzleStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(collectionStore, 'fetchById').mockResolvedValue();
+    authStore.user = {
+      id: 'user-1',
+      username: 'alice',
+      email: 'alice@example.com',
+      isAdmin: false,
+      language: 'en',
+      createdAt: '2025-01-01',
+    };
+    puzzleStore.puzzles = [
+      { ...mockPuzzle, workers: [{ id: 'user-1', username: 'alice' }] },
+    ];
+
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles');
+
+    const wrapper = mount(PuzzlesPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('You');
+  });
+
   it('shows the add puzzle button for owners', async () => {
     const puzzleStore = usePuzzleStore();
     const collectionStore = useCollectionStore();
