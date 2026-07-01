@@ -9,14 +9,26 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { STATUS_LABELS } from '@/types/puzzle';
+import { useI18n } from 'vue-i18n';
 
 /** Status badge for a puzzle. Renders a color-coded label. */
 const props = defineProps<{
   status: string;
 }>();
 
-const label = computed(() => STATUS_LABELS[props.status] ?? props.status);
+const { t } = useI18n();
+
+const STATUS_I18N_KEYS: Record<string, string> = {
+  open: 'puzzle.status.open',
+  in_progress: 'puzzle.status.in_progress',
+  solved: 'puzzle.status.solved',
+  verified: 'puzzle.status.verified',
+};
+
+const label = computed(() => {
+  const key = STATUS_I18N_KEYS[props.status];
+  return key ? t(key) : props.status;
+});
 
 const variantClass = computed(() => {
   switch (props.status) {

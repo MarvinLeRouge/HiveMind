@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ofetch } from 'ofetch';
 import type { User, AuthResponse } from '@/types/auth';
+import i18n, { type Locale, SUPPORTED_LOCALES } from '@/i18n';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -30,6 +31,7 @@ export const useAuthStore = defineStore('auth', {
       });
       this.accessToken = data.accessToken;
       this.user = data.user;
+      this.syncLocale(data.user.language);
     },
 
     /** Registers a new account and stores the returned token. */
@@ -45,6 +47,7 @@ export const useAuthStore = defineStore('auth', {
       });
       this.accessToken = data.accessToken;
       this.user = data.user;
+      this.syncLocale(data.user.language);
     },
 
     /**
@@ -59,6 +62,7 @@ export const useAuthStore = defineStore('auth', {
         });
         this.accessToken = data.accessToken;
         this.user = data.user;
+        this.syncLocale(data.user.language);
         return true;
       } catch {
         this.accessToken = null;
@@ -93,6 +97,31 @@ export const useAuthStore = defineStore('auth', {
      */
     async init(): Promise<void> {
       await this.refresh();
+    },
+
+    /**
+     * Updates the user's preferred language via the API and syncs the i18n locale.
+     */
+    async setLanguage(language: Locale): Promise<void> {
+      const data = await ofetch<User>(`${BASE_URL}/auth/me`, {
+        method: 'PATCH',
+        body: { language },
+        headers: this.accessToken
+          ? { Authorization: `Bearer ${this.accessToken}` }
+          : {},
+        credentials: 'include',
+      });
+      if (this.user) {
+        this.user = { ...this.user, language: data.language };
+      }
+      this.syncLocale(data.language);
+    },
+
+    syncLocale(language: string): void {
+      const locale = SUPPORTED_LOCALES.includes(language as Locale)
+        ? (language as Locale)
+        : 'en';
+      i18n.global.locale.value = locale;
     },
   },
 });

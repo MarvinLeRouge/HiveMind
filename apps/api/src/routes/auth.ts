@@ -8,6 +8,7 @@ import { env } from '../config/env.js';
 import {
   errorSchema,
   loginBodySchema,
+  patchMeBodySchema,
   registerBodySchema,
   tokenResponseSchema,
   userSchema,
@@ -125,6 +126,28 @@ export default async function authRoutes(app: FastifyInstance): Promise<void> {
     preHandler: authenticate,
     handler: async (request, reply) => {
       const user = await service.me(request.user.sub);
+      return reply.send({ ...user, createdAt: user.createdAt.toISOString() });
+    },
+  });
+
+  // ── PATCH /auth/me ────────────────────────────────────────────────────────
+  typed.patch('/me', {
+    schema: {
+      tags: ['auth'],
+      summary: 'Update current user settings (language)',
+      security: [{ bearerAuth: [] }],
+      body: patchMeBodySchema,
+      response: {
+        200: userSchema,
+        401: errorSchema,
+      },
+    },
+    preHandler: authenticate,
+    handler: async (request, reply) => {
+      const user = await service.updateLanguage(
+        request.user.sub,
+        request.body.language,
+      );
       return reply.send({ ...user, createdAt: user.createdAt.toISOString() });
     },
   });

@@ -33,6 +33,7 @@ describe('TheNavbar', () => {
       username: 'alice',
       email: 'alice@example.com',
       isAdmin: false,
+      language: 'en',
       createdAt: '2025-01-01',
     };
 
@@ -50,13 +51,17 @@ describe('TheNavbar', () => {
       username: 'alice',
       email: 'alice@example.com',
       isAdmin: false,
+      language: 'en',
       createdAt: '2025-01-01',
     };
     auth.accessToken = 'tok';
     vi.spyOn(auth, 'logout').mockResolvedValue();
 
     const wrapper = mount(TheNavbar, { global: { plugins: [pinia, router] } });
-    await wrapper.find('button').trigger('click');
+    const logoutBtn = wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Log out');
+    await logoutBtn!.trigger('click');
     await flushPromises();
 
     expect(auth.logout).toHaveBeenCalledOnce();

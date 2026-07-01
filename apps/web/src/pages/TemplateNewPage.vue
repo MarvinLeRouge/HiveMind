@@ -4,14 +4,16 @@
       to="/templates"
       class="text-sm text-muted-foreground hover:text-foreground"
     >
-      ← Templates
+      ← {{ t('template.title') }}
     </RouterLink>
-    <h1 class="mt-2 text-2xl font-bold">New template</h1>
+    <h1 class="mt-2 text-2xl font-bold">{{ t('template.new') }}</h1>
 
     <form class="mt-6 space-y-6" @submit.prevent="handleSubmit">
       <!-- Name -->
       <div class="space-y-1">
-        <label for="name" class="text-sm font-medium">Name</label>
+        <label for="name" class="text-sm font-medium">
+          {{ t('template.name') }}
+        </label>
         <input
           id="name"
           v-model="form.name"
@@ -26,8 +28,8 @@
       <!-- Description -->
       <div class="space-y-1">
         <label for="description" class="text-sm font-medium">
-          Description
-          <span class="text-muted-foreground">(optional)</span>
+          {{ t('template.description') }}
+          <span class="text-muted-foreground">{{ t('common.optional') }}</span>
         </label>
         <textarea
           id="description"
@@ -48,13 +50,15 @@
           class="h-4 w-4 rounded border-input"
         />
         <label for="isPublic" class="text-sm font-medium">
-          Public (visible to all users)
+          {{ t('template.publicLabel') }}
         </label>
       </div>
 
       <!-- Puzzle fields -->
       <fieldset class="space-y-3 rounded-md border p-4">
-        <legend class="px-1 text-sm font-medium">Puzzle fields</legend>
+        <legend class="px-1 text-sm font-medium">
+          {{ t('template.puzzleFields') }}
+        </legend>
 
         <div
           v-for="field in modeFields"
@@ -67,9 +71,9 @@
             v-model="form[field.key]"
             class="h-8 rounded-md border border-input bg-transparent px-2 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
           >
-            <option value="disabled">Disabled</option>
-            <option value="optional">Optional</option>
-            <option value="required">Required</option>
+            <option value="disabled">{{ t('template.disabled') }}</option>
+            <option value="optional">{{ t('template.optional') }}</option>
+            <option value="required">{{ t('template.required') }}</option>
           </select>
         </div>
 
@@ -92,9 +96,9 @@
             v-model="form[cf.modeKey]"
             class="h-8 rounded-md border border-input bg-transparent px-2 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
           >
-            <option value="disabled">Disabled</option>
-            <option value="optional">Optional</option>
-            <option value="required">Required</option>
+            <option value="disabled">{{ t('template.disabled') }}</option>
+            <option value="optional">{{ t('template.optional') }}</option>
+            <option value="required">{{ t('template.required') }}</option>
           </select>
         </div>
       </fieldset>
@@ -109,13 +113,13 @@
           :disabled="saving"
           class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-50"
         >
-          {{ saving ? 'Saving…' : 'Create template' }}
+          {{ saving ? t('common.saving') : t('template.create') }}
         </button>
         <RouterLink
           to="/templates"
           class="inline-flex h-9 items-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
         >
-          Cancel
+          {{ t('common.cancel') }}
         </RouterLink>
       </div>
     </form>
@@ -123,11 +127,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useTemplateStore } from '@/stores/template';
 import type { FieldMode } from '@/types/template';
 
+const { t } = useI18n();
 const router = useRouter();
 const store = useTemplateStore();
 
@@ -168,47 +174,30 @@ const form = ref<FormShape>({
   customField2Mode: 'disabled',
 });
 
-const modeFields: {
-  key: keyof Pick<
-    FormShape,
-    | 'indexMode'
-    | 'gcCodeMode'
-    | 'difficultyMode'
-    | 'terrainMode'
-    | 'coordsMode'
-    | 'hintMode'
-    | 'spoilerMode'
-  >;
-  label: string;
-}[] = [
-  { key: 'indexMode', label: 'Index number' },
-  { key: 'gcCodeMode', label: 'GC code' },
-  { key: 'difficultyMode', label: 'Difficulty rating' },
-  { key: 'terrainMode', label: 'Terrain rating' },
-  { key: 'coordsMode', label: 'Coordinates' },
-  { key: 'hintMode', label: 'Hint' },
-  { key: 'spoilerMode', label: 'Spoiler' },
-];
+const modeFields = computed(() => [
+  { key: 'indexMode' as const, label: t('template.indexNumber') },
+  { key: 'gcCodeMode' as const, label: t('template.gcCode') },
+  { key: 'difficultyMode' as const, label: t('template.difficultyRating') },
+  { key: 'terrainMode' as const, label: t('template.terrainRating') },
+  { key: 'coordsMode' as const, label: t('template.coordinates') },
+  { key: 'hintMode' as const, label: t('template.hint') },
+  { key: 'spoilerMode' as const, label: t('template.spoiler') },
+]);
 
-const customFields: {
-  label: string;
-  labelKey: 'customField1Label' | 'customField2Label';
-  modeKey: 'customField1Mode' | 'customField2Mode';
-  placeholder: string;
-}[] = [
+const customFields = computed(() => [
   {
-    label: 'Custom field 1',
-    labelKey: 'customField1Label',
-    modeKey: 'customField1Mode',
+    label: t('template.customField', { n: 1 }),
+    labelKey: 'customField1Label' as const,
+    modeKey: 'customField1Mode' as const,
     placeholder: 'Zone',
   },
   {
-    label: 'Custom field 2',
-    labelKey: 'customField2Label',
-    modeKey: 'customField2Mode',
+    label: t('template.customField', { n: 2 }),
+    labelKey: 'customField2Label' as const,
+    modeKey: 'customField2Mode' as const,
     placeholder: 'Reference',
   },
-];
+]);
 
 /** Submits the create form. */
 async function handleSubmit() {

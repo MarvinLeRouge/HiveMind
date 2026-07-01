@@ -20,7 +20,7 @@
             class="text-xs text-destructive hover:underline"
             @click="emit('remove', m.userId)"
           >
-            Remove
+            {{ t('common.remove') }}
           </button>
         </div>
       </li>
@@ -29,7 +29,7 @@
     <!-- Invite form (owner only) -->
     <template v-if="isOwner">
       <hr class="mt-6 mb-4" />
-      <h3 class="mb-3 text-sm font-semibold">Invite a member</h3>
+      <h3 class="mb-3 text-sm font-semibold">{{ t('collection.invite') }}</h3>
       <form class="flex flex-col gap-2" @submit.prevent="submitInvite">
         <label for="panel-invite-email" class="sr-only">Email address</label>
         <input
@@ -45,11 +45,13 @@
           :disabled="inviting"
           class="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-50"
         >
-          {{ inviting ? 'Sending…' : 'Send invitation' }}
+          {{
+            inviting ? t('collection.sending') : t('collection.sendInvitation')
+          }}
         </button>
       </form>
       <p v-if="inviteSuccess" class="mt-2 text-sm text-green-600">
-        Invitation sent.
+        {{ t('collection.invitationSent') }}
       </p>
       <p v-if="inviteError" role="alert" class="mt-2 text-sm text-destructive">
         {{ inviteError }}
@@ -60,6 +62,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 interface Member {
   userId: string;
@@ -68,6 +71,8 @@ interface Member {
   role: string;
   joinedAt: string;
 }
+
+const { t } = useI18n();
 
 defineProps<{
   members: Member[];
@@ -90,7 +95,4 @@ function submitInvite() {
   emit('invite', emailInput.value);
   emailInput.value = '';
 }
-
-// Reset the email input when the invite success state changes to true
-// (parent resets inviteSuccess on next attempt, not here)
 </script>

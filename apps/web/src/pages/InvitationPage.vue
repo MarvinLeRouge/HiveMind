@@ -2,46 +2,49 @@
   <div class="flex min-h-screen items-center justify-center bg-muted/30 px-4">
     <div class="w-full max-w-md rounded-lg border bg-background p-8 shadow-sm">
       <!-- Loading -->
-      <p v-if="loading" class="text-sm text-muted-foreground">Loading…</p>
+      <p v-if="loading" class="text-sm text-muted-foreground">
+        {{ t('common.loading') }}
+      </p>
 
       <!-- Error loading invitation -->
       <div v-else-if="loadError">
-        <h1 class="text-xl font-bold">Invitation not found</h1>
+        <h1 class="text-xl font-bold">{{ t('invitation.notFound') }}</h1>
         <p class="mt-2 text-sm text-muted-foreground">{{ loadError }}</p>
         <RouterLink
           to="/collections"
           class="mt-4 inline-flex h-9 items-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
         >
-          Go to my collections
+          {{ t('invitation.goToCollections') }}
         </RouterLink>
       </div>
 
       <!-- Already handled -->
       <div v-else-if="invitation && invitation.status !== 'pending'">
         <h1 class="text-xl font-bold">
-          Invitation already {{ invitation.status }}
+          {{
+            invitation.status === 'accepted'
+              ? t('invitation.alreadyAccepted')
+              : t('invitation.alreadyDeclined')
+          }}
         </h1>
-        <p class="mt-2 text-sm text-muted-foreground">
-          This invitation has already been {{ invitation.status }}.
-        </p>
         <RouterLink
           to="/collections"
           class="mt-4 inline-flex h-9 items-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
         >
-          Go to my collections
+          {{ t('invitation.goToCollections') }}
         </RouterLink>
       </div>
 
       <!-- Active invitation -->
       <div v-else-if="invitation">
-        <h1 class="text-xl font-bold">You've been invited</h1>
+        <h1 class="text-xl font-bold">{{ t('invitation.title') }}</h1>
         <p class="mt-3 text-sm text-muted-foreground">
-          An invitation was sent to
+          {{ t('invitation.sentTo') }}
           <strong class="text-foreground">{{ invitation.inviteeEmail }}</strong
           >.
         </p>
         <p class="mt-1 text-sm text-muted-foreground">
-          Expires on {{ expiryLabel }}.
+          {{ t('invitation.expires') }} {{ expiryLabel }}.
         </p>
 
         <p
@@ -58,14 +61,22 @@
             class="inline-flex h-9 items-center rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-50"
             @click="accept"
           >
-            {{ acting === 'accept' ? 'Accepting…' : 'Accept' }}
+            {{
+              acting === 'accept'
+                ? t('invitation.accepting')
+                : t('invitation.accept')
+            }}
           </button>
           <button
             :disabled="!!acting"
             class="inline-flex h-9 items-center rounded-md border px-5 text-sm font-medium hover:bg-muted disabled:opacity-50"
             @click="decline"
           >
-            {{ acting === 'decline' ? 'Declining…' : 'Decline' }}
+            {{
+              acting === 'decline'
+                ? t('invitation.declining')
+                : t('invitation.decline')
+            }}
           </button>
         </div>
       </div>
@@ -75,6 +86,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { apiFetch } from '@/lib/api-fetch';
 
@@ -88,6 +100,7 @@ interface Invitation {
   expiresAt: string;
 }
 
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 

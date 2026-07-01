@@ -12,7 +12,7 @@
             :to="`/collections/${collectionId}/puzzles`"
             class="text-sm text-muted-foreground hover:text-foreground"
           >
-            ← Puzzles
+            {{ t('puzzle.back') }}
           </RouterLink>
           <div class="mt-1 flex items-center gap-3">
             <h1 class="text-2xl font-bold">{{ current.title }}</h1>
@@ -28,7 +28,7 @@
             :disabled="claimBusy"
             @click="handleUnclaim"
           >
-            {{ claimBusy ? '…' : 'Release' }}
+            {{ claimBusy ? '…' : t('puzzle.release') }}
           </button>
           <button
             v-else-if="!current.workingOnId"
@@ -36,7 +36,7 @@
             :disabled="claimBusy"
             @click="handleClaim"
           >
-            {{ claimBusy ? '…' : 'Claim' }}
+            {{ claimBusy ? '…' : t('puzzle.claim') }}
           </button>
 
           <button
@@ -45,7 +45,9 @@
             :disabled="statusBusy"
             @click="handleAdvanceStatus"
           >
-            {{ statusBusy ? '…' : `Mark as ${STATUS_LABELS[nextStatus]}` }}
+            {{
+              statusBusy ? '…' : t('puzzle.markAs', { status: nextStatusLabel })
+            }}
           </button>
 
           <button
@@ -53,7 +55,7 @@
             class="inline-flex h-9 items-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
             @click="startEdit"
           >
-            Edit
+            {{ t('common.edit') }}
           </button>
         </div>
       </div>
@@ -62,7 +64,9 @@
       <template v-if="!editing">
         <!-- Description -->
         <div v-if="current.description" class="mb-4 text-sm">
-          <p class="font-medium text-muted-foreground">Description</p>
+          <p class="font-medium text-muted-foreground">
+            {{ t('puzzle.description') }}
+          </p>
           <p class="mt-1 whitespace-pre-wrap">{{ current.description }}</p>
         </div>
 
@@ -72,41 +76,55 @@
           class="mb-6 grid grid-cols-1 gap-x-8 gap-y-3 text-sm sm:grid-cols-2 md:grid-cols-3"
         >
           <div v-if="current.gcCode">
-            <span class="font-medium text-muted-foreground">GC Code</span>
+            <span class="font-medium text-muted-foreground">{{
+              t('puzzle.gcCode')
+            }}</span>
             <p>{{ current.gcCode }}</p>
           </div>
           <div v-if="current.coords">
-            <span class="font-medium text-muted-foreground">Coords</span>
+            <span class="font-medium text-muted-foreground">{{
+              t('puzzle.coords')
+            }}</span>
             <p class="font-mono">{{ current.coords }}</p>
           </div>
           <div v-if="current.difficulty != null">
-            <span class="font-medium text-muted-foreground">Difficulty</span>
+            <span class="font-medium text-muted-foreground">{{
+              t('puzzle.difficulty')
+            }}</span>
             <p>{{ current.difficulty }} / 5</p>
           </div>
           <div v-if="current.terrain != null">
-            <span class="font-medium text-muted-foreground">Terrain</span>
+            <span class="font-medium text-muted-foreground">{{
+              t('puzzle.terrain')
+            }}</span>
             <p>{{ current.terrain }} / 5</p>
           </div>
           <div v-if="current.checkerUrl">
-            <span class="font-medium text-muted-foreground">Checker</span>
+            <span class="font-medium text-muted-foreground">{{
+              t('puzzle.checkerUrl')
+            }}</span>
             <a
               :href="current.checkerUrl"
               target="_blank"
               rel="noopener noreferrer"
               class="text-primary underline hover:no-underline"
             >
-              Open checker
+              {{ t('puzzle.openChecker') }}
             </a>
           </div>
           <div v-if="current.hint">
-            <span class="font-medium text-muted-foreground">Hint</span>
+            <span class="font-medium text-muted-foreground">{{
+              t('puzzle.hint')
+            }}</span>
             <p>{{ current.hint }}</p>
           </div>
           <div v-if="current.spoiler">
-            <span class="font-medium text-muted-foreground">Spoiler</span>
+            <span class="font-medium text-muted-foreground">{{
+              t('puzzle.spoiler')
+            }}</span>
             <details>
               <summary class="cursor-pointer text-muted-foreground">
-                Show spoiler
+                {{ t('puzzle.showSpoiler') }}
               </summary>
               <p class="mt-1">{{ current.spoiler }}</p>
             </details>
@@ -124,7 +142,7 @@
         <!-- Title -->
         <div class="space-y-1">
           <label for="edit-title" class="text-sm font-medium">
-            Title <span class="text-destructive">*</span>
+            {{ t('puzzle.title') }} <span class="text-destructive">*</span>
           </label>
           <input
             id="edit-title"
@@ -138,7 +156,7 @@
         <!-- Description -->
         <div class="space-y-1">
           <label for="edit-description" class="text-sm font-medium">
-            Description
+            {{ t('puzzle.description') }}
           </label>
           <textarea
             id="edit-description"
@@ -151,7 +169,7 @@
         <!-- Checker URL -->
         <div class="space-y-1">
           <label for="edit-checker" class="text-sm font-medium">
-            Checker URL
+            {{ t('puzzle.checkerUrl') }}
           </label>
           <input
             id="edit-checker"
@@ -166,7 +184,7 @@
         <template v-if="template">
           <div v-if="template.gcCodeMode !== 'disabled'" class="space-y-1">
             <label for="edit-gc-code" class="text-sm font-medium">
-              GC code
+              {{ t('puzzle.gcCode') }}
               <span
                 v-if="template.gcCodeMode === 'required'"
                 class="text-destructive"
@@ -184,7 +202,7 @@
 
           <div v-if="template.difficultyMode !== 'disabled'" class="space-y-1">
             <label for="edit-difficulty" class="text-sm font-medium">
-              Difficulty (1–5)
+              {{ t('puzzle.difficulty') }}
               <span
                 v-if="template.difficultyMode === 'required'"
                 class="text-destructive"
@@ -205,7 +223,7 @@
 
           <div v-if="template.terrainMode !== 'disabled'" class="space-y-1">
             <label for="edit-terrain" class="text-sm font-medium">
-              Terrain (1–5)
+              {{ t('puzzle.terrain') }}
               <span
                 v-if="template.terrainMode === 'required'"
                 class="text-destructive"
@@ -226,7 +244,7 @@
 
           <div v-if="template.coordsMode !== 'disabled'" class="space-y-1">
             <label for="edit-coords" class="text-sm font-medium">
-              Coordinates
+              {{ t('puzzle.coords') }}
               <span
                 v-if="template.coordsMode === 'required'"
                 class="text-destructive"
@@ -244,7 +262,7 @@
 
           <div v-if="template.hintMode !== 'disabled'" class="space-y-1">
             <label for="edit-hint" class="text-sm font-medium">
-              Hint
+              {{ t('puzzle.hint') }}
               <span
                 v-if="template.hintMode === 'required'"
                 class="text-destructive"
@@ -262,7 +280,7 @@
 
           <div v-if="template.spoilerMode !== 'disabled'" class="space-y-1">
             <label for="edit-spoiler" class="text-sm font-medium">
-              Spoiler
+              {{ t('puzzle.spoiler') }}
               <span
                 v-if="template.spoilerMode === 'required'"
                 class="text-destructive"
@@ -289,14 +307,14 @@
             :disabled="editSaving"
             class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-50"
           >
-            {{ editSaving ? 'Saving…' : 'Save' }}
+            {{ editSaving ? t('common.saving') : t('common.save') }}
           </button>
           <button
             type="button"
             class="inline-flex h-9 items-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
             @click="editing = false"
           >
-            Cancel
+            {{ t('common.cancel') }}
           </button>
         </div>
       </form>
@@ -314,7 +332,7 @@
           "
           @click="activeTab = 'notes'"
         >
-          Notes
+          {{ t('puzzle.addNote') }}s
         </button>
         <button
           role="tab"
@@ -358,13 +376,13 @@
                     class="text-xs text-muted-foreground hover:text-foreground"
                     @click="startEditNote(note)"
                   >
-                    Edit
+                    {{ t('common.edit') }}
                   </button>
                   <button
                     class="text-xs text-destructive hover:underline"
                     @click="handleDeleteNote(note.id)"
                   >
-                    Delete
+                    {{ t('common.delete') }}
                   </button>
                 </template>
                 <template v-else>
@@ -372,13 +390,13 @@
                     class="text-xs font-medium text-primary hover:underline"
                     @click="handleSaveNote(note.id)"
                   >
-                    Save
+                    {{ t('common.save') }}
                   </button>
                   <button
                     class="text-xs text-muted-foreground hover:text-foreground"
                     @click="editingNoteId = null"
                   >
-                    Cancel
+                    {{ t('common.cancel') }}
                   </button>
                 </template>
               </div>
@@ -400,7 +418,7 @@
             v-model="newNoteContent"
             rows="2"
             required
-            placeholder="Add a note…"
+            :placeholder="t('puzzle.addNoteAction')"
             class="flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
           />
           <button
@@ -408,7 +426,7 @@
             :disabled="addingNote"
             class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-50"
           >
-            {{ addingNote ? '…' : 'Add note' }}
+            {{ addingNote ? '…' : t('puzzle.addNote') }}
           </button>
         </form>
         <p v-if="noteError" role="alert" class="mt-1 text-sm text-destructive">
@@ -440,7 +458,9 @@
                 attempt.checkerResult ? '✓' : '✗'
               }}</span>
               <span class="sr-only">{{
-                attempt.checkerResult ? 'Correct' : 'Incorrect'
+                attempt.checkerResult
+                  ? t('puzzle.status.solved')
+                  : t('puzzle.status.open')
               }}</span>
             </span>
             <span class="font-mono">{{ attempt.valueTested }}</span>
@@ -456,7 +476,7 @@
           v-if="attempts.length === 0"
           class="mb-4 text-sm text-muted-foreground"
         >
-          No attempts yet.
+          {{ t('puzzle.noAttempts') }}
         </p>
 
         <form
@@ -470,7 +490,7 @@
             v-model="newAttemptValue"
             type="text"
             required
-            placeholder="Value to test"
+            :placeholder="t('puzzle.valueTested')"
             class="flex h-9 flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
           />
           <label for="attempt-result" class="sr-only">Result</label>
@@ -479,15 +499,15 @@
             v-model="newAttemptResult"
             class="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
           >
-            <option :value="true">✓ Correct</option>
-            <option :value="false">✗ Incorrect</option>
+            <option :value="true">✓ {{ t('puzzle.status.solved') }}</option>
+            <option :value="false">✗ {{ t('puzzle.status.open') }}</option>
           </select>
           <label for="attempt-comment" class="sr-only">Comment</label>
           <input
             id="attempt-comment"
             v-model="newAttemptComment"
             type="text"
-            placeholder="Comment (optional)"
+            :placeholder="t('puzzle.comment')"
             class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring sm:w-48"
           />
           <button
@@ -495,7 +515,7 @@
             :disabled="addingAttempt"
             class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-50"
           >
-            {{ addingAttempt ? '…' : 'Record' }}
+            {{ addingAttempt ? '…' : t('puzzle.record') }}
           </button>
         </form>
         <p
@@ -508,12 +528,15 @@
       </section>
     </template>
 
-    <p v-else-if="!loadError" class="text-sm text-muted-foreground">Loading…</p>
+    <p v-else-if="!loadError" class="text-sm text-muted-foreground">
+      {{ t('common.loading') }}
+    </p>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { usePuzzleStore } from '@/stores/puzzle';
@@ -522,9 +545,10 @@ import { useAttemptStore } from '@/stores/attempt';
 import { useAuthStore } from '@/stores/auth';
 import { useCollectionStore } from '@/stores/collection';
 import PuzzleStatusBadge from '@/components/PuzzleStatusBadge.vue';
-import { STATUS_NEXT, STATUS_LABELS } from '@/types/puzzle';
+import { STATUS_NEXT } from '@/types/puzzle';
 import type { Note } from '@/types/note';
 
+const { t } = useI18n();
 const route = useRoute();
 const collectionId = route.params.id as string;
 const puzzleId = route.params.pid as string;
@@ -588,9 +612,22 @@ const newAttemptComment = ref('');
 const addingAttempt = ref(false);
 const attemptError = ref('');
 
+const STATUS_I18N: Record<string, string> = {
+  open: 'puzzle.status.open',
+  in_progress: 'puzzle.status.in_progress',
+  solved: 'puzzle.status.solved',
+  verified: 'puzzle.status.verified',
+};
+
 const nextStatus = computed(() =>
   current.value ? (STATUS_NEXT[current.value.status] ?? null) : null,
 );
+
+const nextStatusLabel = computed(() => {
+  if (!nextStatus.value) return '';
+  const key = STATUS_I18N[nextStatus.value];
+  return key ? t(key) : nextStatus.value;
+});
 
 const isClaimed = computed(() => current.value?.workingOnId === currentUserId);
 

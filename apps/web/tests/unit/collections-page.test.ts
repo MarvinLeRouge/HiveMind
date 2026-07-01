@@ -75,7 +75,7 @@ describe('CollectionsPage', () => {
     });
     await flushPromises();
 
-    expect(wrapper.text()).toContain('no collections yet');
+    expect(wrapper.text()).toContain('No collections yet.');
   });
 
   it('shows an error message when loading fails', async () => {

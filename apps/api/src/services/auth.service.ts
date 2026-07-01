@@ -18,6 +18,7 @@ export interface AuthUser {
   username: string;
   email: string;
   isAdmin: boolean;
+  language: string;
   createdAt: Date;
 }
 
@@ -112,6 +113,20 @@ export class AuthService {
     return this.toAuthUser(user);
   }
 
+  /**
+   * Updates the preferred language for the authenticated user.
+   * Throws 400 if the language code is invalid.
+   * Throws 401 if the user no longer exists.
+   */
+  async updateLanguage(userId: string, language: string): Promise<AuthUser> {
+    const user = await this.repo.findById(userId);
+    if (!user) {
+      throw this.unauthorized('User not found');
+    }
+    const updated = await this.repo.updateLanguage(userId, language);
+    return this.toAuthUser(updated);
+  }
+
   // ── Private helpers ────────────────────────────────────────────────────────
 
   private signTokens(user: User): TokenPair {
@@ -135,6 +150,7 @@ export class AuthService {
       username: user.username,
       email: user.email,
       isAdmin: user.isAdmin,
+      language: user.language,
       createdAt: user.createdAt,
     };
   }

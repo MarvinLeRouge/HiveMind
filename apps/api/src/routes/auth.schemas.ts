@@ -23,7 +23,13 @@ export const userSchema = z.object({
   username: z.string(),
   email: z.string().email(),
   isAdmin: z.boolean(),
+  language: z.string(),
   createdAt: z.string(),
+});
+
+/** Request body for PATCH /auth/me. */
+export const patchMeBodySchema = z.object({
+  language: z.enum(['en', 'fr']),
 });
 
 /** Response shape for a successful login or register (includes access token). */

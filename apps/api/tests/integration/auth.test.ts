@@ -207,6 +207,7 @@ describe('GET /auth/me', () => {
     expect(res.statusCode).toBe(200);
     const body = res.json();
     expect(body.email).toBe('test@example.com');
+    expect(body.language).toBe('en');
     expect(body).not.toHaveProperty('passwordHash');
   });
 
@@ -220,6 +221,50 @@ describe('GET /auth/me', () => {
       method: 'GET',
       url: '/auth/me',
       headers: { authorization: 'Bearer invalid.token.here' },
+    });
+    expect(res.statusCode).toBe(401);
+  });
+});
+
+// ── PATCH /auth/me ────────────────────────────────────────────────────────────
+
+describe('PATCH /auth/me', () => {
+  it('updates the user language and returns the updated profile', async () => {
+    await registerUser();
+    const loginRes = await loginUser();
+    const token = loginRes.json().accessToken as string;
+
+    const res = await app.inject({
+      method: 'PATCH',
+      url: '/auth/me',
+      headers: { authorization: `Bearer ${token}` },
+      payload: { language: 'fr' },
+    });
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body.language).toBe('fr');
+    expect(body.email).toBe('test@example.com');
+  });
+
+  it('returns 400 for an unsupported language code', async () => {
+    await registerUser();
+    const loginRes = await loginUser();
+    const token = loginRes.json().accessToken as string;
+
+    const res = await app.inject({
+      method: 'PATCH',
+      url: '/auth/me',
+      headers: { authorization: `Bearer ${token}` },
+      payload: { language: 'de' },
+    });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('returns 401 without a token', async () => {
+    const res = await app.inject({
+      method: 'PATCH',
+      url: '/auth/me',
+      payload: { language: 'fr' },
     });
     expect(res.statusCode).toBe(401);
   });
