@@ -23,6 +23,8 @@ CMD ["pnpm", "--filter", "web", "dev"]
 # ─── build — Vite production build ─────────────────────────────────────────────
 FROM deps AS build
 WORKDIR /app
+ARG VITE_API_BASE_URL
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 COPY tsconfig.json ./
 COPY apps/web ./apps/web
 COPY packages/shared ./packages/shared
