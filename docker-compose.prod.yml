@@ -1,5 +1,8 @@
+name: hivemind
+
 services:
   backend:
+    container_name: hivemind-backend
     image: ghcr.io/marvinlerouge/hivemind/backend:${IMAGE_TAG:-latest}
     expose:
       - "3000"
@@ -25,6 +28,7 @@ services:
       - internal
 
   frontend:
+    container_name: hivemind-frontend
     image: ghcr.io/marvinlerouge/hivemind/frontend:${IMAGE_TAG:-latest}
     expose:
       - "80"
@@ -41,6 +45,7 @@ services:
       - traefik-public
 
   db:
+    container_name: hivemind-db
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: HiveMind
