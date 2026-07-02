@@ -98,12 +98,18 @@ jobs:
             echo "==> Pull new images"
             docker compose -f docker-compose.prod.yml pull
 
-            echo "==> Restart services"
-            docker compose -f docker-compose.prod.yml up -d --remove-orphans
+            echo "==> Start database"
+            docker compose -f docker-compose.prod.yml up -d db
+
+            echo "==> Wait for database to be healthy"
+            timeout 60 sh -c 'until docker compose -f docker-compose.prod.yml exec -T db pg_isready -U HiveMind; do sleep 2; done'
 
             echo "==> Run pending migrations"
-            docker compose -f docker-compose.prod.yml exec -T backend \
+            docker compose -f docker-compose.prod.yml run --rm --no-deps backend \
               node_modules/.bin/prisma migrate deploy
+
+            echo "==> Start all services"
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
             echo "==> Stack status"
             docker compose -f docker-compose.prod.yml ps
