@@ -1,8 +1,7 @@
 name: E2E
 
+# E2E suite parked until BLOCK-22 — re-enable push trigger when tests are ready.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 jobs:
