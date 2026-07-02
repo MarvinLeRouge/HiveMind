@@ -96,6 +96,9 @@ jobs:
       - name: Run migrations
         run: pnpm --filter api exec prisma migrate deploy
 
+      - name: Seed database
+        run: pnpm --filter api exec prisma db seed
+
       - name: Lint
         run: pnpm --filter api lint
 
