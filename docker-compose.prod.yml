@@ -4,7 +4,7 @@ services:
     expose:
       - "3000"
     env_file:
-      - ./apps/api/.env
+      - ../shared/env/app.env
     depends_on:
       db:
         condition: service_healthy

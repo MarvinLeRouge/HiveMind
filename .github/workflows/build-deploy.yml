@@ -71,31 +71,38 @@ jobs:
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1
         env:
-          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ACTOR: ${{ github.actor }}
           SHA: ${{ steps.sha.outputs.sha }}
           REPO: ${{ github.repository }}
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
+          host: ${{ secrets.DEPLOY_SSH_HOST }}
+          username: ${{ secrets.DEPLOY_SSH_USER }}
+          key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
           script_stop: true
           envs: GHCR_TOKEN,ACTOR,SHA,REPO
           script: |
-            # Fetch the exact compose file for this SHA
+            set -Eeuo pipefail
+
+            echo "==> Fetch docker-compose.prod.yml (commit: ${SHA})"
             curl -fsSL \
               "https://raw.githubusercontent.com/${REPO}/${SHA}/docker-compose.prod.yml" \
-              -o /opt/hivemind/docker-compose.prod.yml
+              -o /home/mlr/marvinlerouge.dev/hivemind/compose/docker-compose.prod.yml
 
-            cd /opt/hivemind
+            cd /home/mlr/marvinlerouge.dev/hivemind/compose
 
-            # Authenticate with GHCR on the VPS
+            echo "==> Authenticate with GHCR"
             echo "$GHCR_TOKEN" | docker login ghcr.io -u "$ACTOR" --password-stdin
 
-            # Pull new images and restart services
+            echo "==> Pull new images"
             docker compose -f docker-compose.prod.yml pull
+
+            echo "==> Restart services"
             docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
-            # Run pending migrations
+            echo "==> Run pending migrations"
             docker compose -f docker-compose.prod.yml exec -T backend \
               sh -c "cd /app/apps/api && npx prisma migrate deploy"
+
+            echo "==> Stack status"
+            docker compose -f docker-compose.prod.yml ps
