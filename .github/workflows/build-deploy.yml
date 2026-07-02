@@ -1,21 +1,17 @@
 name: Build & Deploy
 
 on:
-  # Triggered automatically after E2E passes on main
-  workflow_run:
-    workflows: [E2E]
-    types: [completed]
+  # Triggered on every push to main (E2E gate parked until BLOCK-22)
+  push:
     branches: [main]
-  # Manual trigger for hotfixes (bypasses E2E gate)
+  # Manual trigger for hotfixes
   workflow_dispatch:
 
 jobs:
   build-deploy:
     name: Build and Deploy
     runs-on: ubuntu-latest
-    if: >
-      github.event_name == 'workflow_dispatch' ||
-      github.event.workflow_run.conclusion == 'success'
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
 
     permissions:
       contents: read
@@ -26,11 +22,7 @@ jobs:
       - name: Resolve SHA
         id: sha
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
-          else
-            echo "sha=${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_OUTPUT"
-          fi
+          echo "sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
           echo "repo=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@v4
