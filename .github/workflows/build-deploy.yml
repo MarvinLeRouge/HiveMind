@@ -103,7 +103,7 @@ jobs:
 
             echo "==> Run pending migrations"
             docker compose -f docker-compose.prod.yml exec -T backend \
-              sh -c "cd /app/apps/api && npx prisma migrate deploy"
+              npx prisma migrate deploy
 
             echo "==> Stack status"
             docker compose -f docker-compose.prod.yml ps

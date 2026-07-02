@@ -36,6 +36,7 @@ WORKDIR /app
 RUN corepack enable
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/apps/api/dist ./dist
+COPY --from=build /app/apps/api/prisma ./prisma
 COPY apps/api/package.json ./
 EXPOSE 3000
 CMD ["node", "dist/index.js"]
