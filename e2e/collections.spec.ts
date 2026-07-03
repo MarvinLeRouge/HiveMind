@@ -1,11 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { STORAGE_STATE, E2E_USERS } from './global-setup';
-import {
-  API_URL,
-  getGenericTemplateId,
-  createCollection,
-  deleteCollection,
-} from './helpers/api';
+import { API_URL, loginAs } from './helpers/api';
 
 test.describe('Collections — owner', () => {
   test.use({ storageState: STORAGE_STATE.owner });
@@ -15,14 +10,24 @@ test.describe('Collections — owner', () => {
   let collectionSlug: string;
 
   test.beforeAll(async ({ request }) => {
-    templateId = await getGenericTemplateId(request);
-    const col = await createCollection(request, 'E2E Owner Suite', templateId);
+    const api = await loginAs(
+      request,
+      E2E_USERS.owner.email,
+      E2E_USERS.owner.password,
+    );
+    templateId = await api.getGenericTemplateId();
+    const col = await api.createCollection('E2E Owner Suite', templateId);
     collectionId = col.id;
     collectionSlug = col.slug;
   });
 
   test.afterAll(async ({ request }) => {
-    await deleteCollection(request, collectionId);
+    const cleanup = await loginAs(
+      request,
+      E2E_USERS.owner.email,
+      E2E_USERS.owner.password,
+    );
+    await cleanup.deleteCollection(collectionId);
   });
 
   test('newly created collection appears in the list', async ({ page }) => {
@@ -65,7 +70,12 @@ test.describe('Collections — owner', () => {
   });
 
   test('owner can delete a collection', async ({ page, request }) => {
-    const col = await createCollection(request, 'E2E Delete Me', templateId);
+    const api = await loginAs(
+      request,
+      E2E_USERS.owner.email,
+      E2E_USERS.owner.password,
+    );
+    const col = await api.createCollection('E2E Delete Me', templateId);
 
     await page.goto(`/collections/${col.slug}/settings`);
     await page.getByRole('button', { name: 'Delete collection' }).click();
@@ -208,8 +218,19 @@ test.describe('Collections — outsider access', () => {
     });
     const { id, slug } = (await colRes.json()) as { id: string; slug: string };
 
-    // Outsider tries to navigate to the collection
-    const res = await request.get(`${API_URL}/collections/${slug}`);
+    // Outsider makes an authenticated request — expects 403 (forbidden), not 401
+    const outsiderRes = await request.post(`${API_URL}/auth/login`, {
+      data: {
+        email: E2E_USERS.outsider.email,
+        password: E2E_USERS.outsider.password,
+      },
+    });
+    const { accessToken: outsiderToken } = (await outsiderRes.json()) as {
+      accessToken: string;
+    };
+    const res = await request.get(`${API_URL}/collections/${slug}`, {
+      headers: { Authorization: `Bearer ${outsiderToken}` },
+    });
     expect(res.status()).toBe(403);
 
     // Cleanup

@@ -1,12 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { STORAGE_STATE, E2E_USERS } from './global-setup';
-import {
-  API_URL,
-  getGenericTemplateId,
-  createCollection,
-  createPuzzle,
-  deleteCollection,
-} from './helpers/api';
+import { API_URL, loginAs } from './helpers/api';
 
 test.describe('Puzzles', () => {
   test.use({ storageState: STORAGE_STATE.owner });
@@ -16,19 +10,25 @@ test.describe('Puzzles', () => {
   let puzzleId: string;
 
   test.beforeAll(async ({ request }) => {
-    const templateId = await getGenericTemplateId(request);
-    const col = await createCollection(
+    const api = await loginAs(
       request,
-      'E2E Puzzles Suite',
-      templateId,
+      E2E_USERS.owner.email,
+      E2E_USERS.owner.password,
     );
+    const templateId = await api.getGenericTemplateId();
+    const col = await api.createCollection('E2E Puzzles Suite', templateId);
     collectionId = col.id;
     collectionSlug = col.slug;
-    puzzleId = await createPuzzle(request, collectionId, 'E2E Puzzle Alpha');
+    puzzleId = await api.createPuzzle(collectionId, 'E2E Puzzle Alpha');
   });
 
   test.afterAll(async ({ request }) => {
-    await deleteCollection(request, collectionId);
+    const api = await loginAs(
+      request,
+      E2E_USERS.owner.email,
+      E2E_USERS.owner.password,
+    );
+    await api.deleteCollection(collectionId);
   });
 
   test('puzzle list shows existing puzzle', async ({ page }) => {
@@ -92,8 +92,12 @@ test.describe('Puzzles', () => {
   });
 
   test('owner can delete a puzzle', async ({ page, request }) => {
-    const toDeleteId = await createPuzzle(
+    const api = await loginAs(
       request,
+      E2E_USERS.owner.email,
+      E2E_USERS.owner.password,
+    );
+    const toDeleteId = await api.createPuzzle(
       collectionId,
       'E2E Delete Puzzle',
     );
@@ -101,17 +105,7 @@ test.describe('Puzzles', () => {
     await expect(page.getByText('E2E Delete Puzzle')).toBeVisible();
 
     // Delete via API (no deletion UI — owner deletes via API or future UI)
-    const ownerRes = await request.post(`${API_URL}/auth/login`, {
-      data: {
-        email: E2E_USERS.owner.email,
-        password: E2E_USERS.owner.password,
-      },
-    });
-    const { accessToken } = (await ownerRes.json()) as { accessToken: string };
-    await request.delete(
-      `${API_URL}/collections/${collectionId}/puzzles/${toDeleteId}`,
-      { headers: { Authorization: `Bearer ${accessToken}` } },
-    );
+    await api.deletePuzzle(collectionId, toDeleteId);
 
     await page.reload();
     await expect(page.getByText('E2E Delete Puzzle')).not.toBeVisible();

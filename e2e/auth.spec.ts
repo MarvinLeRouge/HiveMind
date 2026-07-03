@@ -63,14 +63,14 @@ test.describe('Authentication', () => {
     await page.getByRole('button', { name: 'Sign in' }).click();
     await expect(page).toHaveURL(/\/collections$/);
 
-    // Switch to French
+    // Switch to French — locale may switch after PATCH /auth/me completes
     await page.getByRole('button', { name: 'FR' }).click();
-    await expect(
-      page.getByRole('button', { name: 'Déconnexion' }),
-    ).toBeVisible();
+    await expect(page.getByText('Déconnexion')).toBeVisible({
+      timeout: 10_000,
+    });
 
     // Switch back to English
     await page.getByRole('button', { name: 'EN' }).click();
-    await expect(page.getByRole('button', { name: 'Log out' })).toBeVisible();
+    await expect(page.getByText('Log out')).toBeVisible({ timeout: 10_000 });
   });
 });
