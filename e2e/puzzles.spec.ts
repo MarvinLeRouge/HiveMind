@@ -183,7 +183,9 @@ test.describe('Puzzles — member', () => {
 
   test('member can view the puzzle list', async ({ page }) => {
     await page.goto(`/collections/${collectionSlug}`);
-    await expect(page.getByText('E2E Member Puzzle')).toBeVisible();
+    await expect(
+      page.getByText('E2E Member Puzzle', { exact: true }),
+    ).toBeVisible();
   });
 
   test('member cannot see the "+ Add puzzle" button', async ({ page }) => {
