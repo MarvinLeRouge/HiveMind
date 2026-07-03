@@ -1,0 +1,79 @@
+name: hivemind-e2e
+
+# E2E stack: production builds, no Traefik, ports exposed for CI runner.
+# Run: docker compose -f docker-compose.e2e.yml up -d
+# Migrations: pnpm --filter api exec prisma migrate deploy  (from CI runner, uses exposed DB port)
+# Seed:       pnpm --filter api exec prisma db seed         (same)
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: production
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://HiveMind:password@db:5432/HiveMind
+      JWT_ACCESS_SECRET: e2e_access_secret_not_for_production
+      JWT_REFRESH_SECRET: e2e_refresh_secret_not_for_production
+      JWT_ACCESS_EXPIRES_IN: 15m
+      JWT_REFRESH_EXPIRES_IN: 7d
+      PORT: "3000"
+      NODE_ENV: production
+      CORS_ORIGIN: http://localhost
+      SEED_ADMIN_USERNAME: admin
+      SEED_ADMIN_EMAIL: admin@hivemind.test
+      SEED_ADMIN_PASSWORD: E2eAdmin1!
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
+      SMTP_SECURE: "false"
+      SMTP_IGNORE_TLS: "true"
+      SMTP_FROM: noreply@hivemind.test
+      FRONTEND_BASE_URL: http://localhost
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - e2e-net
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      target: production
+      args:
+        VITE_API_BASE_URL: http://localhost:3000
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - e2e-net
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"
+    networks:
+      - e2e-net
+
+  db:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: HiveMind
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: HiveMind
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U HiveMind -d HiveMind"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - e2e-net
+
+networks:
+  e2e-net:
+    driver: bridge

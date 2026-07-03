@@ -27,6 +27,7 @@ coverage-backend/
 playwright-report/
 test-results/
 .nyc_output/
+e2e/.auth/
 
 # ─── Docker ────────────────────────────────────────────────────────────────────
 .docker/
