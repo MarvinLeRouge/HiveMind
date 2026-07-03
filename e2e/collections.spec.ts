@@ -50,7 +50,7 @@ test.describe('Collections — owner', () => {
   }) => {
     await page.goto(`/collections/${collectionSlug}`);
     await expect(page.getByText('E2E Owner Suite')).toBeVisible();
-    await expect(page.getByText('Puzzles')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Puzzles' })).toBeVisible();
   });
 
   test('owner can access and update collection settings', async ({ page }) => {

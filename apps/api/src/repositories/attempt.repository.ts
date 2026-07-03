@@ -17,12 +17,12 @@ export class AttemptRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
   /**
-   * Returns all attempts for a puzzle, ordered by creation date ascending.
+   * Returns all attempts for a puzzle, ordered by creation date descending (newest first).
    */
   async findAllByPuzzle(puzzleId: string): Promise<Attempt[]> {
     return this.prisma.attempt.findMany({
       where: { puzzleId },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: 'desc' },
     });
   }
 
