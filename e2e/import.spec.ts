@@ -69,8 +69,8 @@ test.describe('Import (API)', () => {
     );
 
     expect(res.status()).toBe(201);
-    const body = (await res.json()) as { imported: number };
-    expect(body.imported).toBeGreaterThan(0);
+    const body = (await res.json()) as { created: number };
+    expect(body.created).toBeGreaterThan(0);
 
     // Verify puzzles were actually created
     const puzzlesRes = await request.get(
@@ -78,7 +78,7 @@ test.describe('Import (API)', () => {
       { headers: { Authorization: `Bearer ${accessToken}` } },
     );
     const puzzles = (await puzzlesRes.json()) as Array<{ id: string }>;
-    expect(puzzles.length).toBeGreaterThanOrEqual(body.imported);
+    expect(puzzles.length).toBeGreaterThanOrEqual(body.created);
   });
 
   test('CSV preview returns column names without creating puzzles', async ({
@@ -155,13 +155,13 @@ test.describe('Import (API)', () => {
             mimeType: 'text/csv',
             buffer: csvBuffer,
           },
-          titleColumn,
+          mapping: JSON.stringify({ title: titleColumn }),
         },
       },
     );
 
     expect(importRes.status()).toBe(201);
-    const body = (await importRes.json()) as { imported: number };
-    expect(body.imported).toBeGreaterThan(0);
+    const body = (await importRes.json()) as { created: number };
+    expect(body.created).toBeGreaterThan(0);
   });
 });
