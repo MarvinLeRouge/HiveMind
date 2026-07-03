@@ -32,9 +32,10 @@ Each **Collection** contains **Puzzles**. Each puzzle can carry free-text **Note
 
 | Metric | Value |
 |--------|-------|
-| API endpoints | 38 (auth, templates, collections, invitations, puzzles, notes, attempts, import) |
-| Backend test coverage | 98 % (261 tests) |
-| Frontend test coverage | 91 % (140 tests) |
+| API endpoints | 39 (auth, templates, collections, invitations, puzzles, notes, attempts, import) |
+| Backend test coverage | ≥ 97 % |
+| Frontend test coverage | ≥ 92 % |
+| Languages | EN, FR (per-user preference) |
 | E2E spec files | — *(BLOCK-22)* |
 
 ---
@@ -47,8 +48,10 @@ Each **Collection** contains **Puzzles**. Each puzzle can carry free-text **Note
 - **Attempts** — immutable records of values tested, with pass/fail result and optional comment
 - **Checker URL** — attach an external verification link to a puzzle; attempted values can be checked directly
 - **Templates** — define which fields are active on puzzles; system templates provided out of the box (`generic`, `geocaching`)
-- **Collaboration** — invite members by email; owner controls access, members contribute notes and attempts
+- **Collaboration** — invite members by email; invitees receive an email with direct accept/decline links
+- **Non-exclusive claiming** — any member can mark themselves as working on a puzzle; multiple members can claim the same puzzle simultaneously
 - **Roles** — `owner` and `member` roles per collection; platform admins manage system templates
+- **Multilingual UI** — EN/FR interface; language preference stored per user and synced across sessions
 - **GPX import** — upload a Geocaching pocket query to auto-populate puzzles with coordinates, difficulty, terrain, and GC codes
 - **CSV import** — upload a spreadsheet with flexible column-to-field mapping
 - **JWT auth** — access token (15 min) + httpOnly refresh cookie (7 days)
@@ -68,7 +71,7 @@ HiveMind/
 │   │   │   ├── services/       # Business logic
 │   │   │   ├── repositories/   # Prisma data access
 │   │   │   ├── middlewares/    # authenticate, requireMember, requireOwner
-│   │   │   ├── plugins/        # Fastify plugins (swagger, jwt, cors, cookie)
+│   │   │   ├── plugins/        # Fastify plugins (swagger, jwt, cors, cookie, multipart)
 │   │   │   └── types/          # Local TypeScript types
 │   │   ├── prisma/
 │   │   │   ├── schema.prisma
@@ -84,6 +87,7 @@ HiveMind/
 │       │   ├── stores/         # Pinia stores
 │       │   ├── router/         # Vue Router + auth guard
 │       │   ├── composables/    # Shared composition functions
+│       │   ├── i18n/           # vue-i18n setup + EN/FR locale files
 │       │   └── types/          # Local TypeScript types
 │       └── tests/
 ├── packages/
@@ -92,8 +96,8 @@ HiveMind/
 │           ├── schemas/        # Zod schemas shared between api and web
 │           └── types/          # TypeScript types inferred from schemas
 ├── .github/workflows/
-│   ├── ci.yml                  # Lint + unit + integration tests
-│   ├── e2e.yml                 # Playwright E2E (gates CD)
+│   ├── ci.yml                  # Lint + unit + integration tests + Codecov
+│   ├── e2e.yml                 # Playwright E2E (parked until BLOCK-22)
 │   └── build-deploy.yml        # Build images + deploy to VPS
 ├── docker-compose.yml          # Dev stack (hot reload)
 ├── docker-compose.prod.yml     # Prod stack (Traefik labels)
@@ -122,6 +126,23 @@ pnpm --filter api test:coverage     # With coverage report (target ≥ 80%)
 - **Unit tests** — `apps/api/tests/unit/` — service logic, repositories mocked
 - **Integration tests** — `apps/api/tests/integration/` — real Fastify instance via `fastify.inject()`
 - Every endpoint is tested for the happy path + 401/403/404 scenarios
+- Integration tests run against a dedicated test database to protect the dev database
+
+#### Test database setup (local)
+
+Integration tests require a separate PostgreSQL database. Create it once:
+
+```bash
+createdb HiveMind_test
+```
+
+Then add the connection string to `apps/api/.env`:
+
+```env
+DATABASE_URL_TEST=postgresql://postgres@localhost:5432/HiveMind_test
+```
+
+When `DATABASE_URL_TEST` is set, the test global setup applies migrations and seed to that database before the suite runs. In CI, there is no `DATABASE_URL_TEST` — the CI PostgreSQL service is used directly via `DATABASE_URL`.
 
 ### Frontend
 
@@ -133,7 +154,7 @@ pnpm --filter web test:coverage     # With coverage report (target ≥ 80%)
 - JSDOM environment, Vue Test Utils
 - Components, composables, and Pinia stores tested
 
-### E2E — Playwright *(V3)*
+### E2E — Playwright *(BLOCK-22)*
 
 ```bash
 pnpm test:e2e       # Requires full Docker stack running
@@ -154,33 +175,43 @@ Husky + lint-staged:
 
 ### CI workflow (`ci.yml`)
 
-Triggers on push + PR to `main`. Ignores `docs/**` and `**.md`.
+Triggers on push + PR to `main`. Ignores `docs/**` and `**.md`. Uses `dorny/paths-filter` to skip unchanged apps.
 
 | Job | Steps |
 |-----|-------|
-| `backend` | lint → Vitest unit → Vitest integration → Codecov |
-| `frontend` | lint → Vitest → Codecov |
+| `backend` | lint → typecheck → Vitest (unit + integration) → Codecov |
+| `frontend` | lint → typecheck → Vitest → Codecov |
+
+Coverage is uploaded to Codecov via OIDC — no token required for public repositories.
 
 ### E2E workflow (`e2e.yml`)
 
-Triggers on push to `main` + `workflow_dispatch`. Starts the Docker stack, runs migrations and seed, executes the Playwright suite. **Gates the CD workflow** via `workflow_run`.
+Parked until BLOCK-22. Triggers on `workflow_dispatch` only. The CD pipeline does not wait for it.
 
 ### CD workflow (`build-deploy.yml`)
 
-Triggered by E2E success or `workflow_dispatch` (hotfix bypass).
+Triggered on every push to `main` and on `workflow_dispatch` (hotfix bypass).
 
-1. Resolve commit SHA
-2. Build and push `backend` + `frontend` images to GHCR (tagged `sha-xxxxxxx` + `latest`)
-3. SSH deploy: fetch `docker-compose.prod.yml` at exact SHA, pull images, `docker compose up -d --remove-orphans`, run `prisma migrate deploy`
+1. Resolve exact commit SHA + lowercase repository name
+2. Build and push `backend` + `frontend` Docker images to GHCR (tagged `sha` + `latest`)
+   - Frontend receives `VITE_API_BASE_URL` as a build argument (baked at build time by Vite)
+3. SSH deploy to VPS:
+   - Fetch `docker-compose.prod.yml` at exact SHA
+   - Pull new images
+   - Start database, wait for health check
+   - Run `prisma migrate deploy`
+   - Start all services with `--remove-orphans`
 
 ---
 
 ## Docker
 
+### Development
+
 | Service | Description | Port |
 |---------|-------------|------|
-| `backend` | Fastify API with hot reload (dev) | 3000 |
-| `frontend` | Vite dev server / Nginx (prod) | 5173 |
+| `backend` | Fastify API with hot reload | 3000 |
+| `frontend` | Vite dev server | 5173 |
 | `db` | PostgreSQL 16 with named volume `pgdata` | 5432 |
 
 ```bash
@@ -197,6 +228,18 @@ docker compose logs -f api
 docker compose down
 ```
 
+### Production
+
+The production stack runs on a VPS behind Traefik with Let's Encrypt TLS. Containers are named `hivemind-backend`, `hivemind-frontend`, and `hivemind-db`. All services share the external `traefik-public` Docker network.
+
+```bash
+# Check production stack status
+docker compose -f docker-compose.prod.yml ps
+
+# Follow production logs
+docker compose -f docker-compose.prod.yml logs -f backend
+```
+
 ---
 
 ## API endpoints
@@ -208,6 +251,7 @@ docker compose down
 | POST | /auth/refresh | — | Rotate tokens from cookie |
 | POST | /auth/logout | ✓ | Clear refresh cookie |
 | GET | /auth/me | ✓ | Return current user |
+| PATCH | /auth/me | ✓ | Update language preference |
 | GET | /templates | ✓ | List templates |
 | POST | /templates | ✓ | Create user template |
 | GET | /templates/:id | ✓ | Get template by ID |
@@ -220,7 +264,7 @@ docker compose down
 | DELETE | /collections/:id | ✓ owner | Delete collection |
 | GET | /collections/:id/members | ✓ member | List members |
 | DELETE | /collections/:id/members/:userId | ✓ owner | Remove member |
-| POST | /collections/:id/invitations | ✓ owner | Send invitation |
+| POST | /collections/:id/invitations | ✓ owner | Send invitation (email dispatched) |
 | GET | /invitations/:id | ✓ | Get invitation |
 | POST | /invitations/:id/accept | ✓ | Accept invitation |
 | POST | /invitations/:id/decline | ✓ | Decline invitation |
@@ -230,8 +274,8 @@ docker compose down
 | PATCH | /collections/:id/puzzles/:pid | ✓ member | Update puzzle |
 | DELETE | /collections/:id/puzzles/:pid | ✓ owner | Delete puzzle |
 | PATCH | /collections/:id/puzzles/reorder | ✓ owner | Bulk reorder |
-| POST | /collections/:id/puzzles/:pid/claim | ✓ member | Claim puzzle |
-| DELETE | /collections/:id/puzzles/:pid/claim | ✓ member | Unclaim puzzle |
+| POST | /collections/:id/puzzles/:pid/claim | ✓ member | Add self as worker |
+| DELETE | /collections/:id/puzzles/:pid/claim | ✓ member | Remove self as worker |
 | GET | /puzzles/:pid/notes | ✓ member | List notes |
 | POST | /puzzles/:pid/notes | ✓ member | Add note |
 | PATCH | /puzzles/:pid/notes/:nid | ✓ author | Edit own note |
@@ -253,9 +297,10 @@ docker compose down
 - Docker + Docker Compose
 - Traefik running locally with a `traefik-public` Docker network
 - `hivemind.marvinlerouge.local` added to `/etc/hosts`:
-  ```
-  echo "127.0.0.1 hivemind.marvinlerouge.local" | sudo tee -a /etc/hosts
-  ```
+
+```bash
+echo "127.0.0.1 hivemind.marvinlerouge.local" | sudo tee -a /etc/hosts
+```
 
 ### Local development
 
@@ -277,11 +322,69 @@ docker compose up -d
 # Apply migrations and seed the database
 docker compose exec backend npx prisma migrate deploy
 docker compose exec backend npx prisma db seed
+```
 
-# The app is now running:
-#   Frontend:     http://hivemind.marvinlerouge.local
-#   API:          http://hivemind.marvinlerouge.local/api
-#   Swagger UI:   http://hivemind.marvinlerouge.local/api/docs
+The app is now running:
+
+| Service | URL |
+|---------|-----|
+| Frontend | http://hivemind.marvinlerouge.local |
+| API | http://hivemind.marvinlerouge.local/api |
+| Swagger UI | http://hivemind.marvinlerouge.local/api/docs |
+
+The default admin credentials are defined in `apps/api/.env` (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`).
+
+### Production deployment
+
+The CD pipeline deploys automatically on every push to `main`. To trigger a manual deployment:
+
+1. Go to **Actions → Build & Deploy → Run workflow** on GitHub.
+
+Required GitHub secrets:
+
+| Secret | Description |
+|--------|-------------|
+| `DEPLOY_SSH_HOST` | VPS hostname or IP |
+| `DEPLOY_SSH_USER` | SSH user on the VPS |
+| `DEPLOY_SSH_PRIVATE_KEY` | SSH private key with access to the VPS |
+| `VITE_API_BASE_URL` | Public API URL baked into the frontend (e.g. `https://example.com/api`) |
+
+The VPS must have Docker installed, the `traefik-public` Docker network created, and a production `.env` file at the path referenced in `docker-compose.prod.yml`.
+
+On first deployment, run the database seed manually:
+
+```bash
+docker exec hivemind-backend node node_modules/.bin/prisma db seed
+```
+
+---
+
+## Backup & restore
+
+The production database is backed up daily via a cron job running on the VPS (`0 2 * * *`). Backups are gzip-compressed `pg_dump` exports with the following rotation:
+
+- **7 daily backups** — one per day, overwritten after 7 days
+- **4 weekly backups** — every Sunday, overwritten after 4 weeks
+
+### Restore procedure
+
+```bash
+# 1. Copy the backup file to the VPS if needed
+scp backup.sql.gz user@vps:/tmp/
+
+# 2. Create a temporary database for verification
+docker exec hivemind-db createdb -U HiveMind hivemind_restore
+
+# 3. Restore into the temporary database
+gunzip -c /tmp/backup.sql.gz | docker exec -i hivemind-db psql -U HiveMind -d hivemind_restore
+
+# 4. Verify the restore (table count, row counts, spot checks)
+docker exec -it hivemind-db psql -U HiveMind -d hivemind_restore -c "\dt"
+
+# 5. If verified, stop the stack, restore into the live database, then restart
+docker compose -f docker-compose.prod.yml down
+gunzip -c /tmp/backup.sql.gz | docker exec -i hivemind-db psql -U HiveMind -d HiveMind
+docker compose -f docker-compose.prod.yml up -d
 ```
 
 ---
@@ -300,6 +403,7 @@ docker compose exec backend npx prisma db seed
 | API docs | @fastify/swagger + Swagger UI | |
 | Frontend | Vue 3 + Vite + Vue Router + Pinia | [![Vue.js](https://img.shields.io/badge/vue-3-42b883?logo=vue.js)](https://vuejs.org) |
 | UI | Tailwind CSS + shadcn-vue | [![Tailwind](https://img.shields.io/badge/tailwind-3-38bdf8?logo=tailwindcss)](https://tailwindcss.com) |
+| i18n | vue-i18n v9 (EN + FR) | |
 | HTTP client | ofetch | |
 | Backend tests | Vitest + fastify.inject() | [![Vitest](https://img.shields.io/badge/vitest-2-6e9f18?logo=vitest)](https://vitest.dev) |
 | Frontend tests | Vitest + Vue Test Utils | |
@@ -342,11 +446,18 @@ docker compose exec backend npx prisma db seed
 - [x] BLOCK-20 · Frontend quality pass (coverage, a11y, responsive)
 - [x] BLOCK-21 · CI frontend integration + CD finalization
 
+### Post-V2 features
+
+- [x] BLOCK-i18n · FR/EN multilingualism (vue-i18n, language stored per user)
+- [x] BLOCK-invitation-email · SMTP invitation emails (Nodemailer, NoopMailer in CI)
+- [x] BLOCK-claim-workers · Non-exclusive puzzle claiming (PuzzleWorker join table)
+- [x] BLOCK-test-isolation · Dedicated test database (`HiveMind_test` + `DATABASE_URL_TEST`)
+
 ### V3 — Quality & Production
 
 - [ ] BLOCK-22 · E2E Playwright suite
-- [ ] BLOCK-23 · Production deployment (Traefik, GHCR, SSH)
-- [ ] BLOCK-24 · Automated PostgreSQL backups
+- [x] BLOCK-23 · Production deployment (VPS, Traefik, GHCR, SSH CD)
+- [x] BLOCK-24 · Automated PostgreSQL backups (daily cron, 7d + 4w rotation)
 
 ---
 
