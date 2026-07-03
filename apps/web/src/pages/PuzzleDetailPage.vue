@@ -307,7 +307,7 @@
             :disabled="editSaving"
             class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-50"
           >
-            {{ editSaving ? t('common.saving') : t('common.save') }}
+            {{ editSaving ? t('common.saving') : t('puzzle.saveChanges') }}
           </button>
           <button
             type="button"
