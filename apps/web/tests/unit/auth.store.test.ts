@@ -75,13 +75,17 @@ describe('useAuthStore', () => {
 
   describe('refresh', () => {
     it('returns true and updates state when cookie is valid', async () => {
-      mockFetch.mockResolvedValueOnce(mockAuthResponse);
+      // refresh returns only { accessToken }; /auth/me is fetched separately
+      mockFetch
+        .mockResolvedValueOnce({ accessToken: 'token-abc' })
+        .mockResolvedValueOnce(mockUser);
       const auth = useAuthStore();
 
       const result = await auth.refresh();
 
       expect(result).toBe(true);
       expect(auth.accessToken).toBe('token-abc');
+      expect(auth.user).toEqual(mockUser);
     });
 
     it('returns false and clears state when cookie is expired', async () => {
@@ -126,7 +130,9 @@ describe('useAuthStore', () => {
 
   describe('init', () => {
     it('restores session when a valid refresh cookie is present', async () => {
-      mockFetch.mockResolvedValueOnce(mockAuthResponse);
+      mockFetch
+        .mockResolvedValueOnce({ accessToken: 'token-abc' })
+        .mockResolvedValueOnce(mockUser);
       const auth = useAuthStore();
 
       await auth.init();

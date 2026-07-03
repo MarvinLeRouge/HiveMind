@@ -53,16 +53,21 @@ export const useAuthStore = defineStore('auth', {
     /**
      * Silently refreshes the access token using the httpOnly refresh cookie.
      * Returns true on success, false if the session has expired.
+     * The /auth/refresh endpoint returns only { accessToken }; the user profile
+     * is fetched separately via GET /auth/me with the new token.
      */
     async refresh(): Promise<boolean> {
       try {
-        const data = await ofetch<AuthResponse>(`${BASE_URL}/auth/refresh`, {
-          method: 'POST',
-          credentials: 'include',
+        const { accessToken } = await ofetch<{ accessToken: string }>(
+          `${BASE_URL}/auth/refresh`,
+          { method: 'POST', credentials: 'include' },
+        );
+        this.accessToken = accessToken;
+        const user = await ofetch<User>(`${BASE_URL}/auth/me`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
         });
-        this.accessToken = data.accessToken;
-        this.user = data.user;
-        this.syncLocale(data.user.language);
+        this.user = user;
+        this.syncLocale(user.language);
         return true;
       } catch {
         this.accessToken = null;
