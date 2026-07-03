@@ -36,7 +36,7 @@ Each **Collection** contains **Puzzles**. Each puzzle can carry free-text **Note
 | Backend test coverage | ≥ 97 % |
 | Frontend test coverage | ≥ 92 % |
 | Languages | EN, FR (per-user preference) |
-| E2E spec files | — *(BLOCK-22)* |
+| E2E tests | 35 (auth, collections, puzzles, notes, attempts, import) |
 
 ---
 
@@ -97,7 +97,7 @@ HiveMind/
 │           └── types/          # TypeScript types inferred from schemas
 ├── .github/workflows/
 │   ├── ci.yml                  # Lint + unit + integration tests + Codecov
-│   ├── e2e.yml                 # Playwright E2E (parked until BLOCK-22)
+│   ├── e2e.yml                 # Playwright E2E (35 tests, Chromium, gates CD)
 │   └── build-deploy.yml        # Build images + deploy to VPS
 ├── docker-compose.yml          # Dev stack (hot reload)
 ├── docker-compose.prod.yml     # Prod stack (Traefik labels)
@@ -154,13 +154,22 @@ pnpm --filter web test:coverage     # With coverage report (target ≥ 80%)
 - JSDOM environment, Vue Test Utils
 - Components, composables, and Pinia stores tested
 
-### E2E — Playwright *(BLOCK-22)*
+### E2E — Playwright
 
 ```bash
 pnpm test:e2e       # Requires full Docker stack running
 ```
 
-Spec files in `e2e/` at monorepo root. Chromium only. Runs against the full Docker stack.
+35 tests across 6 spec files in `e2e/` at monorepo root. Chromium only. Runs against the full production Docker stack (backend + frontend + DB + mailpit).
+
+| Spec | Tests | Coverage |
+|------|-------|----------|
+| `auth.spec.ts` | 6 | login, wrong password, register, logout, redirect, i18n toggle |
+| `collections.spec.ts` | 8 | create, view, settings, delete, invite, member/outsider access |
+| `puzzles.spec.ts` | 10 | list, add, edit, claim/release, status advance, delete, member access |
+| `notes.spec.ts` | 5 | add, edit, delete own note; member cannot edit owner's notes |
+| `attempts.spec.ts` | 3 | record, immutability, chronological order |
+| `import.spec.ts` | 3 | GPX import, CSV preview, CSV import |
 
 ---
 
@@ -186,7 +195,7 @@ Coverage is uploaded to Codecov via OIDC — no token required for public reposi
 
 ### E2E workflow (`e2e.yml`)
 
-Parked until BLOCK-22. Triggers on `workflow_dispatch` only. The CD pipeline does not wait for it.
+Triggers on push to `main` and `workflow_dispatch`. Builds the full production Docker stack, applies migrations, seeds the database, then runs all 35 Playwright tests. The CD workflow is gated on E2E success via `workflow_run`.
 
 ### CD workflow (`build-deploy.yml`)
 
@@ -458,7 +467,7 @@ docker compose -f docker-compose.prod.yml up -d
 
 ### V3 — Quality & Production
 
-- [ ] BLOCK-22 · E2E Playwright suite
+- [x] BLOCK-22 · E2E Playwright suite (35 tests, Chromium)
 - [x] BLOCK-23 · Production deployment (VPS, Traefik, GHCR, SSH CD)
 - [x] BLOCK-24 · Automated PostgreSQL backups (daily cron, 7d + 4w rotation)
 

@@ -36,7 +36,7 @@ Chaque **Collection** contient des **Puzzles**. Chaque puzzle peut recevoir des 
 | Couverture de tests backend | ≥ 97 % |
 | Couverture de tests frontend | ≥ 92 % |
 | Langues | FR, EN (préférence par utilisateur) |
-| Fichiers de specs E2E | — *(BLOCK-22)* |
+| Tests E2E | 35 (auth, collections, puzzles, notes, tentatives, import) |
 
 ---
 
@@ -97,7 +97,7 @@ HiveMind/
 │           └── types/          # Types TypeScript inférés des schémas
 ├── .github/workflows/
 │   ├── ci.yml                  # Lint + tests unitaires + intégration + Codecov
-│   ├── e2e.yml                 # E2E Playwright (en pause jusqu'au BLOCK-22)
+│   ├── e2e.yml                 # E2E Playwright (35 tests, Chromium, gate CD)
 │   └── build-deploy.yml        # Build images + déploiement VPS
 ├── docker-compose.yml          # Stack de dev (hot reload)
 ├── docker-compose.prod.yml     # Stack de prod (labels Traefik)
@@ -154,13 +154,22 @@ pnpm --filter web test:coverage     # Avec rapport de couverture (cible ≥ 80 %
 - Environnement JSDOM, Vue Test Utils
 - Composants, composables et stores Pinia testés
 
-### E2E — Playwright *(BLOCK-22)*
+### E2E — Playwright
 
 ```bash
 pnpm test:e2e       # Nécessite la stack Docker complète en cours d'exécution
 ```
 
-Fichiers de specs dans `e2e/` à la racine du monorepo. Chromium uniquement. Exécuté contre la stack Docker complète.
+35 tests répartis sur 6 fichiers de specs dans `e2e/` à la racine du monorepo. Chromium uniquement. Exécuté contre la stack Docker complète de production (backend + frontend + DB + mailpit).
+
+| Spec | Tests | Périmètre |
+|------|-------|-----------|
+| `auth.spec.ts` | 6 | login, mauvais mdp, register, logout, redirect, bascule i18n |
+| `collections.spec.ts` | 8 | create, view, settings, delete, invite, accès member/outsider |
+| `puzzles.spec.ts` | 10 | liste, add, edit, claim/release, avance statut, delete, accès member |
+| `notes.spec.ts` | 5 | add, edit, delete note ; member ne peut pas éditer les notes owner |
+| `attempts.spec.ts` | 3 | enregistrement, immutabilité, ordre chronologique |
+| `import.spec.ts` | 3 | import GPX, preview CSV, import CSV |
 
 ---
 
@@ -186,7 +195,7 @@ La couverture est envoyée à Codecov via OIDC — aucun token requis pour les d
 
 ### Workflow E2E (`e2e.yml`)
 
-En pause jusqu'au BLOCK-22. Déclenché sur `workflow_dispatch` uniquement. Le pipeline CD n'attend pas ce workflow.
+Déclenché sur push vers `main` et `workflow_dispatch`. Construit la stack Docker de production complète, applique les migrations, seed la base, puis exécute les 35 tests Playwright. Le workflow CD est conditionné au succès de l'E2E via `workflow_run`.
 
 ### Workflow CD (`build-deploy.yml`)
 
@@ -458,7 +467,7 @@ docker compose -f docker-compose.prod.yml up -d
 
 ### V3 — Qualité & Production
 
-- [ ] BLOCK-22 · Suite E2E Playwright
+- [x] BLOCK-22 · Suite E2E Playwright (35 tests, Chromium)
 - [x] BLOCK-23 · Déploiement production (VPS, Traefik, GHCR, CD SSH)
 - [x] BLOCK-24 · Sauvegardes PostgreSQL automatisées (cron quotidien, rotation 7j + 4s)
 
