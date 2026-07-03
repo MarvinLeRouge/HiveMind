@@ -43,6 +43,9 @@ jobs:
             'until docker compose -f docker-compose.e2e.yml exec -T db \
               pg_isready -U HiveMind -d HiveMind; do sleep 2; done'
 
+      - name: Generate Prisma client
+        run: pnpm --filter api exec prisma generate
+
       - name: Run migrations
         run: pnpm --filter api exec prisma migrate deploy
         env:
