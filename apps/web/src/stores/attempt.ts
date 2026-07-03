@@ -27,7 +27,7 @@ export const useAttemptStore = defineStore('attempt', {
         `${BASE_URL}/puzzles/${puzzleId}/attempts`,
         { method: 'POST', body: data },
       );
-      this.attempts.push(attempt);
+      this.attempts.unshift(attempt);
     },
   },
 });

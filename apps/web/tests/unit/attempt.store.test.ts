@@ -38,7 +38,7 @@ describe('useAttemptStore', () => {
   });
 
   describe('add', () => {
-    it('appends the new attempt to the list', async () => {
+    it('prepends the new attempt to the list (newest first)', async () => {
       mockFetch.mockResolvedValueOnce(mockAttempt);
       const store = useAttemptStore();
 

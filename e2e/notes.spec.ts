@@ -107,12 +107,11 @@ test.describe('Notes', () => {
       await expect(page.getByText('Note to edit')).toBeVisible();
 
       // Edit it
-      await page
+      const noteItem = page
         .getByRole('listitem')
-        .filter({ hasText: 'Note to edit' })
-        .getByRole('button', { name: 'Edit' })
-        .click();
-      await page.getByRole('textbox').fill('Note edited');
+        .filter({ hasText: 'Note to edit' });
+      await noteItem.getByRole('button', { name: 'Edit' }).click();
+      await noteItem.getByRole('textbox').fill('Note edited');
       await page.getByRole('button', { name: 'Save' }).click();
       await expect(page.getByText('Note edited')).toBeVisible();
     });
@@ -147,9 +146,14 @@ test.describe('Notes', () => {
       await expect(page.getByText('Member note')).toBeVisible();
     });
 
-    test("member cannot edit or delete owner's notes", async ({ page }) => {
-      // Add an owner note first via API
-      const ownerRes = await page.request.post(`${API_URL}/auth/login`, {
+    test("member cannot edit or delete owner's notes", async ({
+      page,
+      request,
+    }) => {
+      // Add an owner note via the standalone request fixture (NOT page.request,
+      // which would inject the owner's refresh cookie into the member's browser
+      // context and silently replace the member's session on the next page.goto).
+      const ownerRes = await request.post(`${API_URL}/auth/login`, {
         data: {
           email: E2E_USERS.owner.email,
           password: E2E_USERS.owner.password,
@@ -158,7 +162,7 @@ test.describe('Notes', () => {
       const { accessToken } = (await ownerRes.json()) as {
         accessToken: string;
       };
-      await page.request.post(`${API_URL}/puzzles/${puzzleId}/notes`, {
+      await request.post(`${API_URL}/puzzles/${puzzleId}/notes`, {
         data: { content: 'Owner private note' },
         headers: { Authorization: `Bearer ${accessToken}` },
       });
