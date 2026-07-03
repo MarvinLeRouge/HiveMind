@@ -40,7 +40,7 @@ test.describe('Puzzles', () => {
     await page.goto(`/collections/${collectionSlug}`);
     await page.getByRole('button', { name: '+ Add puzzle' }).click();
     await page.getByLabel('Title').fill('E2E Puzzle Beta');
-    await page.getByRole('button', { name: 'Add' }).click();
+    await page.getByRole('button', { name: 'Add', exact: true }).click();
     await expect(page.getByText('E2E Puzzle Beta')).toBeVisible();
   });
 

@@ -64,9 +64,11 @@ test.describe('Collections — owner', () => {
 
     await expect(page.getByText(newName)).toBeVisible();
 
-    // Restore original name
+    // Save navigates to the collection detail page — go back to settings to restore.
+    await page.getByRole('link', { name: 'Settings' }).click();
     await page.getByLabel('Name').fill('E2E Owner Suite');
     await page.getByRole('button', { name: 'Save changes' }).click();
+    await expect(page.getByText('E2E Owner Suite')).toBeVisible();
   });
 
   test('owner can delete a collection', async ({ page, request }) => {
