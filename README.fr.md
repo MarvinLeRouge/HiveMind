@@ -32,7 +32,7 @@ Chaque **Collection** contient des **Puzzles**. Chaque puzzle peut recevoir des 
 
 | Métrique | Valeur |
 |----------|--------|
-| Endpoints API | 39 (auth, templates, collections, invitations, puzzles, notes, tentatives, import) |
+| Endpoints API | 42 (auth, templates, collections, invitations, puzzles, notes, tentatives, import) |
 | Couverture de tests backend | ≥ 97 % |
 | Couverture de tests frontend | ≥ 92 % |
 | Langues | FR, EN (préférence par utilisateur) |
@@ -257,6 +257,9 @@ docker compose -f docker-compose.prod.yml logs -f backend
 | GET | /templates/:id | ✓ | Obtenir un template par ID |
 | PATCH | /templates/:id | ✓ | Modifier son propre template |
 | DELETE | /templates/:id | ✓ | Supprimer son propre template |
+| POST | /templates/system | ✓ admin | Créer un template système |
+| PATCH | /templates/system/:id | ✓ admin | Modifier un template système |
+| DELETE | /templates/system/:id | ✓ admin | Supprimer un template système |
 | GET | /collections | ✓ | Lister mes collections |
 | POST | /collections | ✓ | Créer une collection |
 | GET | /collections/:id | ✓ membre | Obtenir une collection |
