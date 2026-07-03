@@ -29,6 +29,8 @@ services:
       SMTP_PORT: "1025"
       SMTP_SECURE: "false"
       SMTP_IGNORE_TLS: "true"
+      SMTP_USER: mailpit
+      SMTP_PASS: mailpit
       SMTP_FROM: noreply@hivemind.test
       FRONTEND_BASE_URL: http://localhost
     depends_on:

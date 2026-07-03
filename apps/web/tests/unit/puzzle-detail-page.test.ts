@@ -255,6 +255,34 @@ describe('PuzzleDetailPage', () => {
     expect(wrapper.text()).toContain('Claim');
   });
 
+  it('shows "Save changes" button when entering puzzle edit mode', async () => {
+    const puzzleStore = usePuzzleStore();
+    const noteStore = useNoteStore();
+    const attemptStore = useAttemptStore();
+    vi.spyOn(puzzleStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(noteStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(attemptStore, 'fetchAll').mockResolvedValue();
+    puzzleStore.current = mockPuzzle;
+
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles/pzl-1');
+
+    const wrapper = mount(PuzzleDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    await wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Edit')
+      ?.trigger('click');
+    await flushPromises();
+
+    expect(
+      wrapper.findAll('button').some((b) => b.text() === 'Save changes'),
+    ).toBe(true);
+  });
+
   it('shows an error message when loading fails', async () => {
     const puzzleStore = usePuzzleStore();
     const noteStore = useNoteStore();

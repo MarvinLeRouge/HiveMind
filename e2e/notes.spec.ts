@@ -111,7 +111,10 @@ test.describe('Notes', () => {
         .getByRole('listitem')
         .filter({ hasText: 'Note to edit' });
       await noteItem.getByRole('button', { name: 'Edit' }).click();
-      await noteItem.getByRole('textbox').fill('Note edited');
+      // After clicking Edit the note's <p> is replaced by a <textarea>; the
+      // hasText filter no longer matches (innerText excludes textarea values),
+      // so scope to the notes <ul> instead of the stale noteItem locator.
+      await page.locator('ul').getByRole('textbox').fill('Note edited');
       await page.getByRole('button', { name: 'Save' }).click();
       await expect(page.getByText('Note edited')).toBeVisible();
     });
