@@ -94,11 +94,13 @@ import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useCollectionStore } from '@/stores/collection';
+import { useToastStore } from '@/stores/toast';
 
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const store = useCollectionStore();
+const toast = useToastStore();
 
 const form = ref({ name: '', description: '' });
 const saving = ref(false);
@@ -125,6 +127,7 @@ async function handleSave() {
       name: form.value.name,
       description: form.value.description || null,
     });
+    toast.add(t('toast.collectionSaved'));
     await router.push(`/collections/${store.current!.slug}`);
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Failed to save changes.';

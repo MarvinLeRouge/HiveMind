@@ -542,6 +542,7 @@ import { useNoteStore } from '@/stores/note';
 import { useAttemptStore } from '@/stores/attempt';
 import { useAuthStore } from '@/stores/auth';
 import { useCollectionStore } from '@/stores/collection';
+import { useToastStore } from '@/stores/toast';
 import PuzzleStatusBadge from '@/components/PuzzleStatusBadge.vue';
 import AppSpinner from '@/components/AppSpinner.vue';
 import { STATUS_NEXT } from '@/types/puzzle';
@@ -557,6 +558,7 @@ const noteStore = useNoteStore();
 const attemptStore = useAttemptStore();
 const authStore = useAuthStore();
 const collectionStore = useCollectionStore();
+const toast = useToastStore();
 
 const { current } = storeToRefs(puzzleStore);
 const { current: collection } = storeToRefs(collectionStore);
@@ -684,6 +686,7 @@ async function handleSaveEdit() {
       spoiler: f.spoiler || null,
     });
     editing.value = false;
+    toast.add(t('toast.puzzleUpdated'));
   } catch (e) {
     editError.value = e instanceof Error ? e.message : 'Failed to save puzzle.';
   } finally {
@@ -699,6 +702,7 @@ async function handleAdvanceStatus() {
     await puzzleStore.update(collectionId, puzzleId, {
       status: nextStatus.value,
     });
+    toast.add(t('toast.puzzleStatusChanged'));
   } finally {
     statusBusy.value = false;
   }
@@ -709,6 +713,7 @@ async function handleClaim() {
   claimBusy.value = true;
   try {
     await puzzleStore.claim(collectionId, puzzleId);
+    toast.add(t('toast.puzzleClaimed'));
   } finally {
     claimBusy.value = false;
   }
@@ -719,6 +724,7 @@ async function handleUnclaim() {
   claimBusy.value = true;
   try {
     await puzzleStore.unclaim(collectionId, puzzleId);
+    toast.add(t('toast.puzzleReleased'));
   } finally {
     claimBusy.value = false;
   }

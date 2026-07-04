@@ -459,6 +459,7 @@ import { storeToRefs } from 'pinia';
 import { useCollectionStore } from '@/stores/collection';
 import { usePuzzleStore } from '@/stores/puzzle';
 import { useAuthStore } from '@/stores/auth';
+import { useToastStore } from '@/stores/toast';
 import PuzzleStatusBadge from '@/components/PuzzleStatusBadge.vue';
 import MembersPanel from '@/components/MembersPanel.vue';
 import AppSpinner from '@/components/AppSpinner.vue';
@@ -470,6 +471,7 @@ const collectionId = route.params.id as string;
 const collectionStore = useCollectionStore();
 const puzzleStore = usePuzzleStore();
 const auth = useAuthStore();
+const toast = useToastStore();
 
 const { current, members, isOwner } = storeToRefs(collectionStore);
 const { puzzles } = storeToRefs(puzzleStore);
@@ -548,6 +550,7 @@ function toggleMembers() {
 async function handleRemoveMember(userId: string) {
   try {
     await collectionStore.removeMember(collectionId, userId);
+    toast.add(t('toast.memberRemoved'));
   } catch (e) {
     loadError.value =
       e instanceof Error ? e.message : 'Failed to remove member.';
@@ -563,6 +566,7 @@ async function handleInvite(email: string) {
     await collectionStore.invite(collectionId, email);
     inviteSuccess.value = true;
     inviteEmail.value = '';
+    toast.add(t('toast.inviteSent'));
   } catch (e) {
     inviteError.value =
       e instanceof Error ? e.message : 'Failed to send invitation.';
@@ -631,6 +635,7 @@ async function handleAdd() {
       spoiler: '',
     };
     showAddForm.value = false;
+    toast.add(t('toast.puzzleAdded'));
   } catch (e) {
     addError.value = e instanceof Error ? e.message : 'Failed to add puzzle.';
   } finally {

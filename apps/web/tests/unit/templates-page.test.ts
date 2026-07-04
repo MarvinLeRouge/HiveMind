@@ -185,6 +185,27 @@ describe('TemplatesPage', () => {
     expect(wrapper.find('a[href="/templates/new"]').exists()).toBe(true);
   });
 
+  it('shows "none" when a template has no active fields', async () => {
+    const store = useTemplateStore();
+    vi.spyOn(store, 'fetchAll').mockResolvedValue();
+    store.templates = [
+      {
+        ...mockTemplate,
+        gcCodeMode: 'disabled' as const,
+      },
+    ];
+
+    const router = makeRouter();
+    await router.push('/templates');
+
+    const wrapper = mount(TemplatesPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('none');
+  });
+
   it('shows an error message when loading fails', async () => {
     const store = useTemplateStore();
     vi.spyOn(store, 'fetchAll').mockRejectedValue(new Error('Network error'));

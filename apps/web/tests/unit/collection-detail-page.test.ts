@@ -152,6 +152,55 @@ describe('CollectionDetailPage', () => {
     expect(wrapper.text()).toContain('Invite a member');
   });
 
+  it('calls puzzleStore.create when the add puzzle form is submitted', async () => {
+    const collectionStore = useCollectionStore();
+    const puzzleStore = usePuzzleStore();
+    const auth = useAuthStore();
+    vi.spyOn(collectionStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'create').mockResolvedValue({
+      id: 'puz-new',
+      title: 'New Puzzle',
+      status: 'open',
+      sortOrder: 2,
+      workers: [],
+      gcCode: null,
+    } as never);
+    auth.user = {
+      id: 'user-1',
+      username: 'alice',
+      email: 'alice@example.com',
+      isAdmin: false,
+      language: 'en',
+      createdAt: '2025-01-01',
+    };
+    collectionStore.current = mockCollection as never;
+    collectionStore.members = [mockMember as never];
+    puzzleStore.puzzles = [];
+    const router = makeRouter();
+    await router.push('/collections/col-1');
+
+    const wrapper = mount(CollectionDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    const addBtn = wrapper
+      .findAll('button')
+      .find((b) => b.text().includes('Add puzzle'));
+    await addBtn!.trigger('click');
+    await flushPromises();
+
+    await wrapper.find('#new-puzzle-title').setValue('New Puzzle');
+    await wrapper.find('form[aria-label="Add puzzle"]').trigger('submit');
+    await flushPromises();
+
+    expect(puzzleStore.create).toHaveBeenCalledWith(
+      'col-1',
+      expect.objectContaining({ title: 'New Puzzle' }),
+    );
+  });
+
   it('shows an error when loading fails', async () => {
     const collectionStore = useCollectionStore();
     const puzzleStore = usePuzzleStore();
