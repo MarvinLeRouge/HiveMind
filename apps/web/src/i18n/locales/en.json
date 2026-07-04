@@ -18,7 +18,9 @@
   "nav": {
     "collections": "Collections",
     "templates": "Templates",
-    "logout": "Log out"
+    "logout": "Log out",
+    "darkMode": "Switch to dark mode",
+    "lightMode": "Switch to light mode"
   },
   "auth": {
     "login": "Log in",

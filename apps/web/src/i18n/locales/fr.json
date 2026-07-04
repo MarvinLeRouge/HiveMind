@@ -18,7 +18,9 @@
   "nav": {
     "collections": "Collections",
     "templates": "Modèles",
-    "logout": "Déconnexion"
+    "logout": "Déconnexion",
+    "darkMode": "Passer en mode sombre",
+    "lightMode": "Passer en mode clair"
   },
   "auth": {
     "login": "Se connecter",
