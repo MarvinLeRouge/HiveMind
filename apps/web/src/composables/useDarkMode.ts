@@ -14,7 +14,9 @@ function apply(dark: boolean): void {
 /** Initialise from localStorage, falling back to OS preference. */
 if (typeof window !== 'undefined') {
   const stored = localStorage.getItem(STORAGE_KEY);
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const prefersDark =
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches;
   apply(stored === 'dark' || (stored === null && prefersDark));
 }
 

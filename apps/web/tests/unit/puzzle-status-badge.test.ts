@@ -18,15 +18,15 @@ describe('PuzzleStatusBadge', () => {
     expect(wrapper.text()).toBe('custom');
   });
 
-  it('applies green classes for verified status', () => {
+  it('applies semantic style token for verified status', () => {
     const wrapper = mount(PuzzleStatusBadge, { props: { status: 'verified' } });
-    expect(wrapper.classes().some((c) => c.includes('green'))).toBe(true);
+    expect(wrapper.attributes('style')).toContain('--status-verified-bg');
   });
 
-  it('applies blue classes for in_progress status', () => {
+  it('applies semantic style token for in_progress status', () => {
     const wrapper = mount(PuzzleStatusBadge, {
       props: { status: 'in_progress' },
     });
-    expect(wrapper.classes().some((c) => c.includes('blue'))).toBe(true);
+    expect(wrapper.attributes('style')).toContain('--status-in-progress-bg');
   });
 });
