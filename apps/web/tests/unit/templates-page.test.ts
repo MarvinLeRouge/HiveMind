@@ -168,6 +168,23 @@ describe('TemplatesPage', () => {
     expect(wrapper.text()).toContain('Delete');
   });
 
+  it('shows the empty state when there are no templates', async () => {
+    const store = useTemplateStore();
+    vi.spyOn(store, 'fetchAll').mockResolvedValue();
+    store.templates = [];
+
+    const router = makeRouter();
+    await router.push('/templates');
+
+    const wrapper = mount(TemplatesPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('No templates yet.');
+    expect(wrapper.find('a[href="/templates/new"]').exists()).toBe(true);
+  });
+
   it('shows an error message when loading fails', async () => {
     const store = useTemplateStore();
     vi.spyOn(store, 'fetchAll').mockRejectedValue(new Error('Network error'));
