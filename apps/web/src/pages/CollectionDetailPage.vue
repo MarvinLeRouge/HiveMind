@@ -337,7 +337,8 @@
               </RouterLink>
               <span
                 v-if="puzzle.workers.length > 0"
-                class="rounded-full bg-primary/12 px-2 py-0.5 text-xs text-primary"
+                class="rounded-full px-2 py-0.5 text-xs text-primary"
+                style="background-color: oklch(var(--primary) / 0.1)"
               >
                 {{
                   puzzle.workers.some((w) => w.id === currentUserId)

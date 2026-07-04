@@ -50,7 +50,7 @@
           }}
         </button>
       </form>
-      <p v-if="inviteSuccess" class="mt-2 text-sm text-green-600">
+      <p v-if="inviteSuccess" class="mt-2 text-sm text-primary">
         {{ t('collection.invitationSent') }}
       </p>
       <p v-if="inviteError" role="alert" class="mt-2 text-sm text-destructive">

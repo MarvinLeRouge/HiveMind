@@ -1,5 +1,5 @@
 <template>
-  <div class="flex min-h-screen items-center justify-center bg-muted/30 px-4">
+  <div class="flex min-h-screen items-center justify-center bg-muted px-4">
     <div class="w-full max-w-md rounded-lg border bg-background p-8 shadow-sm">
       <!-- Loading -->
       <p v-if="loading" class="text-sm text-muted-foreground">
