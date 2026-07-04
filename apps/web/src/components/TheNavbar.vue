@@ -3,7 +3,7 @@
     <div
       class="container flex min-h-14 flex-wrap items-center gap-x-6 gap-y-2 py-2"
     >
-      <RouterLink to="/collections" class="font-semibold text-foreground">
+      <RouterLink to="/collections" class="font-semibold text-primary">
         HiveMind
       </RouterLink>
 
