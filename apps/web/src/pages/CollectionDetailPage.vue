@@ -306,11 +306,15 @@
             {{ t('puzzle.noItems') }}
           </div>
 
-          <ul v-else aria-label="Puzzle list" class="space-y-2">
+          <ul
+            v-else
+            aria-label="Puzzle list"
+            class="overflow-hidden rounded-md border divide-y"
+          >
             <li
               v-for="(puzzle, index) in puzzles"
               :key="puzzle.id"
-              class="flex items-center gap-3 rounded-md border px-4 py-3 text-sm"
+              class="flex items-center gap-3 px-4 py-3 text-sm transition-colors odd:bg-muted/40 hover:bg-muted/70"
               :draggable="isOwner"
               @dragstart="onDragStart(index)"
               @dragover.prevent
@@ -333,7 +337,7 @@
               </RouterLink>
               <span
                 v-if="puzzle.workers.length > 0"
-                class="rounded bg-blue-50 px-2 py-0.5 text-xs text-blue-600"
+                class="rounded-full bg-primary/12 px-2 py-0.5 text-xs text-primary"
               >
                 {{
                   puzzle.workers.some((w) => w.id === currentUserId)

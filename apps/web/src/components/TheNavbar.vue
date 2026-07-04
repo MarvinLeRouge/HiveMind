@@ -9,12 +9,12 @@
 
       <RouterLink
         to="/templates"
-        class="text-sm text-muted-foreground hover:text-foreground"
+        class="rounded-md px-2 py-1 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
       >
         {{ t('nav.templates') }}
       </RouterLink>
 
-      <div class="ml-auto flex items-center gap-4">
+      <div class="ml-auto flex items-center gap-2">
         <span class="text-sm text-muted-foreground">{{
           auth.user?.username
         }}</span>
@@ -25,10 +25,10 @@
             v-for="lang in SUPPORTED_LOCALES"
             :key="lang"
             :class="[
-              'px-1.5 py-0.5 rounded transition-colors',
+              'rounded-full px-2.5 py-0.5 transition-colors',
               currentLocale === lang
-                ? 'font-semibold text-foreground'
-                : 'text-muted-foreground hover:text-foreground',
+                ? 'bg-primary/15 font-semibold text-primary'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
             ]"
             :aria-pressed="currentLocale === lang"
             @click="changeLanguage(lang)"
@@ -38,7 +38,7 @@
         </div>
 
         <button
-          class="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          class="rounded-md px-2 py-1 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           @click="handleLogout"
         >
           {{ t('nav.logout') }}
