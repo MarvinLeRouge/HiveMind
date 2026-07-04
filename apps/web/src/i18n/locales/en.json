@@ -52,6 +52,7 @@
     "invitationSent": "Invitation sent.",
     "noItems": "No collections yet.",
     "noItemsCreate": "Create your first one.",
+    "noItemsHint": "Create a collection to start solving puzzles with your team.",
     "puzzles": "Puzzles",
     "settings": "Settings",
     "remove": "Remove",
@@ -69,6 +70,7 @@
     "add": "+ Add puzzle",
     "title": "Title",
     "noItems": "No puzzles yet.",
+    "noItemsHint": "Use the form above to add your first puzzle.",
     "noAttempts": "No attempts yet.",
     "claimed": "Claimed",
     "you": "You",
@@ -124,7 +126,8 @@
     "create": "Create template",
     "save": "Save template",
     "saveChanges": "Save changes",
-    "noItems": "No templates yet."
+    "noItems": "No templates yet.",
+    "noItemsHint": "Templates define the structure of your puzzles."
   },
   "invitation": {
     "title": "You've been invited",

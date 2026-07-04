@@ -92,6 +92,14 @@
   }
 }
 
+/* Respect reduced-motion preference for the spinner animation */
+@media (prefers-reduced-motion: reduce) {
+  .animate-spin {
+    animation: none;
+    opacity: 0.5;
+  }
+}
+
 /* Touch targets: enforce 44px minimum on coarse-pointer devices (WCAG 2.5.5).
    Targets native form elements and RouterLinks styled as buttons (a.inline-flex).
    h-9 (36px) stays intact on fine-pointer (mouse/trackpad) devices. */
