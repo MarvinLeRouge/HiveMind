@@ -50,6 +50,9 @@ docs/ai/
 CLAUDE.md
 PROMPT_CLAUDE_CODE.md
 PROGRESS.md
+PRODUCT.md
+.claude
+.github/skills
 
 # ─── Misc ──────────────────────────────────────────────────────────────────────
 !.gitkeep
