@@ -90,4 +90,5 @@
   .zebra > li:hover {
     background-color: oklch(var(--primary) / 0.14);
   }
+
 }
