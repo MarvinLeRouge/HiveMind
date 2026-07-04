@@ -32,7 +32,7 @@
             <span class="font-medium">{{ tmpl.name }}</span>
             <span
               v-if="tmpl.isSystem"
-              class="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-600"
+              class="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground"
             >
               {{ t('template.system') }}
             </span>
