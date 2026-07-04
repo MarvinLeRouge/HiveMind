@@ -309,12 +309,12 @@
           <ul
             v-else
             aria-label="Puzzle list"
-            class="overflow-hidden rounded-md border divide-y"
+            class="zebra overflow-hidden rounded-md border divide-y"
           >
             <li
               v-for="(puzzle, index) in puzzles"
               :key="puzzle.id"
-              class="flex items-center gap-3 px-4 py-3 text-sm transition-colors odd:bg-primary/[0.06] hover:bg-primary/[0.12]"
+              class="flex items-center gap-3 px-4 py-3 text-sm transition-colors"
               :draggable="isOwner"
               @dragstart="onDragStart(index)"
               @dragover.prevent

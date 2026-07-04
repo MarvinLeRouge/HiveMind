@@ -81,3 +81,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  /* Zebra stripes for data lists — uses --primary so dark mode is automatic */
+  .zebra > li:nth-child(odd) {
+    background-color: oklch(var(--primary) / 0.07);
+  }
+  .zebra > li:hover {
+    background-color: oklch(var(--primary) / 0.14);
+  }
+}
