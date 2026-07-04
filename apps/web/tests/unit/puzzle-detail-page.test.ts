@@ -283,6 +283,40 @@ describe('PuzzleDetailPage', () => {
     ).toBe(true);
   });
 
+  it('calls puzzleStore.update when submitting the edit form', async () => {
+    const puzzleStore = usePuzzleStore();
+    const noteStore = useNoteStore();
+    const attemptStore = useAttemptStore();
+    vi.spyOn(puzzleStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(noteStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(attemptStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'update').mockResolvedValue();
+    puzzleStore.current = mockPuzzle;
+
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles/pzl-1');
+
+    const wrapper = mount(PuzzleDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    await wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Edit')
+      ?.trigger('click');
+    await flushPromises();
+
+    await wrapper.find('form[aria-label="Edit puzzle"]').trigger('submit');
+    await flushPromises();
+
+    expect(puzzleStore.update).toHaveBeenCalledWith(
+      'col-1',
+      'pzl-1',
+      expect.objectContaining({ title: 'Mystery #1' }),
+    );
+  });
+
   it('shows an error message when loading fails', async () => {
     const puzzleStore = usePuzzleStore();
     const noteStore = useNoteStore();
