@@ -314,7 +314,7 @@
             <li
               v-for="(puzzle, index) in puzzles"
               :key="puzzle.id"
-              class="flex items-center gap-3 px-4 py-3 text-sm transition-colors odd:bg-muted/40 hover:bg-muted/70"
+              class="flex items-center gap-3 px-4 py-3 text-sm transition-colors odd:bg-primary/[0.06] hover:bg-primary/[0.12]"
               :draggable="isOwner"
               @dragstart="onDragStart(index)"
               @dragover.prevent
