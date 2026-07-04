@@ -4,9 +4,7 @@
       {{ loadError }}
     </p>
 
-    <p v-else-if="loading" class="text-sm text-muted-foreground">
-      {{ t('common.loading') }}
-    </p>
+    <AppSpinner v-else-if="loading" />
 
     <template v-else-if="current">
       <!-- Outer layout: main content + members panel -->
@@ -301,9 +299,14 @@
           <!-- Puzzle list -->
           <div
             v-if="puzzles.length === 0"
-            class="text-sm text-muted-foreground"
+            class="rounded-md border border-dashed px-4 py-8 text-center"
           >
-            {{ t('puzzle.noItems') }}
+            <p class="text-sm font-medium text-foreground">
+              {{ t('puzzle.noItems') }}
+            </p>
+            <p class="mt-1 text-xs text-muted-foreground">
+              {{ t('puzzle.noItemsHint') }}
+            </p>
           </div>
 
           <ul
@@ -458,6 +461,7 @@ import { usePuzzleStore } from '@/stores/puzzle';
 import { useAuthStore } from '@/stores/auth';
 import PuzzleStatusBadge from '@/components/PuzzleStatusBadge.vue';
 import MembersPanel from '@/components/MembersPanel.vue';
+import AppSpinner from '@/components/AppSpinner.vue';
 
 const { t } = useI18n();
 const route = useRoute();

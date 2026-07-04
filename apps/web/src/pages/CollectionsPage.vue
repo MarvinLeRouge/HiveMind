@@ -14,19 +14,42 @@
       {{ error }}
     </p>
 
-    <p v-else-if="loading" class="text-sm text-muted-foreground">
-      {{ t('common.loading') }}
-    </p>
+    <AppSpinner v-else-if="loading" />
 
-    <p
+    <div
       v-else-if="collections.length === 0"
-      class="text-sm text-muted-foreground"
+      class="flex flex-col items-center py-16 text-center"
     >
-      {{ t('collection.noItems') }}
-      <RouterLink to="/collections/new" class="text-primary hover:underline">
-        {{ t('collection.noItemsCreate') }}
+      <div class="mb-4 rounded-full bg-muted p-3">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="h-6 w-6 text-muted-foreground"
+          aria-hidden="true"
+        >
+          <path
+            d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+          />
+        </svg>
+      </div>
+      <h2 class="mb-1 text-sm font-semibold text-foreground">
+        {{ t('collection.noItems') }}
+      </h2>
+      <p class="mb-4 max-w-xs text-sm text-muted-foreground">
+        {{ t('collection.noItemsHint') }}
+      </p>
+      <RouterLink
+        to="/collections/new"
+        class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90"
+      >
+        {{ t('collection.new') }}
       </RouterLink>
-    </p>
+    </div>
 
     <ul v-else class="zebra divide-y overflow-hidden rounded-md border">
       <li v-for="col in collections" :key="col.id" class="transition-colors">
@@ -91,6 +114,7 @@ import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useCollectionStore } from '@/stores/collection';
 import { storeToRefs } from 'pinia';
+import AppSpinner from '@/components/AppSpinner.vue';
 
 const { t, locale } = useI18n();
 const store = useCollectionStore();

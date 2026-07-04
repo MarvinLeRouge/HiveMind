@@ -212,8 +212,16 @@
       </form>
 
       <!-- Puzzle list -->
-      <div v-if="puzzles.length === 0" class="text-sm text-muted-foreground">
-        {{ t('puzzle.noItems') }}
+      <div
+        v-if="puzzles.length === 0"
+        class="rounded-md border border-dashed px-4 py-8 text-center"
+      >
+        <p class="text-sm font-medium text-foreground">
+          {{ t('puzzle.noItems') }}
+        </p>
+        <p class="mt-1 text-xs text-muted-foreground">
+          {{ t('puzzle.noItemsHint') }}
+        </p>
       </div>
 
       <ul v-else aria-label="Puzzle list" class="space-y-2">
@@ -268,9 +276,7 @@
       </ul>
     </template>
 
-    <p v-if="!loadError && loading" class="text-sm text-muted-foreground">
-      {{ t('common.loading') }}
-    </p>
+    <AppSpinner v-if="!loadError && loading" />
   </div>
 </template>
 
@@ -283,6 +289,7 @@ import { usePuzzleStore } from '@/stores/puzzle';
 import { useCollectionStore } from '@/stores/collection';
 import { useAuthStore } from '@/stores/auth';
 import PuzzleStatusBadge from '@/components/PuzzleStatusBadge.vue';
+import AppSpinner from '@/components/AppSpinner.vue';
 
 const { t } = useI18n();
 const route = useRoute();

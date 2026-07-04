@@ -52,6 +52,7 @@
     "invitationSent": "Invitation envoyée.",
     "noItems": "Aucune collection pour le moment.",
     "noItemsCreate": "Créez votre première collection.",
+    "noItemsHint": "Créez une collection pour commencer à résoudre des puzzles en équipe.",
     "puzzles": "Puzzles",
     "settings": "Paramètres",
     "remove": "Retirer",
@@ -69,6 +70,7 @@
     "add": "+ Ajouter un puzzle",
     "title": "Titre",
     "noItems": "Aucun puzzle pour le moment.",
+    "noItemsHint": "Ajoutez votre premier puzzle avec le formulaire ci-dessus.",
     "noAttempts": "Aucune tentative pour le moment.",
     "claimed": "En cours",
     "you": "Vous",
@@ -124,7 +126,8 @@
     "create": "Créer le modèle",
     "save": "Enregistrer le modèle",
     "saveChanges": "Enregistrer",
-    "noItems": "Aucun modèle pour le moment."
+    "noItems": "Aucun modèle pour le moment.",
+    "noItemsHint": "Les modèles définissent la structure de vos puzzles."
   },
   "invitation": {
     "title": "Vous avez été invité(e)",

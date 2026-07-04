@@ -16,9 +16,37 @@
 
     <div
       v-else-if="templates.length === 0 && !loading"
-      class="text-sm text-muted-foreground"
+      class="flex flex-col items-center py-16 text-center"
     >
-      {{ t('template.noItems') }}
+      <div class="mb-4 rounded-full bg-muted p-3">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="h-6 w-6 text-muted-foreground"
+          aria-hidden="true"
+        >
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <line x1="3" y1="9" x2="21" y2="9" />
+          <line x1="9" y1="21" x2="9" y2="9" />
+        </svg>
+      </div>
+      <h2 class="mb-1 text-sm font-semibold text-foreground">
+        {{ t('template.noItems') }}
+      </h2>
+      <p class="mb-4 max-w-xs text-sm text-muted-foreground">
+        {{ t('template.noItemsHint') }}
+      </p>
+      <RouterLink
+        to="/templates/new"
+        class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90"
+      >
+        {{ t('template.new') }}
+      </RouterLink>
     </div>
 
     <ul v-else class="space-y-2">
@@ -76,9 +104,7 @@
       </li>
     </ul>
 
-    <p v-if="loading" class="text-sm text-muted-foreground">
-      {{ t('common.loading') }}
-    </p>
+    <AppSpinner v-if="loading" />
 
     <p v-if="deleteError" role="alert" class="mt-4 text-sm text-destructive">
       {{ deleteError }}
@@ -93,6 +119,7 @@ import { storeToRefs } from 'pinia';
 import { useTemplateStore } from '@/stores/template';
 import { useAuthStore } from '@/stores/auth';
 import type { Template } from '@/types/template';
+import AppSpinner from '@/components/AppSpinner.vue';
 
 const { t } = useI18n();
 const store = useTemplateStore();

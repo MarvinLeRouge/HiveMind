@@ -528,9 +528,7 @@
       </section>
     </template>
 
-    <p v-else-if="!loadError" class="text-sm text-muted-foreground">
-      {{ t('common.loading') }}
-    </p>
+    <AppSpinner v-else-if="!loadError" />
   </div>
 </template>
 
@@ -545,6 +543,7 @@ import { useAttemptStore } from '@/stores/attempt';
 import { useAuthStore } from '@/stores/auth';
 import { useCollectionStore } from '@/stores/collection';
 import PuzzleStatusBadge from '@/components/PuzzleStatusBadge.vue';
+import AppSpinner from '@/components/AppSpinner.vue';
 import { STATUS_NEXT } from '@/types/puzzle';
 import type { Note } from '@/types/note';
 
