@@ -90,5 +90,17 @@
   .zebra > li:hover {
     background-color: oklch(var(--primary) / 0.14);
   }
+}
 
+/* Touch targets: enforce 44px minimum on coarse-pointer devices (WCAG 2.5.5).
+   Targets native form elements and RouterLinks styled as buttons (a.inline-flex).
+   h-9 (36px) stays intact on fine-pointer (mouse/trackpad) devices. */
+@media (pointer: coarse) {
+  button,
+  input,
+  select,
+  textarea,
+  a.inline-flex {
+    min-height: 2.75rem;
+  }
 }
