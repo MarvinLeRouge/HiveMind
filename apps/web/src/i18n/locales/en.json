@@ -11,6 +11,8 @@
     "settings": "Settings",
     "saving": "Saving…",
     "optional": "(optional)",
+    "none": "none",
+    "dismiss": "Dismiss",
     "error": {
       "generic": "Something went wrong."
     }
@@ -19,8 +21,24 @@
     "collections": "Collections",
     "templates": "Templates",
     "logout": "Log out",
+    "puzzle": "Puzzle",
     "darkMode": "Switch to dark mode",
     "lightMode": "Switch to light mode"
+  },
+  "toast": {
+    "puzzleAdded": "Puzzle added.",
+    "puzzleUpdated": "Changes saved.",
+    "puzzleClaimed": "Puzzle claimed.",
+    "puzzleReleased": "Puzzle released.",
+    "puzzleStatusChanged": "Status updated.",
+    "collectionCreated": "Collection created.",
+    "collectionSaved": "Settings saved.",
+    "collectionDeleted": "Collection deleted.",
+    "memberRemoved": "Member removed.",
+    "inviteSent": "Invitation sent.",
+    "templateCreated": "Template created.",
+    "templateSaved": "Template saved.",
+    "templateDeleted": "Template deleted."
   },
   "auth": {
     "login": "Log in",

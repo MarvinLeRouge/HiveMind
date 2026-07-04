@@ -89,12 +89,14 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useCollectionStore } from '@/stores/collection';
 import { useTemplateStore } from '@/stores/template';
+import { useToastStore } from '@/stores/toast';
 import { storeToRefs } from 'pinia';
 
 const { t } = useI18n();
 const router = useRouter();
 const collectionStore = useCollectionStore();
 const templateStore = useTemplateStore();
+const toast = useToastStore();
 const { templates } = storeToRefs(templateStore);
 
 const form = ref({ name: '', description: '', templateId: '' });
@@ -119,6 +121,7 @@ async function handleSubmit() {
       description: form.value.description || undefined,
       templateId: form.value.templateId,
     });
+    toast.add(t('toast.collectionCreated'));
     await router.push(`/collections/${collection.slug}`);
   } catch (e) {
     error.value =

@@ -144,12 +144,14 @@ import { ref, computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useTemplateStore } from '@/stores/template';
+import { useToastStore } from '@/stores/toast';
 import type { FieldMode } from '@/types/template';
 
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const store = useTemplateStore();
+const toast = useToastStore();
 
 const templateId = route.params.id as string;
 const saving = ref(false);
@@ -248,6 +250,7 @@ async function handleSubmit() {
       customField2Label: form.value.customField2Label || undefined,
       customField2Mode: form.value.customField2Mode,
     });
+    toast.add(t('toast.templateSaved'));
     router.push('/templates');
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Failed to save template.';

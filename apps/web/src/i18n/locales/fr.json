@@ -11,6 +11,8 @@
     "settings": "Paramètres",
     "saving": "Enregistrement…",
     "optional": "(facultatif)",
+    "none": "aucun",
+    "dismiss": "Fermer",
     "error": {
       "generic": "Une erreur est survenue."
     }
@@ -19,8 +21,24 @@
     "collections": "Collections",
     "templates": "Modèles",
     "logout": "Déconnexion",
+    "puzzle": "Puzzle",
     "darkMode": "Passer en mode sombre",
     "lightMode": "Passer en mode clair"
+  },
+  "toast": {
+    "puzzleAdded": "Puzzle ajouté.",
+    "puzzleUpdated": "Modifications enregistrées.",
+    "puzzleClaimed": "Puzzle pris en charge.",
+    "puzzleReleased": "Puzzle libéré.",
+    "puzzleStatusChanged": "Statut mis à jour.",
+    "collectionCreated": "Collection créée.",
+    "collectionSaved": "Paramètres enregistrés.",
+    "collectionDeleted": "Collection supprimée.",
+    "memberRemoved": "Membre retiré.",
+    "inviteSent": "Invitation envoyée.",
+    "templateCreated": "Modèle créé.",
+    "templateSaved": "Modèle enregistré.",
+    "templateDeleted": "Modèle supprimé."
   },
   "auth": {
     "login": "Se connecter",

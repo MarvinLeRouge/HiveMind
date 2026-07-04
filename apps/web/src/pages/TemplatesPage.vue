@@ -83,7 +83,7 @@
             <span v-if="activeFields(tmpl).length">{{
               activeFields(tmpl).join(', ')
             }}</span>
-            <span v-else>none</span>
+            <span v-else>{{ t('common.none') }}</span>
           </p>
         </div>
 
@@ -118,12 +118,14 @@ import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import { useTemplateStore } from '@/stores/template';
 import { useAuthStore } from '@/stores/auth';
+import { useToastStore } from '@/stores/toast';
 import type { Template } from '@/types/template';
 import AppSpinner from '@/components/AppSpinner.vue';
 
 const { t } = useI18n();
 const store = useTemplateStore();
 const auth = useAuthStore();
+const toast = useToastStore();
 const { templates } = storeToRefs(store);
 
 const loading = ref(true);
@@ -173,6 +175,7 @@ async function handleDelete(id: string) {
   deleteError.value = '';
   try {
     await store.delete(id);
+    toast.add(t('toast.templateDeleted'));
   } catch (e) {
     deleteError.value =
       e instanceof Error ? e.message : 'Failed to delete template.';

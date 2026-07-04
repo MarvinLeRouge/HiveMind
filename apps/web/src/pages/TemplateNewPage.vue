@@ -131,11 +131,13 @@ import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useTemplateStore } from '@/stores/template';
+import { useToastStore } from '@/stores/toast';
 import type { FieldMode } from '@/types/template';
 
 const { t } = useI18n();
 const router = useRouter();
 const store = useTemplateStore();
+const toast = useToastStore();
 
 const saving = ref(false);
 const error = ref('');
@@ -225,6 +227,7 @@ async function handleSubmit() {
         : {}),
       customField2Mode: f.customField2Mode,
     });
+    toast.add(t('toast.templateCreated'));
     router.push('/templates');
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Failed to create template.';
