@@ -9,6 +9,7 @@ vi.mock('../../src/lib/api-fetch', () => ({ apiFetch: vi.fn() }));
 
 const mockCollection = {
   id: 'col-1',
+  slug: 'my-collection',
   name: 'My Collection',
   description: 'A description',
   createdBy: 'user-1',

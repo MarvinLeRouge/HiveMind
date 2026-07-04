@@ -90,4 +90,9 @@
   .zebra > li:hover {
     background-color: oklch(var(--primary) / 0.14);
   }
+
+  /* Hoverable list rows (uniform background, no zebra) */
+  .list-row:hover {
+    background-color: oklch(var(--primary) / 0.06);
+  }
 }
