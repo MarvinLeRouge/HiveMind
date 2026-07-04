@@ -28,7 +28,7 @@ export const useToastStore = defineStore('toast', () => {
    * @param type - Visual severity; defaults to 'success'.
    */
   function add(message: string, type: ToastType = 'success'): void {
-    const id = crypto.randomUUID();
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
     toasts.value.push({ id, type, message });
     setTimeout(() => dismiss(id), DURATION[type]);
   }
