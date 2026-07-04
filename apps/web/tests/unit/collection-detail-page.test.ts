@@ -166,10 +166,6 @@ describe('CollectionDetailPage', () => {
       workers: [],
       gcCode: null,
     } as never);
-    collectionStore.current = mockCollection as never;
-    collectionStore.members = [mockMember as never];
-    collectionStore.isOwner = true as never;
-    puzzleStore.puzzles = [];
     auth.user = {
       id: 'user-1',
       username: 'alice',
@@ -178,6 +174,9 @@ describe('CollectionDetailPage', () => {
       language: 'en',
       createdAt: '2025-01-01',
     };
+    collectionStore.current = mockCollection as never;
+    collectionStore.members = [mockMember as never];
+    puzzleStore.puzzles = [];
     const router = makeRouter();
     await router.push('/collections/col-1');
 
