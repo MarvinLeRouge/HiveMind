@@ -2,7 +2,7 @@
   <div class="flex min-h-screen items-center justify-center bg-background px-4">
     <div class="w-full max-w-sm space-y-8">
       <div class="text-center">
-        <h1 class="text-2xl font-bold tracking-tight">HiveMind</h1>
+        <h1 class="text-2xl font-bold tracking-tight text-primary">HiveMind</h1>
         <p class="mt-2 text-sm text-muted-foreground">
           {{ t('auth.loginSubtitle') }}
         </p>

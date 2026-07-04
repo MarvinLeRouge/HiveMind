@@ -250,7 +250,8 @@
           <!-- Claim indicator -->
           <span
             v-if="puzzle.workers.length > 0"
-            class="rounded bg-blue-50 px-2 py-0.5 text-xs text-blue-600"
+            class="rounded px-2 py-0.5 text-xs text-primary"
+            style="background-color: oklch(var(--primary) / 0.1)"
           >
             {{
               puzzle.workers.some((w) => w.id === currentUserId)

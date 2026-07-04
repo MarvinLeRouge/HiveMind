@@ -4,48 +4,72 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    /* HiveMind — teal palette, Restrained product strategy */
+    /* Stored as bare "L C H" values so Tailwind can inject opacity: oklch(var(--x) / alpha) */
+    --background: 1.000 0.000 0;
+    --foreground: 0.160 0.020 200;
+    --card: 0.990 0.007 200;
+    --card-foreground: 0.160 0.020 200;
+    --popover: 1.000 0.000 0;
+    --popover-foreground: 0.160 0.020 200;
+    --primary: 0.450 0.140 200;
+    --primary-foreground: 0.990 0.005 200;
+    --secondary: 0.955 0.010 200;
+    --secondary-foreground: 0.240 0.025 200;
+    --muted: 0.955 0.010 200;
+    --muted-foreground: 0.440 0.022 200;
+    --accent: 0.955 0.010 200;
+    --accent-foreground: 0.240 0.025 200;
+    --destructive: 0.480 0.200 25;
+    --destructive-foreground: 0.990 0.004 25;
+    --border: 0.880 0.014 200;
+    --input: 0.880 0.014 200;
+    --ring: 0.450 0.140 200;
     --radius: 0.5rem;
+
+    /* Puzzle status — semantic tokens (full oklch, used via inline style) */
+    /* "solved" deliberately uses the brand teal: found = HiveMind */
+    --status-open-bg: oklch(0.940 0.008 250);
+    --status-open-text: oklch(0.320 0.045 250);
+    --status-in-progress-bg: oklch(0.940 0.055 80);
+    --status-in-progress-text: oklch(0.370 0.110 70);
+    --status-solved-bg: oklch(0.920 0.048 200);
+    --status-solved-text: oklch(0.300 0.125 200);
+    --status-verified-bg: oklch(0.915 0.058 150);
+    --status-verified-text: oklch(0.310 0.115 148);
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    --background: 0.145 0.018 200;
+    --foreground: 0.940 0.010 200;
+    --card: 0.190 0.022 200;
+    --card-foreground: 0.940 0.010 200;
+    --popover: 0.190 0.022 200;
+    --popover-foreground: 0.940 0.010 200;
+    /* Bright teal in dark mode — light enough for dark text, stands out on dark bg */
+    --primary: 0.700 0.150 200;
+    --primary-foreground: 0.130 0.015 200;
+    --secondary: 0.240 0.025 200;
+    --secondary-foreground: 0.940 0.010 200;
+    --muted: 0.240 0.025 200;
+    --muted-foreground: 0.620 0.022 200;
+    --accent: 0.240 0.025 200;
+    --accent-foreground: 0.940 0.010 200;
+    --destructive: 0.560 0.200 25;
+    --destructive-foreground: 0.970 0.006 25;
+    --border: 0.270 0.028 200;
+    --input: 0.270 0.028 200;
+    --ring: 0.700 0.150 200;
+
+    /* Puzzle status — dark mode */
+    --status-open-bg: oklch(0.240 0.022 250);
+    --status-open-text: oklch(0.740 0.042 250);
+    --status-in-progress-bg: oklch(0.260 0.045 75);
+    --status-in-progress-text: oklch(0.810 0.095 70);
+    --status-solved-bg: oklch(0.235 0.045 200);
+    --status-solved-text: oklch(0.770 0.115 200);
+    --status-verified-bg: oklch(0.235 0.050 150);
+    --status-verified-text: oklch(0.770 0.095 148);
   }
 }
 
@@ -55,5 +79,15 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  /* Zebra stripes for data lists — uses --primary so dark mode is automatic */
+  .zebra > li:nth-child(odd) {
+    background-color: oklch(var(--primary) / 0.07);
+  }
+  .zebra > li:hover {
+    background-color: oklch(var(--primary) / 0.14);
   }
 }
