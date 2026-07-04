@@ -28,12 +28,8 @@
       </RouterLink>
     </p>
 
-    <ul v-else class="divide-y overflow-hidden rounded-md border">
-      <li
-        v-for="col in collections"
-        :key="col.id"
-        class="list-row transition-colors"
-      >
+    <ul v-else class="zebra divide-y overflow-hidden rounded-md border">
+      <li v-for="col in collections" :key="col.id" class="transition-colors">
         <RouterLink
           :to="`/collections/${col.slug}`"
           class="flex items-center gap-4 px-5 py-4"
