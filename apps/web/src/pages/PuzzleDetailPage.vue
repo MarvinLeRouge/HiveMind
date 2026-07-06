@@ -322,11 +322,11 @@
         <button
           role="tab"
           :aria-selected="activeTab === 'notes'"
-          class="pb-2 text-sm font-medium"
+          class="border-b-2 pb-2 text-sm font-medium transition-colors duration-150"
           :class="
             activeTab === 'notes'
-              ? 'border-b-2 border-primary text-primary'
-              : 'text-muted-foreground hover:text-foreground'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
           "
           @click="activeTab = 'notes'"
         >
@@ -335,11 +335,11 @@
         <button
           role="tab"
           :aria-selected="activeTab === 'attempts'"
-          class="pb-2 text-sm font-medium"
+          class="border-b-2 pb-2 text-sm font-medium transition-colors duration-150"
           :class="
             activeTab === 'attempts'
-              ? 'border-b-2 border-primary text-primary'
-              : 'text-muted-foreground hover:text-foreground'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
           "
           @click="activeTab = 'attempts'"
         >

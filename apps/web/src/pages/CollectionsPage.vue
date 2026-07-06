@@ -16,7 +16,7 @@
 
     <div
       v-else-if="collections.length === 0"
-      class="flex flex-col items-center py-16 text-center"
+      class="animate-enter flex flex-col items-center py-16 text-center"
     >
       <div class="mb-4 rounded-full bg-muted p-3">
         <svg
@@ -49,7 +49,10 @@
       </RouterLink>
     </div>
 
-    <ul v-else class="zebra divide-y overflow-hidden rounded-md border">
+    <ul
+      v-else
+      class="animate-enter zebra divide-y overflow-hidden rounded-md border"
+    >
       <li v-for="col in collections" :key="col.id" class="transition-colors">
         <RouterLink
           :to="`/collections/${col.slug}`"
