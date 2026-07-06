@@ -1,8 +1,6 @@
 <template>
   <div class="container py-8">
-    <p v-if="loadError" role="alert" class="text-sm text-destructive">
-      {{ loadError }}
-    </p>
+    <AppErrorBanner v-if="loadError" :message="loadError" :retry="load" />
 
     <AppSpinner v-else-if="loading" />
 
@@ -463,6 +461,7 @@ import { useToastStore } from '@/stores/toast';
 import PuzzleStatusBadge from '@/components/PuzzleStatusBadge.vue';
 import MembersPanel from '@/components/MembersPanel.vue';
 import AppSpinner from '@/components/AppSpinner.vue';
+import AppErrorBanner from '@/components/AppErrorBanner.vue';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -516,10 +515,10 @@ const inviteError = ref('');
 
 // ── Lifecycle ─────────────────────────────────────────────────────────────────
 
-onMounted(async () => {
-  const stored = localStorage.getItem(storageKey);
-  if (stored !== null) membersOpen.value = stored === 'true';
-
+/** Loads collection and puzzle data; can be called again to retry after an error. */
+async function load() {
+  loadError.value = '';
+  loading.value = true;
   try {
     await Promise.all([
       collectionStore.fetchById(collectionId),
@@ -527,10 +526,16 @@ onMounted(async () => {
     ]);
   } catch (e) {
     loadError.value =
-      e instanceof Error ? e.message : 'Failed to load collection.';
+      e instanceof Error ? e.message : t('common.error.generic');
   } finally {
     loading.value = false;
   }
+}
+
+onMounted(async () => {
+  const stored = localStorage.getItem(storageKey);
+  if (stored !== null) membersOpen.value = stored === 'true';
+  await load();
 });
 
 watch(membersOpen, (val) => {

@@ -13,6 +13,7 @@
     "optional": "(facultatif)",
     "none": "aucun",
     "dismiss": "Fermer",
+    "retry": "Réessayer",
     "error": {
       "generic": "Une erreur est survenue."
     }

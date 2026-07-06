@@ -7,9 +7,12 @@
       ← {{ t('template.title') }}
     </RouterLink>
 
-    <p v-if="loadError" role="alert" class="mt-4 text-sm text-destructive">
-      {{ loadError }}
-    </p>
+    <AppErrorBanner
+      v-if="loadError"
+      :message="loadError"
+      :retry="load"
+      class="mt-4"
+    />
 
     <template v-else-if="form">
       <h1 class="mt-2 text-2xl font-bold">{{ t('template.editTitle') }}</h1>
@@ -111,9 +114,13 @@
           </div>
         </fieldset>
 
-        <p v-if="error" role="alert" class="text-sm text-destructive">
+        <div
+          v-if="error"
+          role="alert"
+          class="rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive"
+        >
           {{ error }}
-        </p>
+        </div>
 
         <div class="flex gap-3">
           <button
@@ -145,6 +152,7 @@ import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useTemplateStore } from '@/stores/template';
 import { useToastStore } from '@/stores/toast';
+import AppErrorBanner from '@/components/AppErrorBanner.vue';
 import type { FieldMode } from '@/types/template';
 
 const { t } = useI18n();
@@ -202,7 +210,9 @@ const customFields = computed(() => [
   },
 ]);
 
-onMounted(async () => {
+/** Loads the template data; can be called again to retry after an error. */
+async function load() {
+  loadError.value = '';
   try {
     await store.fetchById(templateId);
     const tmpl = store.current!;
@@ -224,9 +234,11 @@ onMounted(async () => {
     };
   } catch (e) {
     loadError.value =
-      e instanceof Error ? e.message : 'Failed to load template.';
+      e instanceof Error ? e.message : t('common.error.generic');
   }
-});
+}
+
+onMounted(load);
 
 /** Submits the update form. */
 async function handleSubmit() {

@@ -13,6 +13,7 @@
     "optional": "(optional)",
     "none": "none",
     "dismiss": "Dismiss",
+    "retry": "Try again",
     "error": {
       "generic": "Something went wrong."
     }

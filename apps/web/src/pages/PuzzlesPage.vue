@@ -1,8 +1,6 @@
 <template>
   <div class="container py-8">
-    <p v-if="loadError" role="alert" class="text-sm text-destructive">
-      {{ loadError }}
-    </p>
+    <AppErrorBanner v-if="loadError" :message="loadError" :retry="load" />
 
     <template v-else>
       <!-- Header -->
@@ -290,6 +288,7 @@ import { useCollectionStore } from '@/stores/collection';
 import { useAuthStore } from '@/stores/auth';
 import PuzzleStatusBadge from '@/components/PuzzleStatusBadge.vue';
 import AppSpinner from '@/components/AppSpinner.vue';
+import AppErrorBanner from '@/components/AppErrorBanner.vue';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -325,7 +324,10 @@ const newForm = ref({
 
 let draggedIndex: number | null = null;
 
-onMounted(async () => {
+/** Loads puzzles and collection data; can be called again to retry after an error. */
+async function load() {
+  loadError.value = '';
+  loading.value = true;
   try {
     await Promise.all([
       puzzleStore.fetchAll(collectionId),
@@ -333,11 +335,13 @@ onMounted(async () => {
     ]);
   } catch (e) {
     loadError.value =
-      e instanceof Error ? e.message : 'Failed to load puzzles.';
+      e instanceof Error ? e.message : t('common.error.generic');
   } finally {
     loading.value = false;
   }
-});
+}
+
+onMounted(load);
 
 /** Starts a drag operation from the given index. */
 function onDragStart(index: number) {

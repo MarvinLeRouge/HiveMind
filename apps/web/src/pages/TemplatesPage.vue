@@ -10,9 +10,7 @@
       </RouterLink>
     </div>
 
-    <p v-if="loadError" role="alert" class="text-sm text-destructive">
-      {{ loadError }}
-    </p>
+    <AppErrorBanner v-if="loadError" :message="loadError" :retry="load" />
 
     <div
       v-else-if="templates.length === 0 && !loading"
@@ -106,9 +104,7 @@
 
     <AppSpinner v-if="loading" />
 
-    <p v-if="deleteError" role="alert" class="mt-4 text-sm text-destructive">
-      {{ deleteError }}
-    </p>
+    <AppErrorBanner v-if="deleteError" :message="deleteError" class="mt-4" />
   </div>
 </template>
 
@@ -121,6 +117,7 @@ import { useAuthStore } from '@/stores/auth';
 import { useToastStore } from '@/stores/toast';
 import type { Template } from '@/types/template';
 import AppSpinner from '@/components/AppSpinner.vue';
+import AppErrorBanner from '@/components/AppErrorBanner.vue';
 
 const { t } = useI18n();
 const store = useTemplateStore();
@@ -132,16 +129,21 @@ const loading = ref(true);
 const loadError = ref('');
 const deleteError = ref('');
 
-onMounted(async () => {
+/** Loads all templates; can be called again to retry after an error. */
+async function load() {
+  loadError.value = '';
+  loading.value = true;
   try {
     await store.fetchAll();
   } catch (e) {
     loadError.value =
-      e instanceof Error ? e.message : 'Failed to load templates.';
+      e instanceof Error ? e.message : t('common.error.generic');
   } finally {
     loading.value = false;
   }
-});
+}
+
+onMounted(load);
 
 /** Returns true when the current user may edit or delete the template. */
 function canEdit(tmpl: Template): boolean {
