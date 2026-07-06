@@ -337,4 +337,25 @@ describe('TemplatesPage', () => {
 
     expect(wrapper.find('[role="alert"]').text()).toContain('Cannot delete');
   });
+
+  it('retries loading when the retry button is clicked', async () => {
+    const store = useTemplateStore();
+    const fetchAllSpy = vi
+      .spyOn(store, 'fetchAll')
+      .mockRejectedValueOnce(new Error('Network error'))
+      .mockResolvedValueOnce(undefined);
+
+    const router = makeRouter();
+    await router.push('/templates');
+
+    const wrapper = mount(TemplatesPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    await wrapper.find('[role="alert"] button').trigger('click');
+    await flushPromises();
+
+    expect(fetchAllSpy).toHaveBeenCalledTimes(2);
+  });
 });

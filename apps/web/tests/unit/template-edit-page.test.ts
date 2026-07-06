@@ -126,4 +126,25 @@ describe('TemplateEditPage', () => {
 
     expect(wrapper.find('[role="alert"]').text()).toContain('Forbidden');
   });
+
+  it('retries loading when the retry button is clicked', async () => {
+    const store = useTemplateStore();
+    const fetchBySpy = vi
+      .spyOn(store, 'fetchById')
+      .mockRejectedValueOnce(new Error('Not found'))
+      .mockResolvedValueOnce(undefined);
+
+    const router = makeRouter();
+    await router.push('/templates/tpl-1/edit');
+
+    const wrapper = mount(TemplateEditPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    await wrapper.find('[role="alert"] button').trigger('click');
+    await flushPromises();
+
+    expect(fetchBySpy).toHaveBeenCalledTimes(2);
+  });
 });

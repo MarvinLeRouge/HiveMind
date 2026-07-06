@@ -484,4 +484,27 @@ describe('CollectionDetailPage', () => {
 
     expect(wrapper.text()).not.toContain('You');
   });
+
+  it('retries loading when the retry button is clicked', async () => {
+    const collectionStore = useCollectionStore();
+    const puzzleStore = usePuzzleStore();
+    const fetchBySpy = vi
+      .spyOn(collectionStore, 'fetchById')
+      .mockRejectedValueOnce(new Error('Not found'))
+      .mockResolvedValueOnce(undefined);
+    vi.spyOn(puzzleStore, 'fetchAll').mockResolvedValue();
+
+    const router = makeRouter();
+    await router.push('/collections/col-1');
+
+    const wrapper = mount(CollectionDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    await wrapper.find('[role="alert"] button').trigger('click');
+    await flushPromises();
+
+    expect(fetchBySpy).toHaveBeenCalledTimes(2);
+  });
 });

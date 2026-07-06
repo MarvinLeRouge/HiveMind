@@ -92,4 +92,24 @@ describe('CollectionsPage', () => {
 
     expect(wrapper.find('[role="alert"]').text()).toContain('Network error');
   });
+
+  it('retries loading when the retry button is clicked', async () => {
+    const store = useCollectionStore();
+    const fetchAllSpy = vi
+      .spyOn(store, 'fetchAll')
+      .mockRejectedValueOnce(new Error('Network error'))
+      .mockResolvedValueOnce(undefined);
+    const router = makeRouter();
+    await router.push('/collections');
+
+    const wrapper = mount(CollectionsPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    await wrapper.find('[role="alert"] button').trigger('click');
+    await flushPromises();
+
+    expect(fetchAllSpy).toHaveBeenCalledTimes(2);
+  });
 });

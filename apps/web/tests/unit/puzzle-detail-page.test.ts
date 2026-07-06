@@ -7,6 +7,7 @@ import { usePuzzleStore } from '../../src/stores/puzzle';
 import { useNoteStore } from '../../src/stores/note';
 import { useAttemptStore } from '../../src/stores/attempt';
 import { useAuthStore } from '../../src/stores/auth';
+import { useToastStore } from '../../src/stores/toast';
 
 vi.mock('../../src/lib/api-fetch', () => ({ apiFetch: vi.fn() }));
 
@@ -766,5 +767,103 @@ describe('PuzzleDetailPage', () => {
     await flushPromises();
 
     expect(wrapper.find('[role="alert"]').text()).toContain('Duplicate');
+  });
+
+  it('shows an error toast when advancing status fails', async () => {
+    const puzzleStore = usePuzzleStore();
+    const noteStore = useNoteStore();
+    const attemptStore = useAttemptStore();
+    vi.spyOn(puzzleStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(noteStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(attemptStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'update').mockRejectedValue(
+      new Error('Server error'),
+    );
+    puzzleStore.current = mockPuzzle;
+
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles/pzl-1');
+
+    const wrapper = mount(PuzzleDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    const toast = useToastStore();
+    const statusBtn = wrapper
+      .findAll('button')
+      .find((b) => b.text().startsWith('Mark as'));
+    await statusBtn?.trigger('click');
+    await flushPromises();
+
+    expect(toast.toasts.some((t) => t.type === 'error')).toBe(true);
+  });
+
+  it('shows an error toast when claiming fails', async () => {
+    const puzzleStore = usePuzzleStore();
+    const noteStore = useNoteStore();
+    const attemptStore = useAttemptStore();
+    vi.spyOn(puzzleStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(noteStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(attemptStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'claim').mockRejectedValue(new Error('Forbidden'));
+    puzzleStore.current = mockPuzzle;
+
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles/pzl-1');
+
+    const wrapper = mount(PuzzleDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    const toast = useToastStore();
+    const claimBtn = wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Claim');
+    await claimBtn?.trigger('click');
+    await flushPromises();
+
+    expect(toast.toasts.some((t) => t.type === 'error')).toBe(true);
+  });
+
+  it('shows an error toast when unclaiming fails', async () => {
+    const puzzleStore = usePuzzleStore();
+    const noteStore = useNoteStore();
+    const attemptStore = useAttemptStore();
+    const authStore = useAuthStore();
+    vi.spyOn(puzzleStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(noteStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(attemptStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'unclaim').mockRejectedValue(new Error('Forbidden'));
+    authStore.user = {
+      id: 'user-1',
+      username: 'alice',
+      email: 'alice@example.com',
+      isAdmin: false,
+      language: 'en',
+      createdAt: '2025-01-01',
+    };
+    puzzleStore.current = {
+      ...mockPuzzle,
+      workers: [{ id: 'user-1', username: 'alice' }],
+    };
+
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles/pzl-1');
+
+    const wrapper = mount(PuzzleDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    const toast = useToastStore();
+    const releaseBtn = wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Release');
+    await releaseBtn?.trigger('click');
+    await flushPromises();
+
+    expect(toast.toasts.some((t) => t.type === 'error')).toBe(true);
   });
 });
