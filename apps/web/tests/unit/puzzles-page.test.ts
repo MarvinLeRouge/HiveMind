@@ -259,4 +259,27 @@ describe('PuzzlesPage', () => {
 
     expect(wrapper.text()).toContain('Server error');
   });
+
+  it('retries loading when the retry button is clicked', async () => {
+    const puzzleStore = usePuzzleStore();
+    const collectionStore = useCollectionStore();
+    const fetchAllSpy = vi
+      .spyOn(puzzleStore, 'fetchAll')
+      .mockRejectedValueOnce(new Error('Load failed'))
+      .mockResolvedValueOnce(undefined);
+    vi.spyOn(collectionStore, 'fetchById').mockResolvedValue();
+
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles');
+
+    const wrapper = mount(PuzzlesPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    await wrapper.find('[role="alert"] button').trigger('click');
+    await flushPromises();
+
+    expect(fetchAllSpy).toHaveBeenCalledTimes(2);
+  });
 });
