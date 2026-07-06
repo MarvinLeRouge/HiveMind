@@ -24,7 +24,9 @@
     "logout": "Déconnexion",
     "puzzle": "Puzzle",
     "darkMode": "Passer en mode sombre",
-    "lightMode": "Passer en mode clair"
+    "lightMode": "Passer en mode clair",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu"
   },
   "toast": {
     "puzzleAdded": "Puzzle ajouté.",
