@@ -152,7 +152,7 @@ pnpm --filter web test:coverage     # With coverage report (target ≥ 80%)
 ```
 
 - JSDOM environment, Vue Test Utils
-- Components, composables, and Pinia stores tested
+- 26 test files covering pages (12), reusable components (5), Pinia stores (7), and utilities (2)
 
 ### E2E — Playwright
 

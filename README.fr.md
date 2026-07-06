@@ -152,7 +152,7 @@ pnpm --filter web test:coverage     # Avec rapport de couverture (cible ≥ 80 %
 ```
 
 - Environnement JSDOM, Vue Test Utils
-- Composants, composables et stores Pinia testés
+- 26 fichiers de tests couvrant les pages (12), les composants reutilisables (5), les stores Pinia (7) et les utilitaires (2)
 
 ### E2E — Playwright
 
