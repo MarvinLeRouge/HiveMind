@@ -15,6 +15,7 @@ function makeRouter() {
     routes: [
       { path: '/', component: { template: '<div/>' } },
       { path: '/collections', component: { template: '<div/>' } },
+      { path: '/templates', component: { template: '<div/>' } },
       { path: '/login', component: { template: '<div/>' } },
     ],
   });
@@ -141,5 +142,55 @@ describe('TheNavbar', () => {
     await themeBtn!.trigger('click');
 
     expect(mockToggle).toHaveBeenCalledOnce();
+  });
+
+  it('renders a hamburger button with aria-label', () => {
+    const router = makeRouter();
+    const auth = useAuthStore();
+    auth.user = makeUser();
+
+    const wrapper = mount(TheNavbar, { global: { plugins: [pinia, router] } });
+    const hamburger = wrapper
+      .findAll('button')
+      .find((b) => b.attributes('aria-label') === 'Open menu');
+
+    expect(hamburger).toBeDefined();
+    expect(hamburger!.attributes('aria-expanded')).toBe('false');
+  });
+
+  it('opens the mobile menu when the hamburger button is clicked', async () => {
+    const router = makeRouter();
+    const auth = useAuthStore();
+    auth.user = makeUser();
+
+    const wrapper = mount(TheNavbar, { global: { plugins: [pinia, router] } });
+
+    const hamburger = wrapper
+      .findAll('button')
+      .find((b) => b.attributes('aria-label') === 'Open menu');
+    await hamburger!.trigger('click');
+
+    expect(wrapper.html()).toContain('aria-label="Close menu"');
+    expect(wrapper.text()).toContain('Templates');
+  });
+
+  it('closes the mobile menu when a nav link is clicked', async () => {
+    const router = makeRouter();
+    const auth = useAuthStore();
+    auth.user = makeUser();
+
+    const wrapper = mount(TheNavbar, { global: { plugins: [pinia, router] } });
+
+    await wrapper
+      .findAll('button')
+      .find((b) => b.attributes('aria-label') === 'Open menu')!
+      .trigger('click');
+
+    const templatesLink = wrapper
+      .findAll('a')
+      .find((a) => a.text() === 'Templates' && a.classes().includes('flex'));
+    await templatesLink!.trigger('click');
+
+    expect(wrapper.html()).toContain('aria-label="Open menu"');
   });
 });

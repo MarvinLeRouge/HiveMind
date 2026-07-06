@@ -19,7 +19,7 @@
         </div>
 
         <!-- Actions -->
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
           <button
             v-if="isClaimed"
             class="inline-flex h-9 items-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
@@ -442,32 +442,39 @@
           <li
             v-for="attempt in attempts"
             :key="attempt.id"
-            class="flex items-center gap-3 rounded-md border px-4 py-3 text-sm"
+            class="rounded-md border px-4 py-3 text-sm"
           >
-            <span
-              class="shrink-0 rounded-full px-2 py-0.5 text-xs font-medium"
-              :class="
-                attempt.checkerResult
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-red-100 text-red-700'
-              "
+            <div class="flex items-center gap-3">
+              <span
+                class="shrink-0 rounded-full px-2 py-0.5 text-xs font-medium"
+                :class="
+                  attempt.checkerResult
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-red-100 text-red-700'
+                "
+              >
+                <span aria-hidden="true">{{
+                  attempt.checkerResult ? '✓' : '✗'
+                }}</span>
+                <span class="sr-only">{{
+                  attempt.checkerResult
+                    ? t('puzzle.status.solved')
+                    : t('puzzle.status.open')
+                }}</span>
+              </span>
+              <span class="min-w-0 flex-1 truncate font-mono">{{
+                attempt.valueTested
+              }}</span>
+              <span class="ml-auto shrink-0 text-xs text-muted-foreground">
+                {{ new Date(attempt.createdAt).toLocaleString() }}
+              </span>
+            </div>
+            <p
+              v-if="attempt.comment"
+              class="mt-1 truncate text-xs text-muted-foreground"
             >
-              <span aria-hidden="true">{{
-                attempt.checkerResult ? '✓' : '✗'
-              }}</span>
-              <span class="sr-only">{{
-                attempt.checkerResult
-                  ? t('puzzle.status.solved')
-                  : t('puzzle.status.open')
-              }}</span>
-            </span>
-            <span class="font-mono">{{ attempt.valueTested }}</span>
-            <span v-if="attempt.comment" class="text-muted-foreground">
-              — {{ attempt.comment }}
-            </span>
-            <span class="ml-auto text-xs text-muted-foreground">
-              {{ new Date(attempt.createdAt).toLocaleString() }}
-            </span>
+              {{ attempt.comment }}
+            </p>
           </li>
         </ul>
         <p
