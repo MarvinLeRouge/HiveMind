@@ -103,9 +103,13 @@
         </div>
       </fieldset>
 
-      <p v-if="error" role="alert" class="text-sm text-destructive">
+      <div
+        v-if="error"
+        role="alert"
+        class="rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive"
+      >
         {{ error }}
-      </p>
+      </div>
 
       <div class="flex gap-3">
         <button

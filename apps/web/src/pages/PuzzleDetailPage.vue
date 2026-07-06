@@ -1,8 +1,6 @@
 <template>
   <div class="container py-8">
-    <p v-if="loadError" role="alert" class="text-sm text-destructive">
-      {{ loadError }}
-    </p>
+    <AppErrorBanner v-if="loadError" :message="loadError" :retry="load" />
 
     <template v-else-if="current">
       <!-- Header -->
@@ -545,6 +543,7 @@ import { useCollectionStore } from '@/stores/collection';
 import { useToastStore } from '@/stores/toast';
 import PuzzleStatusBadge from '@/components/PuzzleStatusBadge.vue';
 import AppSpinner from '@/components/AppSpinner.vue';
+import AppErrorBanner from '@/components/AppErrorBanner.vue';
 import { STATUS_NEXT } from '@/types/puzzle';
 import type { Note } from '@/types/note';
 
@@ -636,7 +635,9 @@ const isClaimed = computed(
     (current.value?.workers.some((w) => w.id === currentUserId) ?? false),
 );
 
-onMounted(async () => {
+/** Loads all puzzle data; can be called again to retry after an error. */
+async function load() {
+  loadError.value = '';
   try {
     await Promise.all([
       puzzleStore.fetchById(collectionId, puzzleId),
@@ -645,9 +646,12 @@ onMounted(async () => {
       collectionStore.fetchById(collectionId),
     ]);
   } catch (e) {
-    loadError.value = e instanceof Error ? e.message : 'Failed to load puzzle.';
+    loadError.value =
+      e instanceof Error ? e.message : t('common.error.generic');
   }
-});
+}
+
+onMounted(load);
 
 /** Populates the edit form from the current puzzle and switches to edit mode. */
 function startEdit() {
@@ -703,6 +707,11 @@ async function handleAdvanceStatus() {
       status: nextStatus.value,
     });
     toast.add(t('toast.puzzleStatusChanged'));
+  } catch (e) {
+    toast.add(
+      e instanceof Error ? e.message : t('common.error.generic'),
+      'error',
+    );
   } finally {
     statusBusy.value = false;
   }
@@ -714,6 +723,11 @@ async function handleClaim() {
   try {
     await puzzleStore.claim(collectionId, puzzleId);
     toast.add(t('toast.puzzleClaimed'));
+  } catch (e) {
+    toast.add(
+      e instanceof Error ? e.message : t('common.error.generic'),
+      'error',
+    );
   } finally {
     claimBusy.value = false;
   }
@@ -725,6 +739,11 @@ async function handleUnclaim() {
   try {
     await puzzleStore.unclaim(collectionId, puzzleId);
     toast.add(t('toast.puzzleReleased'));
+  } catch (e) {
+    toast.add(
+      e instanceof Error ? e.message : t('common.error.generic'),
+      'error',
+    );
   } finally {
     claimBusy.value = false;
   }

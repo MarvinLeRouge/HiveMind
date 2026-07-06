@@ -10,9 +10,7 @@
       </RouterLink>
     </div>
 
-    <p v-if="error" role="alert" class="text-sm text-destructive">
-      {{ error }}
-    </p>
+    <AppErrorBanner v-if="error" :message="error" :retry="load" />
 
     <AppSpinner v-else-if="loading" />
 
@@ -115,6 +113,7 @@ import { useI18n } from 'vue-i18n';
 import { useCollectionStore } from '@/stores/collection';
 import { storeToRefs } from 'pinia';
 import AppSpinner from '@/components/AppSpinner.vue';
+import AppErrorBanner from '@/components/AppErrorBanner.vue';
 
 const { t, locale } = useI18n();
 const store = useCollectionStore();
@@ -161,14 +160,18 @@ function relativeDate(dateStr: string): string {
   return fmt.format(Math.round(diffDays / 30), 'month');
 }
 
-onMounted(async () => {
+/** Loads all collections; can be called again to retry after an error. */
+async function load() {
+  error.value = '';
+  loading.value = true;
   try {
     await store.fetchAll();
   } catch (e) {
-    error.value =
-      e instanceof Error ? e.message : 'Failed to load collections.';
+    error.value = e instanceof Error ? e.message : t('common.error.generic');
   } finally {
     loading.value = false;
   }
-});
+}
+
+onMounted(load);
 </script>
