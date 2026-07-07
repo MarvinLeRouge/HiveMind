@@ -4,8 +4,8 @@ import type { MailerService } from '../services/mailer.service.js';
 
 declare module '@fastify/jwt' {
   interface FastifyJWT {
-    payload: { sub: string; email: string; isAdmin: boolean };
-    user: { sub: string; email: string; isAdmin: boolean };
+    payload: { sub: string; email: string; isAdmin: boolean; jti?: string };
+    user: { sub: string; email: string; isAdmin: boolean; jti?: string };
   }
 }
 

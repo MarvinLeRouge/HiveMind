@@ -80,6 +80,7 @@ export class AuthService {
 
     const tokens = this.signTokens(user);
     const decoded = this.app.jwt.decode<{ exp: number }>(tokens.refreshToken);
+    if (!decoded) throw new Error('Failed to decode refresh token');
     await this.repo.createRefreshToken(
       user.id,
       this.hashToken(tokens.refreshToken),
@@ -117,6 +118,7 @@ export class AuthService {
 
     const tokens = this.signTokens(user);
     const decoded = this.app.jwt.decode<{ exp: number }>(tokens.refreshToken);
+    if (!decoded) throw new Error('Failed to decode refresh token');
 
     await this.repo.deleteRefreshToken(tokenHash);
     await this.repo.createRefreshToken(
