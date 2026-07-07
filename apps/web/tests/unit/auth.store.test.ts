@@ -25,11 +25,14 @@ const mockUser = {
 
 const mockAuthResponse = { accessToken: 'token-abc', user: mockUser };
 
+const ACCESS_TOKEN_KEY = 'hivemind_access_token';
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 beforeEach(() => {
   setActivePinia(createPinia());
   vi.clearAllMocks();
+  localStorage.clear();
 });
 
 describe('useAuthStore', () => {
@@ -41,7 +44,7 @@ describe('useAuthStore', () => {
   });
 
   describe('login', () => {
-    it('sets accessToken and user on success', async () => {
+    it('sets accessToken, user, and localStorage on success', async () => {
       mockFetch.mockResolvedValueOnce(mockAuthResponse);
       const auth = useAuthStore();
 
@@ -50,6 +53,7 @@ describe('useAuthStore', () => {
       expect(auth.accessToken).toBe('token-abc');
       expect(auth.user).toEqual(mockUser);
       expect(auth.isAuthenticated).toBe(true);
+      expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBe('token-abc');
     });
 
     it('throws and leaves state unchanged on failure', async () => {
@@ -58,11 +62,12 @@ describe('useAuthStore', () => {
 
       await expect(auth.login('bad@example.com', 'wrong')).rejects.toThrow();
       expect(auth.isAuthenticated).toBe(false);
+      expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBeNull();
     });
   });
 
   describe('register', () => {
-    it('sets accessToken and user on success', async () => {
+    it('sets accessToken, user, and localStorage on success', async () => {
       mockFetch.mockResolvedValueOnce(mockAuthResponse);
       const auth = useAuthStore();
 
@@ -70,12 +75,12 @@ describe('useAuthStore', () => {
 
       expect(auth.accessToken).toBe('token-abc');
       expect(auth.user).toEqual(mockUser);
+      expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBe('token-abc');
     });
   });
 
   describe('refresh', () => {
-    it('returns true and updates state when cookie is valid', async () => {
-      // refresh returns only { accessToken }; /auth/me is fetched separately
+    it('returns true, updates state, and persists token to localStorage when cookie is valid', async () => {
       mockFetch
         .mockResolvedValueOnce({ accessToken: 'token-abc' })
         .mockResolvedValueOnce(mockUser);
@@ -86,9 +91,11 @@ describe('useAuthStore', () => {
       expect(result).toBe(true);
       expect(auth.accessToken).toBe('token-abc');
       expect(auth.user).toEqual(mockUser);
+      expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBe('token-abc');
     });
 
-    it('returns false and clears state when cookie is expired', async () => {
+    it('returns false, clears state, and removes localStorage token when cookie is expired', async () => {
+      localStorage.setItem(ACCESS_TOKEN_KEY, 'old-token');
       mockFetch.mockRejectedValueOnce(new Error('401'));
       const auth = useAuthStore();
       auth.accessToken = 'old-token';
@@ -99,11 +106,13 @@ describe('useAuthStore', () => {
       expect(result).toBe(false);
       expect(auth.accessToken).toBeNull();
       expect(auth.user).toBeNull();
+      expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBeNull();
     });
   });
 
   describe('logout', () => {
-    it('clears state even when the API call fails', async () => {
+    it('clears state and localStorage even when the API call fails', async () => {
+      localStorage.setItem(ACCESS_TOKEN_KEY, 'token-abc');
       mockFetch.mockRejectedValueOnce(new Error('network'));
       const auth = useAuthStore();
       auth.accessToken = 'token-abc';
@@ -114,9 +123,11 @@ describe('useAuthStore', () => {
       expect(auth.accessToken).toBeNull();
       expect(auth.user).toBeNull();
       expect(auth.isAuthenticated).toBe(false);
+      expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBeNull();
     });
 
-    it('clears state on successful logout', async () => {
+    it('clears state and localStorage on successful logout', async () => {
+      localStorage.setItem(ACCESS_TOKEN_KEY, 'token-abc');
       mockFetch.mockResolvedValueOnce(undefined);
       const auth = useAuthStore();
       auth.accessToken = 'token-abc';
@@ -125,11 +136,40 @@ describe('useAuthStore', () => {
       await auth.logout();
 
       expect(auth.isAuthenticated).toBe(false);
+      expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBeNull();
     });
   });
 
   describe('init', () => {
-    it('restores session when a valid refresh cookie is present', async () => {
+    it('restores session from localStorage when a valid stored token is present', async () => {
+      localStorage.setItem(ACCESS_TOKEN_KEY, 'token-abc');
+      mockFetch.mockResolvedValueOnce(mockUser); // GET /auth/me
+      const auth = useAuthStore();
+
+      await auth.init();
+
+      expect(auth.isAuthenticated).toBe(true);
+      expect(auth.accessToken).toBe('token-abc');
+      expect(auth.user).toEqual(mockUser);
+      // refresh (POST /auth/refresh) must NOT have been called
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('falls through to cookie refresh when the stored token is rejected by the server', async () => {
+      localStorage.setItem(ACCESS_TOKEN_KEY, 'expired-token');
+      mockFetch
+        .mockRejectedValueOnce(new Error('401')) // GET /auth/me fails
+        .mockResolvedValueOnce({ accessToken: 'token-new' }) // POST /auth/refresh
+        .mockResolvedValueOnce(mockUser); // GET /auth/me (via refresh)
+      const auth = useAuthStore();
+
+      await auth.init();
+
+      expect(auth.isAuthenticated).toBe(true);
+      expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBe('token-new');
+    });
+
+    it('restores session when a valid refresh cookie is present and no localStorage token', async () => {
       mockFetch
         .mockResolvedValueOnce({ accessToken: 'token-abc' })
         .mockResolvedValueOnce(mockUser);

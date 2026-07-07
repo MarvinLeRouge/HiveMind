@@ -57,9 +57,11 @@ test.describe('Authentication', () => {
   test('language toggle switches navbar to French then back', async ({
     page,
   }) => {
+    // Use the outsider account so this test does not interfere with the
+    // owner language preference that other specs depend on concurrently.
     await page.goto('/login');
-    await page.getByLabel('Email').fill(E2E_USERS.owner.email);
-    await page.getByLabel('Password').fill(E2E_USERS.owner.password);
+    await page.getByLabel('Email').fill(E2E_USERS.outsider.email);
+    await page.getByLabel('Password').fill(E2E_USERS.outsider.password);
     await page.getByRole('button', { name: 'Sign in' }).click();
     await expect(page).toHaveURL(/\/collections$/);
 
