@@ -12,7 +12,7 @@ const envSchema = z.object({
   JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
   PORT: z.coerce.number().int().positive().default(3000),
   NODE_ENV: z
-    .enum(['development', 'production', 'test'])
+    .enum(['development', 'production', 'test', 'e2e'])
     .default('development'),
   CORS_ORIGIN: z.string().url('CORS_ORIGIN must be a valid URL'),
   SEED_ADMIN_USERNAME: z.string().min(1).optional(),

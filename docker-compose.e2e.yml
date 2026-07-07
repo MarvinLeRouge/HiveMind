@@ -20,7 +20,7 @@ services:
       JWT_ACCESS_EXPIRES_IN: 15m
       JWT_REFRESH_EXPIRES_IN: 7d
       PORT: "3000"
-      NODE_ENV: production
+      NODE_ENV: e2e
       CORS_ORIGIN: http://localhost
       SEED_ADMIN_USERNAME: admin
       SEED_ADMIN_EMAIL: admin@hivemind.test

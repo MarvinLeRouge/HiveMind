@@ -36,7 +36,7 @@ export default async function authRoutes(app: FastifyInstance): Promise<void> {
     },
     config: {
       rateLimit: {
-        max: env.NODE_ENV === 'test' ? 10000 : 10,
+        max: ['test', 'e2e'].includes(env.NODE_ENV) ? 10000 : 10,
         timeWindow: '1 minute',
       },
     },
@@ -67,7 +67,7 @@ export default async function authRoutes(app: FastifyInstance): Promise<void> {
     },
     config: {
       rateLimit: {
-        max: env.NODE_ENV === 'test' ? 10000 : 10,
+        max: ['test', 'e2e'].includes(env.NODE_ENV) ? 10000 : 10,
         timeWindow: '1 minute',
       },
     },
@@ -93,7 +93,7 @@ export default async function authRoutes(app: FastifyInstance): Promise<void> {
     },
     config: {
       rateLimit: {
-        max: env.NODE_ENV === 'test' ? 10000 : 30,
+        max: ['test', 'e2e'].includes(env.NODE_ENV) ? 10000 : 30,
         timeWindow: '1 minute',
       },
     },

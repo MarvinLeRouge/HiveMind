@@ -70,7 +70,7 @@ test.describe('Authentication', () => {
     });
 
     // Switch back to English
-    await page.getByRole('button', { name: 'EN' }).click();
+    await page.getByRole('button', { name: 'EN', exact: true }).click();
     await expect(page.getByText('Log out')).toBeVisible({ timeout: 10_000 });
   });
 });
