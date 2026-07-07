@@ -95,6 +95,7 @@ export default async function authRoutes(app: FastifyInstance): Promise<void> {
     },
     config: {
       rateLimit: {
+        /* c8 ignore next */
         max: ['test', 'e2e'].includes(env.NODE_ENV) ? 10000 : 30,
         timeWindow: '1 minute',
       },
