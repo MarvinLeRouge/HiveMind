@@ -48,6 +48,7 @@ afterAll(async () => {
 beforeEach(async () => {
   await prisma.collection.deleteMany({});
   await prisma.template.deleteMany({ where: { isSystem: false } });
+  await prisma.refreshToken.deleteMany();
   await prisma.user.deleteMany({ where: { isAdmin: false } });
 
   const userRes = await app.inject({
@@ -196,6 +197,32 @@ describe('POST /collections/:id/import/gpx', () => {
     });
 
     expect(res.statusCode).toBe(403);
+  });
+
+  it('returns 400 for a non-XML MIME type', async () => {
+    const collectionId = await createCollection(userToken);
+    const boundary = 'testboundary';
+    const body = [
+      `--${boundary}`,
+      'Content-Disposition: form-data; name="file"; filename="import.txt"',
+      'Content-Type: text/plain',
+      '',
+      'not xml content',
+      `--${boundary}--`,
+    ].join('\r\n');
+
+    const res = await app.inject({
+      method: 'POST',
+      url: `/collections/${collectionId}/import/gpx`,
+      headers: {
+        authorization: `Bearer ${userToken}`,
+        'content-type': `multipart/form-data; boundary=${boundary}`,
+      },
+      payload: body,
+    });
+
+    expect(res.statusCode).toBe(400);
+    expect(res.json().message).toContain('GPX');
   });
 
   it('returns 401 without token', async () => {

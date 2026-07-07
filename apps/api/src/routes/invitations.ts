@@ -47,11 +47,18 @@ export default async function invitationRoutes(
       summary: 'Get an invitation by ID',
       security: [{ bearerAuth: [] }],
       params: invitationIdParamSchema,
-      response: { 200: invitationSchema, 404: errorSchema },
+      response: { 200: invitationSchema, 403: errorSchema, 404: errorSchema },
     },
     preHandler: authenticate,
     handler: async (request, reply) => {
       const invitation = await service.getById(request.params.id);
+      if (invitation.inviteeEmail !== request.user.email) {
+        return reply.status(403).send({
+          statusCode: 403,
+          error: 'Forbidden',
+          message: 'Forbidden',
+        });
+      }
       return reply.send(serializeInvitation(invitation));
     },
   });

@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import { createHash, randomUUID } from 'node:crypto';
 import type { FastifyInstance } from 'fastify';
 import type { User } from '@prisma/client';
 import type { AuthRepository } from '../repositories/auth.repository.js';
@@ -60,6 +61,7 @@ export class AuthService {
 
   /**
    * Validates credentials and returns a token pair.
+   * Stores a hashed refresh token for server-side invalidation.
    * Throws 401 if credentials are invalid.
    */
   async login(data: {
@@ -76,12 +78,21 @@ export class AuthService {
       throw this.unauthorized('Invalid email or password');
     }
 
-    return { user: this.toAuthUser(user), tokens: this.signTokens(user) };
+    const tokens = this.signTokens(user);
+    const decoded = this.app.jwt.decode<{ exp: number }>(tokens.refreshToken);
+    await this.repo.createRefreshToken(
+      user.id,
+      this.hashToken(tokens.refreshToken),
+      new Date(decoded.exp * 1000),
+    );
+
+    return { user: this.toAuthUser(user), tokens };
   }
 
   /**
-   * Verifies a refresh token and returns a new token pair.
-   * Throws 401 if the token is invalid or the user no longer exists.
+   * Verifies a refresh token, rotates it (deletes old, stores new), and
+   * returns a new token pair. Throws 401 if the token is invalid, revoked,
+   * or the user no longer exists.
    */
   async refresh(refreshToken: string): Promise<TokenPair> {
     let payload: { sub: string };
@@ -93,12 +104,37 @@ export class AuthService {
       throw this.unauthorized('Invalid refresh token');
     }
 
+    const tokenHash = this.hashToken(refreshToken);
+    const stored = await this.repo.findRefreshToken(tokenHash);
+    if (!stored) {
+      throw this.unauthorized('Refresh token has been revoked');
+    }
+
     const user = await this.repo.findById(payload.sub);
     if (!user) {
       throw this.unauthorized('User not found');
     }
 
-    return this.signTokens(user);
+    const tokens = this.signTokens(user);
+    const decoded = this.app.jwt.decode<{ exp: number }>(tokens.refreshToken);
+
+    await this.repo.deleteRefreshToken(tokenHash);
+    await this.repo.createRefreshToken(
+      user.id,
+      this.hashToken(tokens.refreshToken),
+      new Date(decoded.exp * 1000),
+    );
+    await this.repo.deleteExpiredRefreshTokens(user.id);
+
+    return tokens;
+  }
+
+  /**
+   * Invalidates the stored refresh token. Called on logout.
+   * Silently succeeds if the token is not found (already revoked).
+   */
+  async logout(refreshToken: string): Promise<void> {
+    await this.repo.deleteRefreshToken(this.hashToken(refreshToken));
   }
 
   /**
@@ -129,6 +165,10 @@ export class AuthService {
 
   // ── Private helpers ────────────────────────────────────────────────────────
 
+  private hashToken(token: string): string {
+    return createHash('sha256').update(token).digest('hex');
+  }
+
   private signTokens(user: User): TokenPair {
     const payload = { sub: user.id, email: user.email, isAdmin: user.isAdmin };
 
@@ -136,10 +176,11 @@ export class AuthService {
       expiresIn: env.JWT_ACCESS_EXPIRES_IN,
     });
 
-    const refreshToken = this.app.jwt.sign(payload, {
-      key: env.JWT_REFRESH_SECRET,
-      expiresIn: env.JWT_REFRESH_EXPIRES_IN,
-    });
+    // jti ensures uniqueness even when two tokens are signed in the same second
+    const refreshToken = this.app.jwt.sign(
+      { ...payload, jti: randomUUID() },
+      { key: env.JWT_REFRESH_SECRET, expiresIn: env.JWT_REFRESH_EXPIRES_IN },
+    );
 
     return { accessToken, refreshToken };
   }

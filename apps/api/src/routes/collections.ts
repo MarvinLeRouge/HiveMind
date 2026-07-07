@@ -6,6 +6,7 @@ import { TemplateRepository } from '../repositories/template.repository.js';
 import { CollectionService } from '../services/collection.service.js';
 import { InvitationRepository } from '../repositories/invitation.repository.js';
 import { InvitationService } from '../services/invitation.service.js';
+import { env } from '../config/env.js';
 import { authenticate } from '../middlewares/authenticate.js';
 import { requireMember } from '../middlewares/requireMember.js';
 import { requireOwner } from '../middlewares/requireOwner.js';
@@ -218,6 +219,12 @@ export default async function collectionRoutes(
       params: collectionIdParamSchema,
       body: sendInvitationBodySchema,
       response: { 201: invitationSchema, 403: errorSchema, 409: errorSchema },
+    },
+    config: {
+      rateLimit: {
+        max: env.NODE_ENV === 'test' ? 10000 : 20,
+        timeWindow: '1 hour',
+      },
     },
     preHandler: [authenticate, requireOwner],
     handler: async (request, reply) => {
