@@ -222,6 +222,7 @@ export default async function collectionRoutes(
     },
     config: {
       rateLimit: {
+        /* c8 ignore next */
         max: ['test', 'e2e'].includes(env.NODE_ENV) ? 10000 : 20,
         timeWindow: '1 hour',
       },
