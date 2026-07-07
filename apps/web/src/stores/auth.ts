@@ -5,6 +5,11 @@ import i18n, { type Locale, SUPPORTED_LOCALES } from '@/i18n';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+// Key used to persist the short-lived access token across page loads.
+// Allows Playwright storageState to capture it so E2E tests can restore
+// a session without consuming the httpOnly refresh cookie on every test.
+const ACCESS_TOKEN_KEY = 'hivemind_access_token';
+
 /**
  * Global authentication store.
  * Manages current user state and JWT access token.
@@ -31,6 +36,7 @@ export const useAuthStore = defineStore('auth', {
       });
       this.accessToken = data.accessToken;
       this.user = data.user;
+      localStorage.setItem(ACCESS_TOKEN_KEY, data.accessToken);
       this.syncLocale(data.user.language);
     },
 
@@ -47,6 +53,7 @@ export const useAuthStore = defineStore('auth', {
       });
       this.accessToken = data.accessToken;
       this.user = data.user;
+      localStorage.setItem(ACCESS_TOKEN_KEY, data.accessToken);
       this.syncLocale(data.user.language);
     },
 
@@ -63,6 +70,7 @@ export const useAuthStore = defineStore('auth', {
           { method: 'POST', credentials: 'include' },
         );
         this.accessToken = accessToken;
+        localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
         const user = await ofetch<User>(`${BASE_URL}/auth/me`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
@@ -72,6 +80,7 @@ export const useAuthStore = defineStore('auth', {
       } catch {
         this.accessToken = null;
         this.user = null;
+        localStorage.removeItem(ACCESS_TOKEN_KEY);
         return false;
       }
     },
@@ -94,13 +103,28 @@ export const useAuthStore = defineStore('auth', {
       }
       this.accessToken = null;
       this.user = null;
+      localStorage.removeItem(ACCESS_TOKEN_KEY);
     },
 
     /**
-     * Called on app mount: attempts a silent refresh to restore the session
-     * if a refresh cookie is present.
+     * Called on app mount: restores the session from localStorage if a valid
+     * access token is present, otherwise falls back to a silent cookie refresh.
      */
     async init(): Promise<void> {
+      const stored = localStorage.getItem(ACCESS_TOKEN_KEY);
+      if (stored) {
+        try {
+          const user = await ofetch<User>(`${BASE_URL}/auth/me`, {
+            headers: { Authorization: `Bearer ${stored}` },
+          });
+          this.accessToken = stored;
+          this.user = user;
+          this.syncLocale(user.language);
+          return;
+        } catch {
+          localStorage.removeItem(ACCESS_TOKEN_KEY);
+        }
+      }
       await this.refresh();
     },
 
