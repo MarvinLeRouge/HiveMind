@@ -96,7 +96,9 @@ test.describe('Collections — owner', () => {
       .click();
     await page.getByLabel('Email address').fill(E2E_USERS.member.email);
     await page.getByRole('button', { name: 'Send invitation' }).click();
-    await expect(page.getByText('Invitation sent.')).toBeVisible();
+    await expect(
+      page.getByRole('status').getByText('Invitation sent.'),
+    ).toBeVisible();
   });
 });
 
