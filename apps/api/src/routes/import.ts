@@ -59,6 +59,19 @@ export default async function importRoutes(
         });
       }
 
+      const allowedMimes = [
+        'application/gpx+xml',
+        'text/xml',
+        'application/xml',
+      ];
+      if (!allowedMimes.includes(file.mimetype)) {
+        return reply.status(400).send({
+          statusCode: 400,
+          error: 'Bad Request',
+          message: 'File must be a GPX/XML file',
+        });
+      }
+
       const buffer = await file.toBuffer();
       const xml = buffer.toString('utf-8');
 
@@ -92,6 +105,14 @@ export default async function importRoutes(
         });
       }
 
+      if (file.mimetype !== 'text/csv' && file.mimetype !== 'text/plain') {
+        return reply.status(400).send({
+          statusCode: 400,
+          error: 'Bad Request',
+          message: 'File must be a CSV file',
+        });
+      }
+
       const csv = (await file.toBuffer()).toString('utf-8');
       const preview = csvPreviewService.preview(csv);
 
@@ -120,6 +141,13 @@ export default async function importRoutes(
 
       for await (const part of request.parts()) {
         if (part.type === 'file' && part.fieldname === 'file') {
+          if (part.mimetype !== 'text/csv' && part.mimetype !== 'text/plain') {
+            return reply.status(400).send({
+              statusCode: 400,
+              error: 'Bad Request',
+              message: 'File must be a CSV file',
+            });
+          }
           csvContent = (await part.toBuffer()).toString('utf-8');
         } else if (part.type === 'field' && part.fieldname === 'mapping') {
           try {

@@ -26,6 +26,7 @@ beforeEach(async () => {
   await prisma.collectionMember.deleteMany();
   await prisma.invitation.deleteMany();
   await prisma.collection.deleteMany();
+  await prisma.refreshToken.deleteMany();
   await prisma.user.deleteMany({ where: { isAdmin: false } });
 });
 
@@ -164,6 +165,28 @@ describe('POST /auth/refresh', () => {
     });
     expect(res.statusCode).toBe(401);
   });
+
+  it('returns 401 after the refresh token has been used (rotation)', async () => {
+    const loginRes = await registerUser();
+    const setCookie = loginRes.headers['set-cookie'];
+    const rawCookie = Array.isArray(setCookie) ? setCookie[0] : setCookie;
+    const cookieHeader = rawCookie?.split(';')[0] ?? '';
+
+    // Use the refresh token once — it gets rotated
+    await app.inject({
+      method: 'POST',
+      url: '/auth/refresh',
+      headers: { cookie: cookieHeader },
+    });
+
+    // Trying to use the same old token should fail
+    const res = await app.inject({
+      method: 'POST',
+      url: '/auth/refresh',
+      headers: { cookie: cookieHeader },
+    });
+    expect(res.statusCode).toBe(401);
+  });
 });
 
 // ── POST /auth/logout ─────────────────────────────────────────────────────────
@@ -183,6 +206,32 @@ describe('POST /auth/logout', () => {
     const setCookie = res.headers['set-cookie'];
     const cookie = Array.isArray(setCookie) ? setCookie[0] : setCookie;
     expect(cookie).toContain('refreshToken=;');
+  });
+
+  it('invalidates the refresh token after logout', async () => {
+    const regRes = await registerUser();
+    const setCookie = regRes.headers['set-cookie'];
+    const rawCookie = Array.isArray(setCookie) ? setCookie[0] : setCookie;
+    const cookieHeader = rawCookie?.split(';')[0] ?? '';
+    const accessToken = regRes.json().accessToken as string;
+
+    // Logout — passes both access token and refresh cookie
+    await app.inject({
+      method: 'POST',
+      url: '/auth/logout',
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+        cookie: cookieHeader,
+      },
+    });
+
+    // Refresh should now be rejected
+    const res = await app.inject({
+      method: 'POST',
+      url: '/auth/refresh',
+      headers: { cookie: cookieHeader },
+    });
+    expect(res.statusCode).toBe(401);
   });
 
   it('returns 401 without a valid access token', async () => {

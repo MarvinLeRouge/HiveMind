@@ -187,7 +187,7 @@ describe('POST /collections/:id/invitations', () => {
 // ── GET /invitations/:id ──────────────────────────────────────────────────────
 
 describe('GET /invitations/:id', () => {
-  it('returns the invitation for any authenticated user', async () => {
+  it('returns the invitation to the invitee', async () => {
     const collectionId = await createCollection(userToken);
     const invRes = await sendInvitation(
       userToken,
@@ -205,6 +205,25 @@ describe('GET /invitations/:id', () => {
     expect(res.statusCode).toBe(200);
     expect(res.json().id).toBe(invId);
     expect(res.json().status).toBe('pending');
+  });
+
+  it('returns 403 when the requester is not the invitee', async () => {
+    const collectionId = await createCollection(userToken);
+    const invRes = await sendInvitation(
+      userToken,
+      collectionId,
+      'user2@example.com',
+    );
+    const invId = invRes.json().id as string;
+
+    // user1 tries to read an invitation sent to user2
+    const res = await app.inject({
+      method: 'GET',
+      url: `/invitations/${invId}`,
+      headers: { authorization: `Bearer ${userToken}` },
+    });
+
+    expect(res.statusCode).toBe(403);
   });
 
   it('returns 404 for an unknown invitation', async () => {

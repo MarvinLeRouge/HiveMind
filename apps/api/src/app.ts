@@ -1,4 +1,6 @@
 import fastify from 'fastify';
+import helmet from '@fastify/helmet';
+import rateLimit from '@fastify/rate-limit';
 import cors from '@fastify/cors';
 import cookie from '@fastify/cookie';
 import jwt from '@fastify/jwt';
@@ -56,6 +58,29 @@ export async function buildApp(options?: AppOptions): Promise<FastifyInstance> {
   app.setSerializerCompiler(serializerCompiler);
 
   // ── Plugins ────────────────────────────────────────────────────────────────
+  await app.register(rateLimit, {
+    // High ceiling in tests to prevent flaky 429s from integration test setup requests
+    max: env.NODE_ENV === 'test' ? 10000 : 100,
+    timeWindow: '1 minute',
+    skipOnError: true,
+  });
+
+  await app.register(helmet, {
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        // 'unsafe-inline' required for Swagger UI (dev only — UI is disabled in production)
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:'],
+        connectSrc: ["'self'"],
+        fontSrc: ["'self'", 'data:'],
+        objectSrc: ["'none'"],
+      },
+    },
+    crossOriginEmbedderPolicy: false,
+  });
+
   await app.register(cors, {
     origin: env.CORS_ORIGIN,
     credentials: true,
@@ -79,7 +104,9 @@ export async function buildApp(options?: AppOptions): Promise<FastifyInstance> {
     },
   });
 
-  await app.register(swaggerUi, { routePrefix: '/docs' });
+  if (env.NODE_ENV !== 'production') {
+    await app.register(swaggerUi, { routePrefix: '/docs' });
+  }
 
   await app.register(multipart, { limits: { fileSize: 10 * 1024 * 1024 } });
 

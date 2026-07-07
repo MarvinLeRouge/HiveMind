@@ -48,6 +48,7 @@ afterAll(async () => {
 beforeEach(async () => {
   await prisma.collection.deleteMany({});
   await prisma.template.deleteMany({ where: { isSystem: false } });
+  await prisma.refreshToken.deleteMany();
   await prisma.user.deleteMany({ where: { isAdmin: false } });
 
   const userRes = await app.inject({
@@ -152,6 +153,32 @@ describe('POST /collections/:id/import/csv/preview', () => {
     });
 
     expect(res.statusCode).toBe(403);
+  });
+
+  it('returns 400 for a non-CSV MIME type', async () => {
+    const collectionId = await createCollection(userToken);
+    const boundary = 'testboundary';
+    const body = [
+      `--${boundary}`,
+      'Content-Disposition: form-data; name="file"; filename="data.pdf"',
+      'Content-Type: application/pdf',
+      '',
+      'not csv content',
+      `--${boundary}--`,
+    ].join('\r\n');
+
+    const res = await app.inject({
+      method: 'POST',
+      url: `/collections/${collectionId}/import/csv/preview`,
+      headers: {
+        authorization: `Bearer ${userToken}`,
+        'content-type': `multipart/form-data; boundary=${boundary}`,
+      },
+      payload: body,
+    });
+
+    expect(res.statusCode).toBe(400);
+    expect(res.json().message).toContain('CSV');
   });
 
   it('returns 401 without token', async () => {
@@ -266,6 +293,32 @@ describe('POST /collections/:id/import/csv', () => {
     });
 
     expect(res.statusCode).toBe(403);
+  });
+
+  it('returns 400 for a non-CSV MIME type', async () => {
+    const collectionId = await createCollection(userToken);
+    const boundary = 'testboundary';
+    const body = [
+      `--${boundary}`,
+      'Content-Disposition: form-data; name="file"; filename="data.pdf"',
+      'Content-Type: application/pdf',
+      '',
+      'not csv content',
+      `--${boundary}--`,
+    ].join('\r\n');
+
+    const res = await app.inject({
+      method: 'POST',
+      url: `/collections/${collectionId}/import/csv`,
+      headers: {
+        authorization: `Bearer ${userToken}`,
+        'content-type': `multipart/form-data; boundary=${boundary}`,
+      },
+      payload: body,
+    });
+
+    expect(res.statusCode).toBe(400);
+    expect(res.json().message).toContain('CSV');
   });
 
   it('returns 401 without token', async () => {

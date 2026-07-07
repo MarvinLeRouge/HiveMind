@@ -19,12 +19,18 @@ const mockUser: User = {
 
 // ── Mocks ────────────────────────────────────────────────────────────────────
 
+const MOCK_EXP = Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60;
+
 function makeRepo(overrides: Partial<AuthRepository> = {}): AuthRepository {
   return {
     findByEmail: vi.fn().mockResolvedValue(null),
     findById: vi.fn().mockResolvedValue(null),
     create: vi.fn().mockResolvedValue(mockUser),
     updateLanguage: vi.fn().mockResolvedValue(mockUser),
+    createRefreshToken: vi.fn().mockResolvedValue(undefined),
+    findRefreshToken: vi.fn().mockResolvedValue({ userId: mockUser.id }),
+    deleteRefreshToken: vi.fn().mockResolvedValue(undefined),
+    deleteExpiredRefreshTokens: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   } as unknown as AuthRepository;
 }
@@ -34,6 +40,7 @@ function makeApp(): FastifyInstance {
     jwt: {
       sign: vi.fn().mockReturnValue('signed-token'),
       verify: vi.fn().mockReturnValue({ sub: mockUser.id }),
+      decode: vi.fn().mockReturnValue({ exp: MOCK_EXP }),
     },
   } as unknown as FastifyInstance;
 }
@@ -119,6 +126,8 @@ describe('AuthService.refresh', () => {
 
     expect(result.accessToken).toBe('signed-token');
     expect(result.refreshToken).toBe('signed-token');
+    expect(repo.deleteRefreshToken).toHaveBeenCalledOnce();
+    expect(repo.createRefreshToken).toHaveBeenCalledOnce();
   });
 
   it('throws 401 for an invalid refresh token', async () => {
@@ -128,11 +137,24 @@ describe('AuthService.refresh', () => {
         verify: vi.fn().mockImplementation(() => {
           throw new Error('invalid token');
         }),
+        decode: vi.fn(),
       },
     } as unknown as FastifyInstance;
     const service = new AuthService(makeRepo(), app);
 
     await expect(service.refresh('bad-token')).rejects.toMatchObject({
+      statusCode: 401,
+    });
+  });
+
+  it('throws 401 when the refresh token has been revoked', async () => {
+    const repo = makeRepo({
+      findById: vi.fn().mockResolvedValue(mockUser),
+      findRefreshToken: vi.fn().mockResolvedValue(null),
+    });
+    const service = new AuthService(repo, makeApp());
+
+    await expect(service.refresh('revoked-token')).rejects.toMatchObject({
       statusCode: 401,
     });
   });
@@ -144,6 +166,17 @@ describe('AuthService.refresh', () => {
     await expect(service.refresh('valid-token')).rejects.toMatchObject({
       statusCode: 401,
     });
+  });
+});
+
+describe('AuthService.logout', () => {
+  it('deletes the stored refresh token', async () => {
+    const repo = makeRepo();
+    const service = new AuthService(repo, makeApp());
+
+    await service.logout('some-refresh-token');
+
+    expect(repo.deleteRefreshToken).toHaveBeenCalledOnce();
   });
 });
 

@@ -38,4 +38,49 @@ export class AuthRepository {
   async updateLanguage(id: string, language: string): Promise<User> {
     return this.prisma.user.update({ where: { id }, data: { language } });
   }
+
+  /**
+   * Stores a hashed refresh token for server-side invalidation.
+   */
+  async createRefreshToken(
+    userId: string,
+    tokenHash: string,
+    expiresAt: Date,
+  ): Promise<void> {
+    await this.prisma.refreshToken.create({
+      data: { userId, tokenHash, expiresAt },
+    });
+  }
+
+  /**
+   * Looks up a stored refresh token by its hash.
+   * Returns null if not found or already expired.
+   */
+  async findRefreshToken(
+    tokenHash: string,
+  ): Promise<{ userId: string } | null> {
+    return this.prisma.refreshToken.findUnique({
+      where: { tokenHash },
+      select: { userId: true },
+    });
+  }
+
+  /**
+   * Deletes a stored refresh token (used on refresh rotation and logout).
+   * Silently succeeds if the token does not exist.
+   */
+  async deleteRefreshToken(tokenHash: string): Promise<void> {
+    await this.prisma.refreshToken
+      .delete({ where: { tokenHash } })
+      .catch(() => undefined);
+  }
+
+  /**
+   * Removes all expired refresh tokens for a given user (lazy cleanup).
+   */
+  async deleteExpiredRefreshTokens(userId: string): Promise<void> {
+    await this.prisma.refreshToken.deleteMany({
+      where: { userId, expiresAt: { lte: new Date() } },
+    });
+  }
 }

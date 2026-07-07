@@ -34,6 +34,12 @@ export default async function authRoutes(app: FastifyInstance): Promise<void> {
         409: errorSchema,
       },
     },
+    config: {
+      rateLimit: {
+        max: env.NODE_ENV === 'test' ? 10000 : 10,
+        timeWindow: '1 minute',
+      },
+    },
     handler: async (request, reply) => {
       const user = await service.register(request.body);
       const { tokens } = await service.login({
@@ -59,6 +65,12 @@ export default async function authRoutes(app: FastifyInstance): Promise<void> {
         401: errorSchema,
       },
     },
+    config: {
+      rateLimit: {
+        max: env.NODE_ENV === 'test' ? 10000 : 10,
+        timeWindow: '1 minute',
+      },
+    },
     handler: async (request, reply) => {
       const { user, tokens } = await service.login(request.body);
       setRefreshCookie(reply, tokens.refreshToken);
@@ -77,6 +89,12 @@ export default async function authRoutes(app: FastifyInstance): Promise<void> {
       response: {
         200: z.object({ accessToken: z.string() }),
         401: errorSchema,
+      },
+    },
+    config: {
+      rateLimit: {
+        max: env.NODE_ENV === 'test' ? 10000 : 30,
+        timeWindow: '1 minute',
       },
     },
     handler: async (request, reply) => {
@@ -106,7 +124,11 @@ export default async function authRoutes(app: FastifyInstance): Promise<void> {
       },
     },
     preHandler: authenticate,
-    handler: async (_request, reply) => {
+    handler: async (request, reply) => {
+      const token: string | undefined = request.cookies[REFRESH_COOKIE];
+      if (token) {
+        await service.logout(token);
+      }
       reply.clearCookie(REFRESH_COOKIE, { path: '/' });
       return reply.status(204).send({});
     },
