@@ -4,7 +4,7 @@
 
 > Une plateforme collaborative pour résoudre des collections d'énigmes de manière asynchrone.
 
-[![Statut](https://img.shields.io/badge/statut-en%20développement-yellow)](https://github.com/MarvinLeRouge/HiveMind)
+[![Statut](https://img.shields.io/badge/statut-production-brightgreen)](https://github.com/MarvinLeRouge/HiveMind)
 [![CI](https://github.com/MarvinLeRouge/HiveMind/actions/workflows/ci.yml/badge.svg)](https://github.com/MarvinLeRouge/HiveMind/actions/workflows/ci.yml)
 [![E2E](https://github.com/MarvinLeRouge/HiveMind/actions/workflows/e2e.yml/badge.svg)](https://github.com/MarvinLeRouge/HiveMind/actions/workflows/e2e.yml)
 [![CD](https://github.com/MarvinLeRouge/HiveMind/actions/workflows/build-deploy.yml/badge.svg)](https://github.com/MarvinLeRouge/HiveMind/actions/workflows/build-deploy.yml)
@@ -55,7 +55,7 @@ Chaque **Collection** contient des **Puzzles**. Chaque puzzle peut recevoir des 
 - **Import GPX** — importer une pocket query Geocaching pour peupler automatiquement les puzzles avec coordonnées, difficulté, terrain et codes GC
 - **Import CSV** — importer un tableur avec mapping flexible colonne → champ
 - **Auth JWT** — access token (15 min) + cookie httpOnly de refresh (7 jours)
-- **Swagger UI** — documentation API interactive auto-générée sur `/docs`
+- **Swagger UI** — documentation API interactive auto-générée sur `/docs` (développement uniquement ; désactivé en production)
 
 ---
 
@@ -71,7 +71,7 @@ HiveMind/
 │   │   │   ├── services/       # Logique métier
 │   │   │   ├── repositories/   # Accès données Prisma
 │   │   │   ├── middlewares/    # authenticate, requireMember, requireOwner
-│   │   │   ├── plugins/        # Plugins Fastify (swagger, jwt, cors, cookie, multipart)
+│   │   │   ├── plugins/        # Plugins Fastify (swagger, jwt, cors, cookie, multipart, helmet, rate-limit)
 │   │   │   └── types/          # Types TypeScript locaux
 │   │   ├── prisma/
 │   │   │   ├── schema.prisma
@@ -199,7 +199,7 @@ Déclenché sur push vers `main` et `workflow_dispatch`. Construit la stack Dock
 
 ### Workflow CD (`build-deploy.yml`)
 
-Déclenché à chaque push sur `main` et sur `workflow_dispatch` (contournement hotfix).
+Déclenché par le succès du workflow E2E via `workflow_run`, et sur `workflow_dispatch` (contournement hotfix).
 
 1. Résolution du SHA exact du commit + nom du dépôt en minuscules
 2. Build et push des images Docker `backend` + `frontend` vers GHCR (tags `sha` + `latest`)
@@ -231,7 +231,7 @@ docker compose up -d
 docker compose logs -f
 
 # Suivre uniquement les logs backend
-docker compose logs -f api
+docker compose logs -f backend
 
 # Arrêter et supprimer les conteneurs
 docker compose down
@@ -417,7 +417,7 @@ docker compose -f docker-compose.prod.yml up -d
 | UI | Tailwind CSS + shadcn-vue | [![Tailwind](https://img.shields.io/badge/tailwind-3-38bdf8?logo=tailwindcss)](https://tailwindcss.com) |
 | i18n | vue-i18n v9 (FR + EN) | |
 | Client HTTP | ofetch | |
-| Tests backend | Vitest + fastify.inject() | [![Vitest](https://img.shields.io/badge/vitest-2-6e9f18?logo=vitest)](https://vitest.dev) |
+| Tests backend | Vitest + fastify.inject() | [![Vitest](https://img.shields.io/badge/vitest-3-6e9f18?logo=vitest)](https://vitest.dev) |
 | Tests frontend | Vitest + Vue Test Utils | |
 | Tests E2E | Playwright | [![Playwright](https://img.shields.io/badge/playwright-1-2ead33?logo=playwright)](https://playwright.dev) |
 | Linting | ESLint + Prettier | |
@@ -470,12 +470,16 @@ docker compose -f docker-compose.prod.yml up -d
 - [x] BLOCK-22 · Suite E2E Playwright (35 tests, Chromium)
 - [x] BLOCK-23 · Déploiement production (VPS, Traefik, GHCR, CD SSH)
 - [x] BLOCK-24 · Sauvegardes PostgreSQL automatisées (cron quotidien, rotation 7j + 4s)
+- [x] BLOCK-25 · Sécurisation (audit OWASP Top 10, Helmet/CSP, rate limiting, invalidation JWT côté serveur, correctifs CVE)
+- [x] BLOCK-26 · Polish design & UX (palette OKLCH accessible, dark mode, responsive mobile, états vides, gestion d'erreurs, micro-interactions)
 
 ---
 
 ## À propos
 
 HiveMind est un projet portfolio conçu pour explorer et démontrer le développement full-stack avec un écosystème Node.js moderne : Fastify pour une API performante et fortement typée, Prisma pour un accès ergonomique à la base de données, Vue 3 pour un frontend réactif, et GitHub Actions pour un pipeline CI/CD de qualité production.
+
+La sécurité a été traitée comme une contrainte de premier ordre : le code a fait l'objet d'un audit OWASP Top 10 ayant abouti à des en-têtes HTTP de sécurité (Helmet, CSP), un rate limiting sur les endpoints sensibles, une invalidation côté serveur des refresh tokens et des correctifs CVE ciblés sur les dépendances transitives.
 
 Le projet a été conçu avec un usage réel en tête — spécifiquement les séries de mystères en géocaching collaboratif — mais le modèle de domaine est intentionnellement générique et applicable à toute collection d'énigmes.
 

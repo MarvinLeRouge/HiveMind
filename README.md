@@ -4,7 +4,7 @@
 
 > A collaborative platform for solving puzzle collections asynchronously.
 
-[![Status](https://img.shields.io/badge/status-in%20development-yellow)](https://github.com/MarvinLeRouge/HiveMind)
+[![Status](https://img.shields.io/badge/status-production-brightgreen)](https://github.com/MarvinLeRouge/HiveMind)
 [![CI](https://github.com/MarvinLeRouge/HiveMind/actions/workflows/ci.yml/badge.svg)](https://github.com/MarvinLeRouge/HiveMind/actions/workflows/ci.yml)
 [![E2E](https://github.com/MarvinLeRouge/HiveMind/actions/workflows/e2e.yml/badge.svg)](https://github.com/MarvinLeRouge/HiveMind/actions/workflows/e2e.yml)
 [![CD](https://github.com/MarvinLeRouge/HiveMind/actions/workflows/build-deploy.yml/badge.svg)](https://github.com/MarvinLeRouge/HiveMind/actions/workflows/build-deploy.yml)
@@ -55,7 +55,7 @@ Each **Collection** contains **Puzzles**. Each puzzle can carry free-text **Note
 - **GPX import** — upload a Geocaching pocket query to auto-populate puzzles with coordinates, difficulty, terrain, and GC codes
 - **CSV import** — upload a spreadsheet with flexible column-to-field mapping
 - **JWT auth** — access token (15 min) + httpOnly refresh cookie (7 days)
-- **Swagger UI** — auto-generated interactive API documentation at `/docs`
+- **Swagger UI** — auto-generated interactive API documentation at `/docs` (development only; disabled in production)
 
 ---
 
@@ -71,7 +71,7 @@ HiveMind/
 │   │   │   ├── services/       # Business logic
 │   │   │   ├── repositories/   # Prisma data access
 │   │   │   ├── middlewares/    # authenticate, requireMember, requireOwner
-│   │   │   ├── plugins/        # Fastify plugins (swagger, jwt, cors, cookie, multipart)
+│   │   │   ├── plugins/        # Fastify plugins (swagger, jwt, cors, cookie, multipart, helmet, rate-limit)
 │   │   │   └── types/          # Local TypeScript types
 │   │   ├── prisma/
 │   │   │   ├── schema.prisma
@@ -199,7 +199,7 @@ Triggers on push to `main` and `workflow_dispatch`. Builds the full production D
 
 ### CD workflow (`build-deploy.yml`)
 
-Triggered on every push to `main` and on `workflow_dispatch` (hotfix bypass).
+Triggered by E2E workflow success via `workflow_run`, and on `workflow_dispatch` (hotfix bypass).
 
 1. Resolve exact commit SHA + lowercase repository name
 2. Build and push `backend` + `frontend` Docker images to GHCR (tagged `sha` + `latest`)
@@ -231,7 +231,7 @@ docker compose up -d
 docker compose logs -f
 
 # Follow backend logs only
-docker compose logs -f api
+docker compose logs -f backend
 
 # Stop and remove containers
 docker compose down
@@ -417,7 +417,7 @@ docker compose -f docker-compose.prod.yml up -d
 | UI | Tailwind CSS + shadcn-vue | [![Tailwind](https://img.shields.io/badge/tailwind-3-38bdf8?logo=tailwindcss)](https://tailwindcss.com) |
 | i18n | vue-i18n v9 (EN + FR) | |
 | HTTP client | ofetch | |
-| Backend tests | Vitest + fastify.inject() | [![Vitest](https://img.shields.io/badge/vitest-2-6e9f18?logo=vitest)](https://vitest.dev) |
+| Backend tests | Vitest + fastify.inject() | [![Vitest](https://img.shields.io/badge/vitest-3-6e9f18?logo=vitest)](https://vitest.dev) |
 | Frontend tests | Vitest + Vue Test Utils | |
 | E2E tests | Playwright | [![Playwright](https://img.shields.io/badge/playwright-1-2ead33?logo=playwright)](https://playwright.dev) |
 | Linting | ESLint + Prettier | |
@@ -470,12 +470,16 @@ docker compose -f docker-compose.prod.yml up -d
 - [x] BLOCK-22 · E2E Playwright suite (35 tests, Chromium)
 - [x] BLOCK-23 · Production deployment (VPS, Traefik, GHCR, SSH CD)
 - [x] BLOCK-24 · Automated PostgreSQL backups (daily cron, 7d + 4w rotation)
+- [x] BLOCK-25 · Security hardening (OWASP Top 10 audit, Helmet/CSP, rate limiting, server-side JWT invalidation, CVE patching)
+- [x] BLOCK-26 · Design polish (accessible OKLCH palette, dark mode, mobile-responsive layout, empty states, error boundaries, micro-interactions)
 
 ---
 
 ## About
 
 HiveMind is a portfolio project built to explore and demonstrate full-stack development with a modern Node.js ecosystem: Fastify for a performant and type-safe API, Prisma for ergonomic database access, Vue 3 for a reactive frontend, and GitHub Actions for a production-grade CI/CD pipeline.
+
+Security was treated as a first-class concern: the codebase went through an OWASP Top 10 audit covering HTTP security headers (Helmet, CSP), rate limiting on sensitive endpoints, server-side refresh token invalidation, and targeted CVE patching across transitive dependencies.
 
 The project was designed with real-world use in mind — specifically collaborative geocaching mystery series — but the domain model is intentionally generic enough to apply to any puzzle collection.
 
