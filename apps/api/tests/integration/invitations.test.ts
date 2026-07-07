@@ -42,6 +42,7 @@ afterAll(async () => {
 beforeEach(async () => {
   await prisma.collection.deleteMany({});
   await prisma.template.deleteMany({ where: { isSystem: false } });
+  await prisma.refreshToken.deleteMany({});
   await prisma.user.deleteMany({ where: { isAdmin: false } });
 
   const userRes = await app.inject({
