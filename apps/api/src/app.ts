@@ -59,8 +59,9 @@ export async function buildApp(options?: AppOptions): Promise<FastifyInstance> {
 
   // ── Plugins ────────────────────────────────────────────────────────────────
   await app.register(rateLimit, {
-    // High ceiling in tests to prevent flaky 429s from integration test setup requests
-    max: env.NODE_ENV === 'test' ? 10000 : 100,
+    // High ceiling in test/e2e to prevent flaky 429s from parallel test setup requests
+    /* c8 ignore next */
+    max: ['test', 'e2e'].includes(env.NODE_ENV) ? 10000 : 100,
     timeWindow: '1 minute',
     skipOnError: true,
   });
