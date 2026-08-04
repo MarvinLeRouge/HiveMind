@@ -9,10 +9,18 @@ export interface InvitationEmailOptions {
   expiresAt: Date;
 }
 
+/** Data required to send an email verification email. */
+export interface VerificationEmailOptions {
+  to: string;
+  token: string;
+}
+
 /** Contract for outbound email delivery. */
 export interface MailerService {
   /** Sends an invitation email to the given recipient. Throws on delivery failure. */
   sendInvitationEmail(opts: InvitationEmailOptions): Promise<void>;
+  /** Sends an email verification link to a newly registered user. Throws on delivery failure. */
+  sendVerificationEmail(opts: VerificationEmailOptions): Promise<void>;
 }
 
 interface SmtpConfig {
@@ -32,6 +40,60 @@ interface SmtpConfig {
  */
 export class NodemailerMailerService implements MailerService {
   constructor(private readonly config: Partial<SmtpConfig>) {}
+
+  /** @inheritdoc */
+  async sendVerificationEmail(opts: VerificationEmailOptions): Promise<void> {
+    const { host, user, pass, from, frontendBaseUrl } = this.config;
+
+    if (!host || !user || !pass || !from || !frontendBaseUrl) {
+      throw Object.assign(
+        new Error(
+          'Email service is not configured. Set SMTP_HOST, SMTP_USER, SMTP_PASS, SMTP_FROM, and FRONTEND_BASE_URL.',
+        ),
+        { statusCode: 502 },
+      );
+    }
+
+    const transporter = nodemailer.createTransport({
+      host,
+      port: this.config.port ?? 587,
+      secure: this.config.secure ?? false,
+      ignoreTLS: this.config.ignoreTLS ?? false,
+      auth: user && pass ? { user, pass } : undefined,
+    });
+
+    const verifyUrl = `${frontendBaseUrl}/verify-email?token=${opts.token}`;
+
+    await transporter.sendMail({
+      from,
+      to: opts.to,
+      subject: 'Verify your HiveMind account',
+      text: [
+        `Hello,`,
+        ``,
+        `Please verify your email address by opening the link below:`,
+        verifyUrl,
+        ``,
+        `This link expires in 24 hours.`,
+        ``,
+        `If you did not create a HiveMind account, you can safely ignore this email.`,
+      ].join('\n'),
+      html: `
+        <p>Hello,</p>
+        <p>Please verify your email address to activate your HiveMind account.</p>
+        <p>
+          <a href="${verifyUrl}"
+             style="display:inline-block;padding:10px 20px;background:#18181b;color:#fff;text-decoration:none;border-radius:6px;">
+            Verify email address
+          </a>
+        </p>
+        <p style="color:#71717a;font-size:13px;">This link expires in 24 hours.</p>
+        <p style="color:#71717a;font-size:13px;">
+          If you did not create a HiveMind account, you can safely ignore this email.
+        </p>
+      `,
+    });
+  }
 
   /** @inheritdoc */
   async sendInvitationEmail(opts: InvitationEmailOptions): Promise<void> {
@@ -99,8 +161,19 @@ export class NodemailerMailerService implements MailerService {
   }
 }
 
-/** No-op mailer used in test environments — does not send any email. */
+/**
+ * No-op mailer used in test environments — does not send any email.
+ * Exposes the last verification token for test assertions.
+ */
 export class NoopMailerService implements MailerService {
+  /** The raw verification token from the most recent sendVerificationEmail call. */
+  lastVerificationToken: string | undefined = undefined;
+
   /** @inheritdoc */
   async sendInvitationEmail(): Promise<void> {}
+
+  /** @inheritdoc */
+  async sendVerificationEmail(opts: VerificationEmailOptions): Promise<void> {
+    this.lastVerificationToken = opts.token;
+  }
 }

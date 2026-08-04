@@ -10,8 +10,10 @@ import {
   loginBodySchema,
   patchMeBodySchema,
   registerBodySchema,
+  registerResponseSchema,
   tokenResponseSchema,
   userSchema,
+  verifyEmailBodySchema,
 } from './auth.schemas.js';
 
 const REFRESH_COOKIE = 'refreshToken';
@@ -21,16 +23,20 @@ const REFRESH_COOKIE = 'refreshToken';
  */
 export default async function authRoutes(app: FastifyInstance): Promise<void> {
   const typed = app.withTypeProvider<ZodTypeProvider>();
-  const service = new AuthService(new AuthRepository(app.prisma), app);
+  const service = new AuthService(
+    new AuthRepository(app.prisma),
+    app,
+    app.mailer,
+  );
 
   // ── POST /auth/register ──────────────────────────────────────────────────
   typed.post('/register', {
     schema: {
       tags: ['auth'],
-      summary: 'Create a new account',
+      summary: 'Create a new account — sends a verification email',
       body: registerBodySchema,
       response: {
-        201: tokenResponseSchema,
+        201: registerResponseSchema,
         409: errorSchema,
       },
     },
@@ -43,15 +49,29 @@ export default async function authRoutes(app: FastifyInstance): Promise<void> {
     },
     handler: async (request, reply) => {
       const user = await service.register(request.body);
-      const { tokens } = await service.login({
-        email: request.body.email,
-        password: request.body.password,
-      });
-      setRefreshCookie(reply, tokens.refreshToken);
       return reply.status(201).send({
-        accessToken: tokens.accessToken,
+        message:
+          'Account created. Please check your inbox and verify your email address before logging in.',
         user: { ...user, createdAt: user.createdAt.toISOString() },
       });
+    },
+  });
+
+  // ── POST /auth/verify-email ──────────────────────────────────────────────
+  typed.post('/verify-email', {
+    schema: {
+      tags: ['auth'],
+      summary:
+        'Verify email address using the token from the verification link',
+      body: verifyEmailBodySchema,
+      response: {
+        200: z.object({ message: z.string() }),
+        400: errorSchema,
+      },
+    },
+    handler: async (request, reply) => {
+      await service.verifyEmail(request.body.token);
+      return reply.send({ message: 'Email verified. You can now log in.' });
     },
   });
 
@@ -64,6 +84,7 @@ export default async function authRoutes(app: FastifyInstance): Promise<void> {
       response: {
         200: tokenResponseSchema,
         401: errorSchema,
+        403: errorSchema,
       },
     },
     config: {

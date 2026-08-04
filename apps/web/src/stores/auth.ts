@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ofetch } from 'ofetch';
-import type { User, AuthResponse } from '@/types/auth';
+import type { User, AuthResponse, RegisterResponse } from '@/types/auth';
 import i18n, { type Locale, SUPPORTED_LOCALES } from '@/i18n';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -40,21 +40,31 @@ export const useAuthStore = defineStore('auth', {
       this.syncLocale(data.user.language);
     },
 
-    /** Registers a new account and stores the returned token. */
+    /**
+     * Registers a new account and sends a verification email.
+     * Returns the server message to display to the user.
+     * The user cannot log in until they verify their email.
+     */
     async register(
       username: string,
       email: string,
       password: string,
-    ): Promise<void> {
-      const data = await ofetch<AuthResponse>(`${BASE_URL}/auth/register`, {
+    ): Promise<RegisterResponse> {
+      return ofetch<RegisterResponse>(`${BASE_URL}/auth/register`, {
         method: 'POST',
         body: { username, email, password },
-        credentials: 'include',
       });
-      this.accessToken = data.accessToken;
-      this.user = data.user;
-      localStorage.setItem(ACCESS_TOKEN_KEY, data.accessToken);
-      this.syncLocale(data.user.language);
+    },
+
+    /**
+     * Verifies the user's email using the token from the verification link.
+     * Throws on invalid or expired token.
+     */
+    async verifyEmail(token: string): Promise<void> {
+      await ofetch(`${BASE_URL}/auth/verify-email`, {
+        method: 'POST',
+        body: { token },
+      });
     },
 
     /**

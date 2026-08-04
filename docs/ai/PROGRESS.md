@@ -362,13 +362,13 @@ Audit 2026-08-04 : score **14/20** (11/20 avant BLOCK-26).
 
 Calquer l'implémentation de gc-tracker. Brevo est déjà configuré en prod pour les emails d'invitation.
 
-- [ ] Ajouter `emailVerified Boolean @default(false)` + `VerificationToken` sur le modèle User (Prisma migration)
-- [ ] Endpoint `POST /auth/verify-email/:token` — valide le token, passe `emailVerified = true`, expire le token
-- [ ] Envoyer le lien de vérification via Brevo à l'inscription (réutiliser MailerService)
-- [ ] Bloquer le login si `emailVerified = false` (avec message clair)
-- [ ] Page frontend `/verify-email` — affiche succès/erreur selon le token
-- [ ] Tests unitaires + intégration
-- [ ] Variables d'env : `VERIFICATION_TOKEN_EXPIRES_IN` (ex: 24h)
+- [x] Ajouter `emailVerified Boolean @default(false)` + `VerificationToken` sur le modèle User (Prisma migration)
+- [x] Endpoint `POST /auth/verify-email` — valide le token, passe `emailVerified = true`, expire le token
+- [x] Envoyer le lien de vérification via Brevo à l'inscription (réutiliser MailerService)
+- [x] Bloquer le login si `emailVerified = false` (avec message clair 403)
+- [x] Page frontend `/verify-email` — affiche succès/erreur selon le token
+- [x] Tests unitaires + intégration (backend 130 unit + 9 integration files; frontend 230 unit)
+- [x] Variables d'env : `VERIFICATION_TOKEN_EXPIRES_IN` (ex: 24h)
 
 ---
 

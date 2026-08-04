@@ -83,4 +83,63 @@ export class AuthRepository {
       where: { userId, expiresAt: { lte: new Date() } },
     });
   }
+
+  /**
+   * Stores a hashed email verification token for the given user.
+   */
+  async createVerificationToken(
+    userId: string,
+    tokenHash: string,
+    expiresAt: Date,
+  ): Promise<void> {
+    await this.prisma.verificationToken.create({
+      data: { userId, tokenHash, expiresAt },
+    });
+  }
+
+  /**
+   * Looks up a verification token by its hash.
+   * Returns null if not found or already expired.
+   */
+  async findVerificationToken(
+    tokenHash: string,
+  ): Promise<{ userId: string } | null> {
+    const record = await this.prisma.verificationToken.findUnique({
+      where: { tokenHash },
+      select: { userId: true, expiresAt: true },
+    });
+    if (!record) return null;
+    if (record.expiresAt < new Date()) {
+      await this.prisma.verificationToken.delete({ where: { tokenHash } });
+      return null;
+    }
+    return { userId: record.userId };
+  }
+
+  /**
+   * Deletes a verification token after use.
+   * Silently succeeds if the token does not exist.
+   */
+  async deleteVerificationToken(tokenHash: string): Promise<void> {
+    await this.prisma.verificationToken
+      .delete({ where: { tokenHash } })
+      .catch(() => undefined);
+  }
+
+  /**
+   * Marks a user's email as verified.
+   */
+  async markEmailVerified(userId: string): Promise<User> {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { emailVerified: true },
+    });
+  }
+
+  /**
+   * Removes all verification tokens for the given user (cleanup on verify).
+   */
+  async deleteVerificationTokensByUser(userId: string): Promise<void> {
+    await this.prisma.verificationToken.deleteMany({ where: { userId } });
+  }
 }

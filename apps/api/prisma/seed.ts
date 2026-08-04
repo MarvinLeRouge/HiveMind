@@ -25,12 +25,13 @@ async function main(): Promise<void> {
   const testAdminHash = await hashPassword('change_me_admin');
   await prisma.user.upsert({
     where: { email: 'admin@HiveMind.local' },
-    update: { passwordHash: testAdminHash },
+    update: { passwordHash: testAdminHash, emailVerified: true },
     create: {
       username: 'admin-test',
       email: 'admin@HiveMind.local',
       passwordHash: testAdminHash,
       isAdmin: true,
+      emailVerified: true,
     },
   });
 
@@ -38,12 +39,13 @@ async function main(): Promise<void> {
   const passwordHash = await hashPassword(adminPassword);
   const admin = await prisma.user.upsert({
     where: { email: adminEmail },
-    update: { passwordHash, username: adminUsername },
+    update: { passwordHash, username: adminUsername, emailVerified: true },
     create: {
       username: adminUsername,
       email: adminEmail,
       passwordHash,
       isAdmin: true,
+      emailVerified: true,
     },
   });
   console.log(`✔ Admin user: ${admin.email}`);

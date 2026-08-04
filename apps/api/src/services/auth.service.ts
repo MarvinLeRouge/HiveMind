@@ -1,8 +1,9 @@
 import bcrypt from 'bcryptjs';
-import { createHash, randomUUID } from 'node:crypto';
+import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import type { FastifyInstance } from 'fastify';
 import type { User } from '@prisma/client';
 import type { AuthRepository } from '../repositories/auth.repository.js';
+import type { MailerService } from './mailer.service.js';
 import { env } from '../config/env.js';
 
 const BCRYPT_ROUNDS = 12;
@@ -25,16 +26,20 @@ export interface AuthUser {
 
 /**
  * Business logic for authentication.
- * Depends on AuthRepository for data access and FastifyInstance for JWT signing.
+ * Depends on AuthRepository for data access, FastifyInstance for JWT signing,
+ * and MailerService for sending verification emails.
  */
 export class AuthService {
   constructor(
     private readonly repo: AuthRepository,
     private readonly app: FastifyInstance,
+    private readonly mailer: MailerService,
   ) {}
 
   /**
-   * Registers a new user. Throws 409 if email is already in use.
+   * Registers a new user and sends a verification email.
+   * Throws 409 if the email is already in use.
+   * The user cannot log in until they verify their email.
    */
   async register(data: {
     username: string;
@@ -43,10 +48,9 @@ export class AuthService {
   }): Promise<AuthUser> {
     const existing = await this.repo.findByEmail(data.email);
     if (existing) {
-      const err = Object.assign(new Error('Email already in use'), {
+      throw Object.assign(new Error('Email already in use'), {
         statusCode: 409,
       });
-      throw err;
     }
 
     const passwordHash = await bcrypt.hash(data.password, BCRYPT_ROUNDS);
@@ -55,6 +59,40 @@ export class AuthService {
       email: data.email,
       passwordHash,
     });
+
+    const rawToken = randomBytes(32).toString('hex');
+    const expiresAt = new Date(
+      Date.now() + parseDurationMs(env.VERIFICATION_TOKEN_EXPIRES_IN),
+    );
+    await this.repo.createVerificationToken(
+      user.id,
+      this.hashToken(rawToken),
+      expiresAt,
+    );
+    await this.mailer.sendVerificationEmail({
+      to: user.email,
+      token: rawToken,
+    });
+
+    return this.toAuthUser(user);
+  }
+
+  /**
+   * Verifies a user's email using the token from the verification link.
+   * Throws 400 if the token is invalid or expired.
+   * Returns the updated user after marking their email as verified.
+   */
+  async verifyEmail(rawToken: string): Promise<AuthUser> {
+    const tokenHash = this.hashToken(rawToken);
+    const record = await this.repo.findVerificationToken(tokenHash);
+    if (!record) {
+      throw Object.assign(new Error('Invalid or expired verification token'), {
+        statusCode: 400,
+      });
+    }
+
+    const user = await this.repo.markEmailVerified(record.userId);
+    await this.repo.deleteVerificationTokensByUser(record.userId);
 
     return this.toAuthUser(user);
   }
@@ -76,6 +114,15 @@ export class AuthService {
     const valid = await bcrypt.compare(data.password, user.passwordHash);
     if (!valid) {
       throw this.unauthorized('Invalid email or password');
+    }
+
+    if (!user.emailVerified) {
+      throw Object.assign(
+        new Error(
+          'Please verify your email address before logging in. Check your inbox for the verification link.',
+        ),
+        { statusCode: 403 },
+      );
     }
 
     const tokens = this.signTokens(user);
@@ -201,4 +248,19 @@ export class AuthService {
   private unauthorized(message: string): Error {
     return Object.assign(new Error(message), { statusCode: 401 });
   }
+}
+
+/** Parses a duration string like "24h", "7d", "30m" into milliseconds. */
+function parseDurationMs(duration: string): number {
+  const match = /^(\d+)(ms|s|m|h|d)$/.exec(duration);
+  if (!match) throw new Error(`Invalid duration format: "${duration}"`);
+  const value = parseInt(match[1], 10);
+  const multipliers: Record<string, number> = {
+    ms: 1,
+    s: 1_000,
+    m: 60_000,
+    h: 3_600_000,
+    d: 86_400_000,
+  };
+  return value * multipliers[match[2]];
 }

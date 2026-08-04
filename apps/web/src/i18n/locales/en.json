@@ -59,7 +59,15 @@
     "noAccount": "Don't have an account?",
     "haveAccount": "Already have an account?",
     "usernamePlaceholder": "alice",
-    "emailPlaceholder": "you{'@'}example.com"
+    "emailPlaceholder": "you{'@'}example.com",
+    "registerFailed": "Registration failed. Please try again.",
+    "verificationEmailSent": "Check your inbox!",
+    "verificationEmailHint": "We sent you a verification link. Click it to activate your account.",
+    "verifyEmail": "Verify email",
+    "verifying": "Verifying…",
+    "verifySuccess": "Your email has been verified. You can now log in.",
+    "verifyError": "This verification link is invalid or has expired.",
+    "verifyMissingToken": "No verification token found in the link."
   },
   "collection": {
     "title": "Collections",
