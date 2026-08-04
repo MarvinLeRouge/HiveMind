@@ -98,6 +98,19 @@ describe('LoginPage', () => {
     );
   });
 
+  it('displays a generic error when login throws a non-Error value', async () => {
+    const router = makeRouter();
+    await router.push('/login');
+    const wrapper = mount(LoginPage, { global: { plugins: [pinia, router] } });
+    const auth = useAuthStore();
+    vi.spyOn(auth, 'login').mockRejectedValue('unexpected string rejection');
+
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    expect(wrapper.find('[role="alert"]').text()).toContain('Login failed');
+  });
+
   it('disables the submit button while loading', async () => {
     const router = makeRouter();
     await router.push('/login');
