@@ -22,7 +22,7 @@
       <p>{{ message }}</p>
       <button
         v-if="retry"
-        class="mt-2 text-sm font-medium underline hover:no-underline focus:outline-none focus:ring-1 focus:ring-current"
+        class="mt-2 text-sm font-medium underline hover:no-underline focus:outline-none focus:ring-2 focus:ring-current"
         @click="retry"
       >
         {{ t('common.retry') }}

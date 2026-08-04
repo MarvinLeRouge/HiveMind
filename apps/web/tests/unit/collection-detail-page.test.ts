@@ -485,6 +485,90 @@ describe('CollectionDetailPage', () => {
     expect(wrapper.text()).not.toContain('You');
   });
 
+  it('calls puzzleStore.reorder when the move-up button is clicked', async () => {
+    const collectionStore = useCollectionStore();
+    const puzzleStore = usePuzzleStore();
+    const auth = useAuthStore();
+    vi.spyOn(collectionStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'reorder').mockResolvedValue();
+    auth.user = {
+      id: 'user-1',
+      username: 'alice',
+      email: 'alice@example.com',
+      isAdmin: false,
+      language: 'en',
+      createdAt: '2025-01-01',
+    };
+    collectionStore.current = mockCollection as never;
+    collectionStore.members = [mockMember as never];
+    puzzleStore.puzzles = [
+      { ...mockPuzzle, id: 'puz-1', title: 'First', sortOrder: 1 } as never,
+      { ...mockPuzzle, id: 'puz-2', title: 'Second', sortOrder: 2 } as never,
+    ];
+    const router = makeRouter();
+    await router.push('/collections/col-1');
+
+    const wrapper = mount(CollectionDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    const moveUpButtons = wrapper.findAll('[aria-label="Move up"]');
+    await moveUpButtons[1].trigger('click');
+    await flushPromises();
+
+    expect(puzzleStore.reorder).toHaveBeenCalledWith(
+      'col-1',
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'puz-2', sortOrder: 1 }),
+        expect.objectContaining({ id: 'puz-1', sortOrder: 2 }),
+      ]),
+    );
+  });
+
+  it('calls puzzleStore.reorder when the move-down button is clicked', async () => {
+    const collectionStore = useCollectionStore();
+    const puzzleStore = usePuzzleStore();
+    const auth = useAuthStore();
+    vi.spyOn(collectionStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(puzzleStore, 'reorder').mockResolvedValue();
+    auth.user = {
+      id: 'user-1',
+      username: 'alice',
+      email: 'alice@example.com',
+      isAdmin: false,
+      language: 'en',
+      createdAt: '2025-01-01',
+    };
+    collectionStore.current = mockCollection as never;
+    collectionStore.members = [mockMember as never];
+    puzzleStore.puzzles = [
+      { ...mockPuzzle, id: 'puz-1', title: 'First', sortOrder: 1 } as never,
+      { ...mockPuzzle, id: 'puz-2', title: 'Second', sortOrder: 2 } as never,
+    ];
+    const router = makeRouter();
+    await router.push('/collections/col-1');
+
+    const wrapper = mount(CollectionDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    const moveDownButtons = wrapper.findAll('[aria-label="Move down"]');
+    await moveDownButtons[0].trigger('click');
+    await flushPromises();
+
+    expect(puzzleStore.reorder).toHaveBeenCalledWith(
+      'col-1',
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'puz-2', sortOrder: 1 }),
+        expect.objectContaining({ id: 'puz-1', sortOrder: 2 }),
+      ]),
+    );
+  });
+
   it('retries loading when the retry button is clicked', async () => {
     const collectionStore = useCollectionStore();
     const puzzleStore = usePuzzleStore();
