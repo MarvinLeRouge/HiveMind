@@ -91,7 +91,7 @@ test.describe('Notes', () => {
 
     test('can add a note and see it in the list', async ({ page }) => {
       await page.goto(`/collections/${collectionSlug}/puzzles/${puzzleId}`);
-      await page.getByRole('tab', { name: 'Add notes' }).click();
+      await page.getByRole('tab', { name: 'Notes' }).click();
       await page.getByLabel('Note content').fill('My first E2E note');
       await page.getByRole('button', { name: 'Add' }).click();
       await expect(page.getByText('My first E2E note')).toBeVisible();
@@ -99,7 +99,7 @@ test.describe('Notes', () => {
 
     test('can edit own note', async ({ page }) => {
       await page.goto(`/collections/${collectionSlug}/puzzles/${puzzleId}`);
-      await page.getByRole('tab', { name: 'Add notes' }).click();
+      await page.getByRole('tab', { name: 'Notes' }).click();
 
       // Add a note to edit
       await page.getByLabel('Note content').fill('Note to edit');
@@ -121,7 +121,7 @@ test.describe('Notes', () => {
 
     test('can delete own note', async ({ page }) => {
       await page.goto(`/collections/${collectionSlug}/puzzles/${puzzleId}`);
-      await page.getByRole('tab', { name: 'Add notes' }).click();
+      await page.getByRole('tab', { name: 'Notes' }).click();
 
       // Add a note to delete
       await page.getByLabel('Note content').fill('Note to delete');
@@ -143,7 +143,7 @@ test.describe('Notes', () => {
 
     test('member can add their own note', async ({ page }) => {
       await page.goto(`/collections/${collectionSlug}/puzzles/${puzzleId}`);
-      await page.getByRole('tab', { name: 'Add notes' }).click();
+      await page.getByRole('tab', { name: 'Notes' }).click();
       await page.getByLabel('Note content').fill('Member note');
       await page.getByRole('button', { name: 'Add' }).click();
       await expect(page.getByText('Member note')).toBeVisible();
@@ -172,7 +172,7 @@ test.describe('Notes', () => {
 
       // Member views the puzzle
       await page.goto(`/collections/${collectionSlug}/puzzles/${puzzleId}`);
-      await page.getByRole('tab', { name: 'Add notes' }).click();
+      await page.getByRole('tab', { name: 'Notes' }).click();
 
       const ownerNoteItem = page
         .getByRole('listitem')
