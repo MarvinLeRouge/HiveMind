@@ -46,14 +46,14 @@ describe('AppToast', () => {
     expect(item.text()).toContain('Saved!');
   });
 
-  it('applies green classes for success type', () => {
+  it('applies success token styles for success type', () => {
     const store = useToastStore();
     store.toasts = [{ id: '1', type: 'success', message: 'Done' }];
     const wrapper = mount(AppToast, {
       global: { plugins: [pinia, i18n], stubs: STUBS },
     });
     const item = wrapper.find('[role="status"]');
-    expect(item.classes().some((c) => c.includes('green'))).toBe(true);
+    expect(item.attributes('style')).toContain('--toast-ok-bg');
   });
 
   it('applies destructive classes for error type', () => {

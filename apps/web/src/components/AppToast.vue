@@ -18,9 +18,18 @@
           :key="toast.id"
           role="status"
           class="flex w-72 items-start gap-3 rounded-md border px-4 py-3 shadow-md"
+          :style="
+            toast.type === 'success'
+              ? {
+                  backgroundColor: 'var(--toast-ok-bg)',
+                  borderColor: 'var(--toast-ok-border)',
+                  color: 'var(--toast-ok-text)',
+                }
+              : {}
+          "
           :class="
             toast.type === 'success'
-              ? 'border-green-200 bg-green-50 text-green-900 dark:border-green-800 dark:bg-green-950 dark:text-green-100'
+              ? ''
               : 'border-destructive/30 bg-destructive/10 text-destructive dark:bg-destructive/20'
           "
         >
@@ -58,7 +67,7 @@
           <span class="flex-1 text-sm">{{ toast.message }}</span>
 
           <button
-            class="shrink-0 rounded p-0.5 opacity-60 hover:opacity-100 focus:outline-none focus:ring-1 focus:ring-current"
+            class="shrink-0 rounded p-0.5 opacity-60 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-current"
             :aria-label="t('common.dismiss')"
             @click="store.dismiss(toast.id)"
           >
