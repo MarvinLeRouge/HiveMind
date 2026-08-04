@@ -22,6 +22,11 @@ const router = createRouter({
       meta: { requiresAuth: false, titleKey: 'auth.register' },
     },
     {
+      path: '/verify-email',
+      component: () => import('@/pages/VerifyEmailPage.vue'),
+      meta: { requiresAuth: false, titleKey: 'auth.verifyEmail' },
+    },
+    {
       path: '/collections',
       component: () => import('@/pages/CollectionsPage.vue'),
       meta: { requiresAuth: true, titleKey: 'collection.title' },

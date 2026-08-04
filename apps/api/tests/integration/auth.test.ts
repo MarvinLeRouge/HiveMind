@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 import { buildApp } from '../../src/app.js';
+import { NoopMailerService } from '../../src/services/mailer.service.js';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient({
@@ -8,9 +9,11 @@ const prisma = new PrismaClient({
 });
 
 let app: FastifyInstance;
+let mailer: NoopMailerService;
 
 beforeAll(async () => {
-  app = await buildApp();
+  mailer = new NoopMailerService();
+  app = await buildApp({ mailer });
   await app.ready();
 });
 
@@ -20,6 +23,7 @@ afterAll(async () => {
 });
 
 beforeEach(async () => {
+  await prisma.verificationToken.deleteMany();
   await prisma.attempt.deleteMany();
   await prisma.note.deleteMany();
   await prisma.puzzle.deleteMany();
@@ -51,6 +55,23 @@ async function registerUser(
   });
 }
 
+/** Registers a user and verifies their email so they can log in. */
+async function registerAndVerify(
+  overrides: Partial<{
+    username: string;
+    email: string;
+    password: string;
+  }> = {},
+) {
+  await registerUser(overrides);
+  const token = mailer.lastVerificationToken!;
+  await app.inject({
+    method: 'POST',
+    url: '/auth/verify-email',
+    payload: { token },
+  });
+}
+
 async function loginUser(
   email = 'test@example.com',
   password = 'Password123!',
@@ -65,22 +86,25 @@ async function loginUser(
 // ── POST /auth/register ───────────────────────────────────────────────────────
 
 describe('POST /auth/register', () => {
-  it('returns 201 with accessToken and user on success', async () => {
+  it('returns 201 with a message and user (no access token)', async () => {
     const res = await registerUser();
     expect(res.statusCode).toBe(201);
     const body = res.json();
-    expect(body.accessToken).toBeTruthy();
+    expect(body.message).toBeTruthy();
     expect(body.user.email).toBe('test@example.com');
+    expect(body).not.toHaveProperty('accessToken');
     expect(body.user).not.toHaveProperty('passwordHash');
   });
 
-  it('sets httpOnly refreshToken cookie', async () => {
+  it('sends a verification email via the mailer', async () => {
+    await registerUser();
+    expect(mailer.lastVerificationToken).toBeTruthy();
+  });
+
+  it('does not set a refresh cookie', async () => {
     const res = await registerUser();
     const setCookie = res.headers['set-cookie'];
-    expect(setCookie).toBeDefined();
-    const cookie = Array.isArray(setCookie) ? setCookie[0] : setCookie;
-    expect(cookie).toContain('refreshToken=');
-    expect(cookie).toContain('HttpOnly');
+    expect(setCookie).toBeUndefined();
   });
 
   it('returns 409 if email is already registered', async () => {
@@ -100,14 +124,69 @@ describe('POST /auth/register', () => {
   });
 });
 
+// ── POST /auth/verify-email ───────────────────────────────────────────────────
+
+describe('POST /auth/verify-email', () => {
+  it('returns 200 and verifies the user when the token is valid', async () => {
+    await registerUser();
+    const token = mailer.lastVerificationToken!;
+
+    const res = await app.inject({
+      method: 'POST',
+      url: '/auth/verify-email',
+      payload: { token },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.json().message).toBeTruthy();
+  });
+
+  it('allows the user to log in after verification', async () => {
+    await registerAndVerify();
+    const res = await loginUser();
+    expect(res.statusCode).toBe(200);
+    expect(res.json().accessToken).toBeTruthy();
+  });
+
+  it('returns 400 for an invalid token', async () => {
+    const res = await app.inject({
+      method: 'POST',
+      url: '/auth/verify-email',
+      payload: { token: 'totally-invalid-token' },
+    });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('returns 400 if the token is used a second time', async () => {
+    await registerUser();
+    const token = mailer.lastVerificationToken!;
+
+    await app.inject({
+      method: 'POST',
+      url: '/auth/verify-email',
+      payload: { token },
+    });
+
+    const res = await app.inject({
+      method: 'POST',
+      url: '/auth/verify-email',
+      payload: { token },
+    });
+    expect(res.statusCode).toBe(400);
+  });
+});
+
 // ── POST /auth/login ──────────────────────────────────────────────────────────
 
 describe('POST /auth/login', () => {
-  beforeEach(async () => {
+  it('returns 403 if the user email is not verified', async () => {
     await registerUser();
+    const res = await loginUser();
+    expect(res.statusCode).toBe(403);
   });
 
-  it('returns 200 with accessToken and user on valid credentials', async () => {
+  it('returns 200 with accessToken after email is verified', async () => {
+    await registerAndVerify();
     const res = await loginUser();
     expect(res.statusCode).toBe(200);
     const body = res.json();
@@ -116,6 +195,7 @@ describe('POST /auth/login', () => {
   });
 
   it('sets httpOnly refreshToken cookie on login', async () => {
+    await registerAndVerify();
     const res = await loginUser();
     const setCookie = res.headers['set-cookie'];
     const cookie = Array.isArray(setCookie) ? setCookie[0] : setCookie;
@@ -129,6 +209,7 @@ describe('POST /auth/login', () => {
   });
 
   it('returns 401 for wrong password', async () => {
+    await registerAndVerify();
     const res = await loginUser('test@example.com', 'wrongpassword');
     expect(res.statusCode).toBe(401);
   });
@@ -138,7 +219,8 @@ describe('POST /auth/login', () => {
 
 describe('POST /auth/refresh', () => {
   it('returns 200 with a new accessToken when cookie is valid', async () => {
-    const loginRes = await registerUser();
+    await registerAndVerify();
+    const loginRes = await loginUser();
     const setCookie = loginRes.headers['set-cookie'];
     const rawCookie = Array.isArray(setCookie) ? setCookie[0] : setCookie;
     const cookieHeader = rawCookie?.split(';')[0] ?? '';
@@ -167,7 +249,8 @@ describe('POST /auth/refresh', () => {
   });
 
   it('returns 401 after the refresh token has been used (rotation)', async () => {
-    const loginRes = await registerUser();
+    await registerAndVerify();
+    const loginRes = await loginUser();
     const setCookie = loginRes.headers['set-cookie'];
     const rawCookie = Array.isArray(setCookie) ? setCookie[0] : setCookie;
     const cookieHeader = rawCookie?.split(';')[0] ?? '';
@@ -193,7 +276,7 @@ describe('POST /auth/refresh', () => {
 
 describe('POST /auth/logout', () => {
   it('returns 204 and clears the refresh cookie', async () => {
-    await registerUser();
+    await registerAndVerify();
     const loginRes = await loginUser();
     const token = loginRes.json().accessToken as string;
 
@@ -209,13 +292,14 @@ describe('POST /auth/logout', () => {
   });
 
   it('invalidates the refresh token after logout', async () => {
-    const regRes = await registerUser();
-    const setCookie = regRes.headers['set-cookie'];
+    await registerAndVerify();
+    const loginRes = await loginUser();
+    const setCookie = loginRes.headers['set-cookie'];
     const rawCookie = Array.isArray(setCookie) ? setCookie[0] : setCookie;
     const cookieHeader = rawCookie?.split(';')[0] ?? '';
-    const accessToken = regRes.json().accessToken as string;
+    const accessToken = loginRes.json().accessToken as string;
 
-    // Logout — passes both access token and refresh cookie
+    // Logout
     await app.inject({
       method: 'POST',
       url: '/auth/logout',
@@ -244,7 +328,7 @@ describe('POST /auth/logout', () => {
 
 describe('GET /auth/me', () => {
   it('returns the current user profile', async () => {
-    await registerUser();
+    await registerAndVerify();
     const loginRes = await loginUser();
     const token = loginRes.json().accessToken as string;
 
@@ -279,7 +363,7 @@ describe('GET /auth/me', () => {
 
 describe('PATCH /auth/me', () => {
   it('updates the user language and returns the updated profile', async () => {
-    await registerUser();
+    await registerAndVerify();
     const loginRes = await loginUser();
     const token = loginRes.json().accessToken as string;
 
@@ -296,7 +380,7 @@ describe('PATCH /auth/me', () => {
   });
 
   it('returns 400 for an unsupported language code', async () => {
-    await registerUser();
+    await registerAndVerify();
     const loginRes = await loginUser();
     const token = loginRes.json().accessToken as string;
 

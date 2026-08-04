@@ -32,9 +32,20 @@ export const patchMeBodySchema = z.object({
   language: z.enum(['en', 'fr']),
 });
 
-/** Response shape for a successful login or register (includes access token). */
+/** Request body for POST /auth/verify-email. */
+export const verifyEmailBodySchema = z.object({
+  token: z.string().min(1),
+});
+
+/** Response shape for a successful login or token refresh (includes access token). */
 export const tokenResponseSchema = z.object({
   accessToken: z.string(),
+  user: userSchema,
+});
+
+/** Response shape for a successful register (no token — email verification required). */
+export const registerResponseSchema = z.object({
+  message: z.string(),
   user: userSchema,
 });
 

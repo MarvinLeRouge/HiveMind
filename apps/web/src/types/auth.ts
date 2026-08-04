@@ -8,8 +8,14 @@ export interface User {
   createdAt: string;
 }
 
-/** Response shape for login and register endpoints. */
+/** Response shape for the login endpoint. */
 export interface AuthResponse {
   accessToken: string;
+  user: User;
+}
+
+/** Response shape for the register endpoint (no token — email verification required). */
+export interface RegisterResponse {
+  message: string;
   user: User;
 }

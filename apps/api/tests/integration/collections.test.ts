@@ -3,6 +3,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 import { PrismaClient } from '@prisma/client';
 import { buildApp } from '../../src/app.js';
+import { NoopMailerService } from '../../src/services/mailer.service.js';
 
 const prisma = new PrismaClient({
   datasourceUrl: process.env['DATABASE_URL'],
@@ -18,7 +19,7 @@ let systemTemplateId: string;
 // ── Setup ─────────────────────────────────────────────────────────────────────
 
 beforeAll(async () => {
-  app = await buildApp();
+  app = await buildApp({ mailer: new NoopMailerService() });
   await app.ready();
 
   const bcryptHash = await bcrypt.hash('change_me_admin', 1);
@@ -39,34 +40,13 @@ afterAll(async () => {
 });
 
 beforeEach(async () => {
-  // Delete collections first (cascade to members, invitations, puzzles)
   await prisma.collection.deleteMany({});
-  // Delete non-system templates (includes orphaned snapshots)
   await prisma.template.deleteMany({ where: { isSystem: false } });
-  // Delete non-admin users
+  await prisma.verificationToken.deleteMany();
   await prisma.user.deleteMany({ where: { isAdmin: false } });
 
-  const userRes = await app.inject({
-    method: 'POST',
-    url: '/auth/register',
-    payload: {
-      username: 'user1',
-      email: 'user1@example.com',
-      password: 'Password123!',
-    },
-  });
-  userToken = userRes.json().accessToken as string;
-
-  const otherRes = await app.inject({
-    method: 'POST',
-    url: '/auth/register',
-    payload: {
-      username: 'user2',
-      email: 'user2@example.com',
-      password: 'Password123!',
-    },
-  });
-  otherToken = otherRes.json().accessToken as string;
+  userToken = await registerVerifyAndLogin('user1', 'user1@example.com');
+  otherToken = await registerVerifyAndLogin('user2', 'user2@example.com');
 
   const adminRes = await app.inject({
     method: 'POST',
@@ -77,6 +57,28 @@ beforeEach(async () => {
 });
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
+
+async function registerVerifyAndLogin(
+  username: string,
+  email: string,
+  password = 'Password123!',
+): Promise<string> {
+  const regRes = await app.inject({
+    method: 'POST',
+    url: '/auth/register',
+    payload: { username, email, password },
+  });
+  await prisma.user.update({
+    where: { id: regRes.json().user.id as string },
+    data: { emailVerified: true },
+  });
+  const loginRes = await app.inject({
+    method: 'POST',
+    url: '/auth/login',
+    payload: { email, password },
+  });
+  return loginRes.json().accessToken as string;
+}
 
 async function createCollection(token: string, name = 'Test Collection') {
   return app.inject({

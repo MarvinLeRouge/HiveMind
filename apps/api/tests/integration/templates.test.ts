@@ -3,6 +3,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 import { PrismaClient } from '@prisma/client';
 import { buildApp } from '../../src/app.js';
+import { NoopMailerService } from '../../src/services/mailer.service.js';
 
 const prisma = new PrismaClient({
   datasourceUrl: process.env['DATABASE_URL'],
@@ -16,7 +17,7 @@ let otherToken: string;
 // ── Setup ─────────────────────────────────────────────────────────────────────
 
 beforeAll(async () => {
-  app = await buildApp();
+  app = await buildApp({ mailer: new NoopMailerService() });
   await app.ready();
 
   // The seed uses SHA-256 for the admin password, but AuthService uses bcrypt.
@@ -34,36 +35,14 @@ afterAll(async () => {
 });
 
 beforeEach(async () => {
-  // Collections reference template snapshots — must be deleted first.
   await prisma.collection.deleteMany({});
   await prisma.template.deleteMany({ where: { isSystem: false } });
+  await prisma.verificationToken.deleteMany();
   await prisma.user.deleteMany({ where: { isAdmin: false } });
 
-  // Register regular user
-  const userRes = await app.inject({
-    method: 'POST',
-    url: '/auth/register',
-    payload: {
-      username: 'user1',
-      email: 'user1@example.com',
-      password: 'Password123!',
-    },
-  });
-  userToken = userRes.json().accessToken as string;
+  userToken = await registerVerifyAndLogin('user1', 'user1@example.com');
+  otherToken = await registerVerifyAndLogin('user2', 'user2@example.com');
 
-  // Register another regular user
-  const otherRes = await app.inject({
-    method: 'POST',
-    url: '/auth/register',
-    payload: {
-      username: 'user2',
-      email: 'user2@example.com',
-      password: 'Password123!',
-    },
-  });
-  otherToken = otherRes.json().accessToken as string;
-
-  // Login as admin
   const adminRes = await app.inject({
     method: 'POST',
     url: '/auth/login',
@@ -73,6 +52,28 @@ beforeEach(async () => {
 });
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
+
+async function registerVerifyAndLogin(
+  username: string,
+  email: string,
+  password = 'Password123!',
+): Promise<string> {
+  const regRes = await app.inject({
+    method: 'POST',
+    url: '/auth/register',
+    payload: { username, email, password },
+  });
+  await prisma.user.update({
+    where: { id: regRes.json().user.id as string },
+    data: { emailVerified: true },
+  });
+  const loginRes = await app.inject({
+    method: 'POST',
+    url: '/auth/login',
+    payload: { email, password },
+  });
+  return loginRes.json().accessToken as string;
+}
 
 async function createUserTemplate(token: string, name = 'My Template') {
   return app.inject({

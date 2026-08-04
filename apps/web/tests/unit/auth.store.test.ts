@@ -67,15 +67,55 @@ describe('useAuthStore', () => {
   });
 
   describe('register', () => {
-    it('sets accessToken, user, and localStorage on success', async () => {
-      mockFetch.mockResolvedValueOnce(mockAuthResponse);
+    it('returns the server response without setting local session state', async () => {
+      const mockResponse = {
+        message: 'Check your inbox!',
+        user: mockUser,
+      };
+      mockFetch.mockResolvedValueOnce(mockResponse);
       const auth = useAuthStore();
 
-      await auth.register('alice', 'alice@example.com', 'Password123!');
+      const result = await auth.register(
+        'alice',
+        'alice@example.com',
+        'Password123!',
+      );
 
-      expect(auth.accessToken).toBe('token-abc');
-      expect(auth.user).toEqual(mockUser);
-      expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBe('token-abc');
+      expect(result).toEqual(mockResponse);
+      expect(auth.accessToken).toBeNull();
+      expect(auth.user).toBeNull();
+      expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBeNull();
+    });
+
+    it('throws when the API call fails', async () => {
+      mockFetch.mockRejectedValueOnce(new Error('Email already taken'));
+      const auth = useAuthStore();
+
+      await expect(
+        auth.register('alice', 'alice@example.com', 'Password123!'),
+      ).rejects.toThrow('Email already taken');
+    });
+  });
+
+  describe('verifyEmail', () => {
+    it('calls the verify-email endpoint with the token', async () => {
+      mockFetch.mockResolvedValueOnce({ message: 'Email verified.' });
+      const auth = useAuthStore();
+
+      await expect(auth.verifyEmail('raw-token-abc')).resolves.not.toThrow();
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/auth/verify-email'),
+        expect.objectContaining({ body: { token: 'raw-token-abc' } }),
+      );
+    });
+
+    it('throws when the token is invalid or expired', async () => {
+      mockFetch.mockRejectedValueOnce(new Error('Invalid token'));
+      const auth = useAuthStore();
+
+      await expect(auth.verifyEmail('bad-token')).rejects.toThrow(
+        'Invalid token',
+      );
     });
   });
 

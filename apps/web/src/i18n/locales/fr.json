@@ -59,7 +59,15 @@
     "noAccount": "Pas encore de compte ?",
     "haveAccount": "Déjà un compte ?",
     "usernamePlaceholder": "alice",
-    "emailPlaceholder": "vous{'@'}exemple.com"
+    "emailPlaceholder": "vous{'@'}exemple.com",
+    "registerFailed": "L'inscription a échoué. Veuillez réessayer.",
+    "verificationEmailSent": "Consultez votre boite mail !",
+    "verificationEmailHint": "Nous vous avons envoyé un lien de vérification. Cliquez dessus pour activer votre compte.",
+    "verifyEmail": "Vérifier l'e-mail",
+    "verifying": "Vérification…",
+    "verifySuccess": "Votre e-mail a été vérifié. Vous pouvez maintenant vous connecter.",
+    "verifyError": "Ce lien de vérification est invalide ou a expiré.",
+    "verifyMissingToken": "Aucun jeton de vérification trouvé dans le lien."
   },
   "collection": {
     "title": "Collections",

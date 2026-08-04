@@ -4,6 +4,18 @@ import type { FastifyInstance } from 'fastify';
 import type { User } from '@prisma/client';
 import { AuthService } from '../../src/services/auth.service.js';
 import type { AuthRepository } from '../../src/repositories/auth.repository.js';
+import type { MailerService } from '../../src/services/mailer.service.js';
+
+vi.mock('../../src/config/env.js', () => ({
+  env: {
+    JWT_ACCESS_SECRET: 'test-access-secret-min-32-chars-padding',
+    JWT_REFRESH_SECRET: 'test-refresh-secret-min-32-chars-padding',
+    JWT_ACCESS_EXPIRES_IN: '15m',
+    JWT_REFRESH_EXPIRES_IN: '7d',
+    VERIFICATION_TOKEN_EXPIRES_IN: '24h',
+    NODE_ENV: 'test',
+  },
+}));
 
 // ── Fixtures ────────────────────────────────────────────────────────────────
 
@@ -14,8 +26,11 @@ const mockUser: User = {
   passwordHash: bcrypt.hashSync('password123', 1),
   isAdmin: false,
   language: 'en',
+  emailVerified: true,
   createdAt: new Date('2025-01-01T00:00:00Z'),
 };
+
+const unverifiedUser: User = { ...mockUser, emailVerified: false };
 
 // ── Mocks ────────────────────────────────────────────────────────────────────
 
@@ -31,6 +46,11 @@ function makeRepo(overrides: Partial<AuthRepository> = {}): AuthRepository {
     findRefreshToken: vi.fn().mockResolvedValue({ userId: mockUser.id }),
     deleteRefreshToken: vi.fn().mockResolvedValue(undefined),
     deleteExpiredRefreshTokens: vi.fn().mockResolvedValue(undefined),
+    createVerificationToken: vi.fn().mockResolvedValue(undefined),
+    findVerificationToken: vi.fn().mockResolvedValue({ userId: mockUser.id }),
+    deleteVerificationToken: vi.fn().mockResolvedValue(undefined),
+    markEmailVerified: vi.fn().mockResolvedValue(mockUser),
+    deleteVerificationTokensByUser: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   } as unknown as AuthRepository;
 }
@@ -45,12 +65,21 @@ function makeApp(): FastifyInstance {
   } as unknown as FastifyInstance;
 }
 
+function makeMailer(overrides: Partial<MailerService> = {}): MailerService {
+  return {
+    sendInvitationEmail: vi.fn().mockResolvedValue(undefined),
+    sendVerificationEmail: vi.fn().mockResolvedValue(undefined),
+    ...overrides,
+  };
+}
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 describe('AuthService.register', () => {
-  it('creates a user and returns AuthUser', async () => {
+  it('creates a user, sends a verification email, and returns AuthUser', async () => {
     const repo = makeRepo({ findByEmail: vi.fn().mockResolvedValue(null) });
-    const service = new AuthService(repo, makeApp());
+    const mailer = makeMailer();
+    const service = new AuthService(repo, makeApp(), mailer);
 
     const result = await service.register({
       username: 'alice',
@@ -61,11 +90,13 @@ describe('AuthService.register', () => {
     expect(result.email).toBe('alice@example.com');
     expect(result.username).toBe('alice');
     expect(repo.create).toHaveBeenCalledOnce();
+    expect(repo.createVerificationToken).toHaveBeenCalledOnce();
+    expect(mailer.sendVerificationEmail).toHaveBeenCalledOnce();
   });
 
   it('throws 409 if email is already in use', async () => {
     const repo = makeRepo({ findByEmail: vi.fn().mockResolvedValue(mockUser) });
-    const service = new AuthService(repo, makeApp());
+    const service = new AuthService(repo, makeApp(), makeMailer());
 
     await expect(
       service.register({
@@ -77,12 +108,39 @@ describe('AuthService.register', () => {
   });
 });
 
+describe('AuthService.verifyEmail', () => {
+  it('marks the user as verified and deletes all their verification tokens', async () => {
+    const repo = makeRepo();
+    const service = new AuthService(repo, makeApp(), makeMailer());
+
+    const result = await service.verifyEmail('valid-raw-token');
+
+    expect(repo.findVerificationToken).toHaveBeenCalledOnce();
+    expect(repo.markEmailVerified).toHaveBeenCalledWith(mockUser.id);
+    expect(repo.deleteVerificationTokensByUser).toHaveBeenCalledWith(
+      mockUser.id,
+    );
+    expect(result.id).toBe(mockUser.id);
+  });
+
+  it('throws 400 for an invalid or expired token', async () => {
+    const repo = makeRepo({
+      findVerificationToken: vi.fn().mockResolvedValue(null),
+    });
+    const service = new AuthService(repo, makeApp(), makeMailer());
+
+    await expect(service.verifyEmail('bad-token')).rejects.toMatchObject({
+      statusCode: 400,
+    });
+  });
+});
+
 describe('AuthService.login', () => {
   it('returns user and tokens for valid credentials', async () => {
     const repo = makeRepo({
       findByEmail: vi.fn().mockResolvedValue(mockUser),
     });
-    const service = new AuthService(repo, makeApp());
+    const service = new AuthService(repo, makeApp(), makeMailer());
 
     const result = await service.login({
       email: 'alice@example.com',
@@ -94,9 +152,20 @@ describe('AuthService.login', () => {
     expect(result.tokens.refreshToken).toBe('signed-token');
   });
 
+  it('throws 403 if the user email is not verified', async () => {
+    const repo = makeRepo({
+      findByEmail: vi.fn().mockResolvedValue(unverifiedUser),
+    });
+    const service = new AuthService(repo, makeApp(), makeMailer());
+
+    await expect(
+      service.login({ email: 'alice@example.com', password: 'password123' }),
+    ).rejects.toMatchObject({ statusCode: 403 });
+  });
+
   it('throws 401 for unknown email', async () => {
     const repo = makeRepo({ findByEmail: vi.fn().mockResolvedValue(null) });
-    const service = new AuthService(repo, makeApp());
+    const service = new AuthService(repo, makeApp(), makeMailer());
 
     await expect(
       service.login({ email: 'ghost@example.com', password: 'any' }),
@@ -107,7 +176,7 @@ describe('AuthService.login', () => {
     const repo = makeRepo({
       findByEmail: vi.fn().mockResolvedValue(mockUser),
     });
-    const service = new AuthService(repo, makeApp());
+    const service = new AuthService(repo, makeApp(), makeMailer());
 
     await expect(
       service.login({ email: 'alice@example.com', password: 'wrong' }),
@@ -120,7 +189,7 @@ describe('AuthService.refresh', () => {
     const repo = makeRepo({
       findById: vi.fn().mockResolvedValue(mockUser),
     });
-    const service = new AuthService(repo, makeApp());
+    const service = new AuthService(repo, makeApp(), makeMailer());
 
     const result = await service.refresh('valid-refresh-token');
 
@@ -140,7 +209,7 @@ describe('AuthService.refresh', () => {
         decode: vi.fn(),
       },
     } as unknown as FastifyInstance;
-    const service = new AuthService(makeRepo(), app);
+    const service = new AuthService(makeRepo(), app, makeMailer());
 
     await expect(service.refresh('bad-token')).rejects.toMatchObject({
       statusCode: 401,
@@ -152,7 +221,7 @@ describe('AuthService.refresh', () => {
       findById: vi.fn().mockResolvedValue(mockUser),
       findRefreshToken: vi.fn().mockResolvedValue(null),
     });
-    const service = new AuthService(repo, makeApp());
+    const service = new AuthService(repo, makeApp(), makeMailer());
 
     await expect(service.refresh('revoked-token')).rejects.toMatchObject({
       statusCode: 401,
@@ -161,7 +230,7 @@ describe('AuthService.refresh', () => {
 
   it('throws 401 if user no longer exists', async () => {
     const repo = makeRepo({ findById: vi.fn().mockResolvedValue(null) });
-    const service = new AuthService(repo, makeApp());
+    const service = new AuthService(repo, makeApp(), makeMailer());
 
     await expect(service.refresh('valid-token')).rejects.toMatchObject({
       statusCode: 401,
@@ -172,7 +241,7 @@ describe('AuthService.refresh', () => {
 describe('AuthService.logout', () => {
   it('deletes the stored refresh token', async () => {
     const repo = makeRepo();
-    const service = new AuthService(repo, makeApp());
+    const service = new AuthService(repo, makeApp(), makeMailer());
 
     await service.logout('some-refresh-token');
 
@@ -183,7 +252,7 @@ describe('AuthService.logout', () => {
 describe('AuthService.me', () => {
   it('returns the user profile for a valid ID', async () => {
     const repo = makeRepo({ findById: vi.fn().mockResolvedValue(mockUser) });
-    const service = new AuthService(repo, makeApp());
+    const service = new AuthService(repo, makeApp(), makeMailer());
 
     const result = await service.me(mockUser.id);
 
@@ -194,7 +263,7 @@ describe('AuthService.me', () => {
 
   it('throws 401 if user does not exist', async () => {
     const repo = makeRepo({ findById: vi.fn().mockResolvedValue(null) });
-    const service = new AuthService(repo, makeApp());
+    const service = new AuthService(repo, makeApp(), makeMailer());
 
     await expect(service.me('unknown-id')).rejects.toMatchObject({
       statusCode: 401,
@@ -209,7 +278,7 @@ describe('AuthService.updateLanguage', () => {
       findById: vi.fn().mockResolvedValue(mockUser),
       updateLanguage: vi.fn().mockResolvedValue(updatedUser),
     });
-    const service = new AuthService(repo, makeApp());
+    const service = new AuthService(repo, makeApp(), makeMailer());
 
     const result = await service.updateLanguage(mockUser.id, 'fr');
 
@@ -219,7 +288,7 @@ describe('AuthService.updateLanguage', () => {
 
   it('throws 401 if user does not exist', async () => {
     const repo = makeRepo({ findById: vi.fn().mockResolvedValue(null) });
-    const service = new AuthService(repo, makeApp());
+    const service = new AuthService(repo, makeApp(), makeMailer());
 
     await expect(
       service.updateLanguage('unknown-id', 'fr'),
