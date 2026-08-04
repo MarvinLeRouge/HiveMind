@@ -26,14 +26,17 @@ test.describe('Authentication', () => {
     await expect(page).toHaveURL(/\/login/);
   });
 
-  test('register a new user redirects to /collections', async ({ page }) => {
+  test('register a new user shows email confirmation and stays on /register', async ({
+    page,
+  }) => {
     const ts = Date.now();
     await page.goto('/register');
     await page.getByLabel('Username').fill(`e2e-reg-${ts}`);
     await page.getByLabel('Email').fill(`e2e.reg.${ts}@hivemind.test`);
     await page.getByLabel('Password').fill('E2eReg1!');
     await page.getByRole('button', { name: 'Create account' }).click();
-    await expect(page).toHaveURL(/\/collections$/);
+    await expect(page).toHaveURL(/\/register/);
+    await expect(page.getByText('Check your inbox')).toBeVisible();
   });
 
   test('logout clears session and redirects to /login', async ({ page }) => {
