@@ -29,7 +29,7 @@
           type="text"
           required
           :placeholder="t('collection.namePlaceholder')"
-          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
         />
       </div>
 
@@ -43,7 +43,7 @@
           v-model="form.description"
           rows="3"
           :placeholder="t('collection.descriptionPlaceholder')"
-          class="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          class="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
         />
       </div>
 
@@ -55,7 +55,7 @@
           id="template"
           v-model="form.templateId"
           required
-          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
         >
           <option value="" disabled>Select a template…</option>
           <option v-for="tmpl in templates" :key="tmpl.id" :value="tmpl.id">
