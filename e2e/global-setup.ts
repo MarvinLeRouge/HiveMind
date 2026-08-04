@@ -5,6 +5,7 @@ const BASE_URL =
   process.env['E2E_BASE_URL'] ?? 'http://hivemind.marvinlerouge.local';
 const API_URL =
   process.env['E2E_API_URL'] ?? 'http://hivemind.marvinlerouge.local/api';
+const MAILPIT_URL = process.env['E2E_MAILPIT_URL'] ?? 'http://localhost:8025';
 
 /** Stable E2E test accounts, created once and reused across the suite. */
 export const E2E_USERS = {
@@ -50,7 +51,58 @@ async function waitForApp(): Promise<void> {
   throw new Error(`App did not become ready at ${url} within 60s`);
 }
 
-/** Registers an E2E user via the API; silently ignores 409 (already exists). */
+interface MailpitMessage {
+  ID: string;
+  To: Array<{ Address: string }>;
+}
+
+interface MailpitMessageDetail {
+  Text: string;
+}
+
+/**
+ * Polls Mailpit until a message addressed to `toEmail` appears, then returns
+ * the raw verification token extracted from the link in the email body.
+ */
+async function fetchVerificationToken(toEmail: string): Promise<string> {
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const res = await fetch(`${MAILPIT_URL}/api/v1/messages`);
+    const data = (await res.json()) as { messages: MailpitMessage[] };
+
+    const msg = data.messages.find((m) =>
+      m.To.some((to) => to.Address === toEmail),
+    );
+
+    if (msg) {
+      const detail = await fetch(`${MAILPIT_URL}/api/v1/message/${msg.ID}`);
+      const { Text } = (await detail.json()) as MailpitMessageDetail;
+      const match = /verify-email\?token=([a-f0-9]+)/.exec(Text);
+      if (match) return match[1];
+    }
+
+    await new Promise<void>((r) => setTimeout(r, 500));
+  }
+
+  throw new Error(`No verification email found in Mailpit for ${toEmail}`);
+}
+
+/** Calls POST /auth/verify-email with the given raw token. */
+async function verifyEmail(token: string): Promise<void> {
+  const res = await fetch(`${API_URL}/auth/verify-email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token }),
+  });
+  if (res.status !== 200) {
+    const body = await res.text();
+    throw new Error(`Failed to verify email (${res.status}): ${body}`);
+  }
+}
+
+/**
+ * Registers an E2E user via the API and verifies their email through Mailpit.
+ * Silently ignores 409 (user already exists and is presumed verified).
+ */
 async function registerUser(user: {
   username: string;
   email: string;
@@ -61,7 +113,11 @@ async function registerUser(user: {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(user),
   });
-  if (res.status !== 201 && res.status !== 409) {
+
+  if (res.status === 201) {
+    const token = await fetchVerificationToken(user.email);
+    await verifyEmail(token);
+  } else if (res.status !== 409) {
     const body = await res.text();
     throw new Error(
       `Failed to register ${user.email} (${res.status}): ${body}`,
