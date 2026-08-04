@@ -27,7 +27,7 @@
             type="email"
             required
             autocomplete="email"
-            placeholder="you@example.com"
+            :placeholder="t('auth.emailPlaceholder')"
             class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
           />
         </div>
@@ -92,8 +92,7 @@ async function handleSubmit() {
     const redirect = (route.query.redirect as string) || '/collections';
     await router.push(redirect);
   } catch (e) {
-    error.value =
-      e instanceof Error ? e.message : 'Login failed. Please try again.';
+    error.value = e instanceof Error ? e.message : t('auth.loginFailed');
   } finally {
     loading.value = false;
   }

@@ -260,6 +260,59 @@ describe('PuzzlesPage', () => {
     expect(wrapper.text()).toContain('Server error');
   });
 
+  it('shows template-driven fields in the add form when a template is set', async () => {
+    const puzzleStore = usePuzzleStore();
+    const collectionStore = useCollectionStore();
+    const authStore = useAuthStore();
+    vi.spyOn(puzzleStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(collectionStore, 'fetchById').mockResolvedValue();
+    authStore.user = {
+      id: 'user-1',
+      username: 'alice',
+      email: 'alice@example.com',
+      isAdmin: true,
+      language: 'en',
+      createdAt: '2025-01-01',
+    };
+    collectionStore.current = {
+      id: 'col-1',
+      slug: 'my-collection',
+      name: 'My Collection',
+      description: null,
+      createdBy: 'user-1',
+      createdAt: '2025-01-01',
+      templateSnapshot: {
+        id: 'tpl-1',
+        name: 'GC Template',
+        gcCodeMode: 'optional',
+        difficultyMode: 'optional',
+        terrainMode: 'optional',
+        coordsMode: 'optional',
+        hintMode: 'disabled',
+        spoilerMode: 'disabled',
+        indexMode: 'disabled',
+        customField1Mode: 'disabled',
+        customField2Mode: 'disabled',
+      },
+    } as never;
+
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles');
+
+    const wrapper = mount(PuzzlesPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    await wrapper.find('button').trigger('click');
+    await flushPromises();
+
+    expect(wrapper.find('#new-gc-code').exists()).toBe(true);
+    expect(wrapper.find('#new-difficulty').exists()).toBe(true);
+    expect(wrapper.find('#new-terrain').exists()).toBe(true);
+    expect(wrapper.find('#new-coords').exists()).toBe(true);
+  });
+
   it('retries loading when the retry button is clicked', async () => {
     const puzzleStore = usePuzzleStore();
     const collectionStore = useCollectionStore();

@@ -173,7 +173,7 @@
             id="edit-checker"
             v-model="editForm.checkerUrl"
             type="url"
-            placeholder="https://… (optional)"
+            :placeholder="t('puzzle.checkerUrlPlaceholder')"
             class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
           />
         </div>
@@ -330,7 +330,7 @@
           "
           @click="activeTab = 'notes'"
         >
-          {{ t('puzzle.addNote') }}s
+          {{ t('puzzle.tabNotes') }}
         </button>
         <button
           role="tab"
@@ -343,7 +343,7 @@
           "
           @click="activeTab = 'attempts'"
         >
-          Attempts
+          {{ t('puzzle.tabAttempts') }}
         </button>
       </div>
 
@@ -410,7 +410,9 @@
           class="flex flex-col gap-3 sm:flex-row sm:items-start"
           @submit.prevent="handleAddNote"
         >
-          <label for="new-note-content" class="sr-only">Note content</label>
+          <label for="new-note-content" class="sr-only">{{
+            t('puzzle.noteContent')
+          }}</label>
           <textarea
             id="new-note-content"
             v-model="newNoteContent"
@@ -489,7 +491,9 @@
           class="flex flex-col gap-3 sm:flex-row sm:flex-wrap"
           @submit.prevent="handleAddAttempt"
         >
-          <label for="attempt-value" class="sr-only">Value to test</label>
+          <label for="attempt-value" class="sr-only">{{
+            t('puzzle.valueTested')
+          }}</label>
           <input
             id="attempt-value"
             v-model="newAttemptValue"
@@ -498,7 +502,9 @@
             :placeholder="t('puzzle.valueTested')"
             class="flex h-9 flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
           />
-          <label for="attempt-result" class="sr-only">Result</label>
+          <label for="attempt-result" class="sr-only">{{
+            t('puzzle.result')
+          }}</label>
           <select
             id="attempt-result"
             v-model="newAttemptResult"
@@ -507,7 +513,9 @@
             <option :value="true">✓ {{ t('puzzle.status.solved') }}</option>
             <option :value="false">✗ {{ t('puzzle.status.open') }}</option>
           </select>
-          <label for="attempt-comment" class="sr-only">Comment</label>
+          <label for="attempt-comment" class="sr-only">{{
+            t('puzzle.commentLabel')
+          }}</label>
           <input
             id="attempt-comment"
             v-model="newAttemptComment"
