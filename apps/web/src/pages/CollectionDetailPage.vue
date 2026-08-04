@@ -127,7 +127,7 @@
                 type="text"
                 required
                 :placeholder="t('puzzle.titlePlaceholder')"
-                class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
 
@@ -140,7 +140,7 @@
                 v-model="newForm.description"
                 rows="2"
                 :placeholder="t('puzzle.descriptionPlaceholder')"
-                class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
 
@@ -153,7 +153,7 @@
                 v-model="newForm.checkerUrl"
                 type="url"
                 :placeholder="t('puzzle.checkerUrlPlaceholder')"
-                class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
 
@@ -173,7 +173,7 @@
                   type="text"
                   :required="template.gcCodeMode === 'required'"
                   :placeholder="t('puzzle.gcCodePlaceholder')"
-                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 />
               </div>
 
@@ -198,7 +198,7 @@
                   step="0.5"
                   :required="template.difficultyMode === 'required'"
                   :placeholder="t('puzzle.ratingPlaceholder')"
-                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 />
               </div>
 
@@ -220,7 +220,7 @@
                   step="0.5"
                   :required="template.terrainMode === 'required'"
                   :placeholder="t('puzzle.ratingPlaceholder')"
-                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 />
               </div>
 
@@ -239,7 +239,7 @@
                   type="text"
                   :required="template.coordsMode === 'required'"
                   :placeholder="t('puzzle.coordsPlaceholder')"
-                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 />
               </div>
 
@@ -257,7 +257,7 @@
                   v-model="newForm.hint"
                   rows="2"
                   :required="template.hintMode === 'required'"
-                  class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 />
               </div>
 
@@ -275,7 +275,7 @@
                   v-model="newForm.spoiler"
                   rows="2"
                   :required="template.spoilerMode === 'required'"
-                  class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 />
               </div>
             </template>
@@ -329,6 +329,28 @@
               >
                 ⠿
               </span>
+              <div v-if="isOwner" class="flex flex-col">
+                <button
+                  :disabled="index === 0"
+                  :aria-label="t('puzzle.moveUp')"
+                  class="flex h-4 w-4 items-center justify-center rounded text-muted-foreground hover:text-foreground disabled:opacity-30 focus:outline-none focus:ring-2 focus:ring-ring"
+                  @click.stop="moveUp(index)"
+                >
+                  <span aria-hidden="true" class="text-[10px] leading-none"
+                    >▲</span
+                  >
+                </button>
+                <button
+                  :disabled="index === puzzles.length - 1"
+                  :aria-label="t('puzzle.moveDown')"
+                  class="flex h-4 w-4 items-center justify-center rounded text-muted-foreground hover:text-foreground disabled:opacity-30 focus:outline-none focus:ring-2 focus:ring-ring"
+                  @click.stop="moveDown(index)"
+                >
+                  <span aria-hidden="true" class="text-[10px] leading-none"
+                    >▼</span
+                  >
+                </button>
+              </div>
               <PuzzleStatusBadge :status="puzzle.status" />
               <RouterLink
                 :to="`/collections/${collectionId}/puzzles/${puzzle.id}`"
@@ -338,8 +360,7 @@
               </RouterLink>
               <span
                 v-if="puzzle.workers.length > 0"
-                class="rounded-full px-2 py-0.5 text-xs text-primary"
-                style="background-color: oklch(var(--primary) / 0.1)"
+                class="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary"
               >
                 {{
                   puzzle.workers.some((w) => w.id === currentUserId)
@@ -608,6 +629,46 @@ async function onDrop(targetIndex: number) {
   } catch (e) {
     loadError.value =
       e instanceof Error ? e.message : 'Failed to reorder puzzles.';
+  }
+}
+
+/** Keyboard alternative for drag-and-drop: moves a puzzle one step up. */
+async function moveUp(index: number) {
+  if (index === 0) return;
+  const reordered = [...puzzles.value];
+  [reordered[index - 1], reordered[index]] = [
+    reordered[index],
+    reordered[index - 1],
+  ];
+  puzzleStore.puzzles = reordered;
+  try {
+    await puzzleStore.reorder(
+      collectionId,
+      reordered.map((p, i) => ({ id: p.id, sortOrder: i + 1 })),
+    );
+  } catch (e) {
+    loadError.value =
+      e instanceof Error ? e.message : t('common.error.generic');
+  }
+}
+
+/** Keyboard alternative for drag-and-drop: moves a puzzle one step down. */
+async function moveDown(index: number) {
+  if (index === puzzles.value.length - 1) return;
+  const reordered = [...puzzles.value];
+  [reordered[index], reordered[index + 1]] = [
+    reordered[index + 1],
+    reordered[index],
+  ];
+  puzzleStore.puzzles = reordered;
+  try {
+    await puzzleStore.reorder(
+      collectionId,
+      reordered.map((p, i) => ({ id: p.id, sortOrder: i + 1 })),
+    );
+  } catch (e) {
+    loadError.value =
+      e instanceof Error ? e.message : t('common.error.generic');
   }
 }
 

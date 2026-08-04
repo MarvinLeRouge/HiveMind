@@ -147,7 +147,7 @@
             v-model="editForm.title"
             type="text"
             required
-            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
 
@@ -160,7 +160,7 @@
             id="edit-description"
             v-model="editForm.description"
             rows="3"
-            class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
 
@@ -174,7 +174,7 @@
             v-model="editForm.checkerUrl"
             type="url"
             :placeholder="t('puzzle.checkerUrlPlaceholder')"
-            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
 
@@ -194,7 +194,7 @@
               v-model="editForm.gcCode"
               type="text"
               :required="template.gcCodeMode === 'required'"
-              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
 
@@ -215,7 +215,7 @@
               max="5"
               step="0.5"
               :required="template.difficultyMode === 'required'"
-              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
 
@@ -236,7 +236,7 @@
               max="5"
               step="0.5"
               :required="template.terrainMode === 'required'"
-              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
 
@@ -254,7 +254,7 @@
               v-model="editForm.coords"
               type="text"
               :required="template.coordsMode === 'required'"
-              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
 
@@ -272,7 +272,7 @@
               v-model="editForm.hint"
               rows="2"
               :required="template.hintMode === 'required'"
-              class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+              class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
 
@@ -290,7 +290,7 @@
               v-model="editForm.spoiler"
               rows="2"
               :required="template.spoilerMode === 'required'"
-              class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+              class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
         </template>
@@ -320,8 +320,10 @@
       <!-- Tabs -->
       <div role="tablist" class="mb-4 flex gap-4 border-b">
         <button
+          id="tab-notes"
           role="tab"
           :aria-selected="activeTab === 'notes'"
+          aria-controls="tabpanel-notes"
           class="border-b-2 pb-2 text-sm font-medium transition-colors duration-150"
           :class="
             activeTab === 'notes'
@@ -333,8 +335,10 @@
           {{ t('puzzle.tabNotes') }}
         </button>
         <button
+          id="tab-attempts"
           role="tab"
           :aria-selected="activeTab === 'attempts'"
+          aria-controls="tabpanel-attempts"
           class="border-b-2 pb-2 text-sm font-medium transition-colors duration-150"
           :class="
             activeTab === 'attempts'
@@ -348,7 +352,12 @@
       </div>
 
       <!-- Notes tab -->
-      <section v-if="activeTab === 'notes'" role="tabpanel" aria-label="Notes">
+      <section
+        v-if="activeTab === 'notes'"
+        id="tabpanel-notes"
+        role="tabpanel"
+        aria-labelledby="tab-notes"
+      >
         <ul class="mb-4 space-y-3">
           <li
             v-for="note in notes"
@@ -362,7 +371,7 @@
                   v-else
                   v-model="editNoteContent"
                   rows="3"
-                  class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 />
               </div>
               <div
@@ -419,7 +428,7 @@
             rows="2"
             required
             :placeholder="t('puzzle.addNoteAction')"
-            class="flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            class="flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
           />
           <button
             type="submit"
@@ -437,8 +446,9 @@
       <!-- Attempts tab -->
       <section
         v-if="activeTab === 'attempts'"
+        id="tabpanel-attempts"
         role="tabpanel"
-        aria-label="Attempts"
+        aria-labelledby="tab-attempts"
       >
         <ul class="mb-4 space-y-2">
           <li
@@ -449,10 +459,16 @@
             <div class="flex items-center gap-3">
               <span
                 class="shrink-0 rounded-full px-2 py-0.5 text-xs font-medium"
-                :class="
+                :style="
                   attempt.checkerResult
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-red-100 text-red-700'
+                    ? {
+                        backgroundColor: 'var(--checker-ok-bg)',
+                        color: 'var(--checker-ok-text)',
+                      }
+                    : {
+                        backgroundColor: 'var(--checker-fail-bg)',
+                        color: 'var(--checker-fail-text)',
+                      }
                 "
               >
                 <span aria-hidden="true">{{
@@ -500,7 +516,7 @@
             type="text"
             required
             :placeholder="t('puzzle.valueTested')"
-            class="flex h-9 flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            class="flex h-9 flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
           />
           <label for="attempt-result" class="sr-only">{{
             t('puzzle.result')
@@ -508,7 +524,7 @@
           <select
             id="attempt-result"
             v-model="newAttemptResult"
-            class="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            class="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
           >
             <option :value="true">✓ {{ t('puzzle.status.solved') }}</option>
             <option :value="false">✗ {{ t('puzzle.status.open') }}</option>
@@ -521,7 +537,7 @@
             v-model="newAttemptComment"
             type="text"
             :placeholder="t('puzzle.comment')"
-            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring sm:w-48"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring sm:w-48"
           />
           <button
             type="submit"

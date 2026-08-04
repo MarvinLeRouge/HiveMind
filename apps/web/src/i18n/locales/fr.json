@@ -127,6 +127,8 @@
     "commentLabel": "Commentaire",
     "comment": "Commentaire (facultatif)",
     "dragToReorder": "Glisser pour réorganiser",
+    "moveUp": "Déplacer vers le haut",
+    "moveDown": "Déplacer vers le bas",
     "titlePlaceholder": "Titre du puzzle",
     "descriptionPlaceholder": "Brève description…",
     "checkerUrlPlaceholder": "https://… (facultatif)",

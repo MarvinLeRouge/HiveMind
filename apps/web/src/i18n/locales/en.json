@@ -127,6 +127,8 @@
     "commentLabel": "Comment",
     "comment": "Comment (optional)",
     "dragToReorder": "Drag to reorder",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
     "titlePlaceholder": "Puzzle title",
     "descriptionPlaceholder": "Brief description…",
     "checkerUrlPlaceholder": "https://… (optional)",

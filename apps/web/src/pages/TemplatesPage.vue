@@ -64,8 +64,7 @@
             </span>
             <span
               v-if="tmpl.isPublic"
-              class="rounded px-1.5 py-0.5 text-xs text-primary"
-              style="background-color: oklch(var(--primary) / 0.1)"
+              class="rounded bg-primary/10 px-1.5 py-0.5 text-xs text-primary"
             >
               {{ t('template.public') }}
             </span>
