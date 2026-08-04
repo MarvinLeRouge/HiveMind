@@ -48,6 +48,7 @@
     "signIn": "Sign in",
     "signingIn": "Signing in…",
     "loginSubtitle": "Sign in to your account",
+    "loginFailed": "Login failed. Please try again.",
     "register": "Register",
     "createAccount": "Create account",
     "creatingAccount": "Creating account…",
@@ -56,7 +57,9 @@
     "password": "Password",
     "username": "Username",
     "noAccount": "Don't have an account?",
-    "haveAccount": "Already have an account?"
+    "haveAccount": "Already have an account?",
+    "usernamePlaceholder": "alice",
+    "emailPlaceholder": "you{'@'}example.com"
   },
   "collection": {
     "title": "Collections",
@@ -71,6 +74,9 @@
     "sendInvitation": "Send invitation",
     "sending": "Sending…",
     "invitationSent": "Invitation sent.",
+    "inviteEmailPlaceholder": "colleague{'@'}example.com",
+    "namePlaceholder": "My puzzle series",
+    "descriptionPlaceholder": "A short description…",
     "noItems": "No collections yet.",
     "noItemsCreate": "Create your first one.",
     "noItemsHint": "Create a collection to start solving puzzles with your team.",
@@ -110,11 +116,23 @@
     "claim": "Claim",
     "markAs": "Mark as {status}",
     "saveChanges": "Save changes",
+    "tabNotes": "Notes",
+    "tabAttempts": "Attempts",
     "addNote": "Add note",
     "addNoteAction": "Add a note…",
+    "noteContent": "Note content",
     "record": "Record",
     "valueTested": "Value to test",
+    "result": "Result",
+    "commentLabel": "Comment",
     "comment": "Comment (optional)",
+    "dragToReorder": "Drag to reorder",
+    "titlePlaceholder": "Puzzle title",
+    "descriptionPlaceholder": "Brief description…",
+    "checkerUrlPlaceholder": "https://… (optional)",
+    "gcCodePlaceholder": "GC12345",
+    "ratingPlaceholder": "e.g. 2.5",
+    "coordsPlaceholder": "N 48° 51.500 E 002° 21.000",
     "status": {
       "open": "Open",
       "in_progress": "In progress",
@@ -148,7 +166,9 @@
     "save": "Save template",
     "saveChanges": "Save changes",
     "noItems": "No templates yet.",
-    "noItemsHint": "Templates define the structure of your puzzles."
+    "noItemsHint": "Templates define the structure of your puzzles.",
+    "namePlaceholder": "My template",
+    "descriptionPlaceholder": "Short description…"
   },
   "invitation": {
     "title": "You've been invited",

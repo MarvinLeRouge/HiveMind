@@ -20,7 +20,7 @@
           type="text"
           required
           maxlength="64"
-          placeholder="My template"
+          :placeholder="t('template.namePlaceholder')"
           class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
         />
       </div>
@@ -36,7 +36,7 @@
           v-model="form.description"
           rows="2"
           maxlength="256"
-          placeholder="Short description…"
+          :placeholder="t('template.descriptionPlaceholder')"
           class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
         />
       </div>

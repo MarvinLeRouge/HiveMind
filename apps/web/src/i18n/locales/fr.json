@@ -48,6 +48,7 @@
     "signIn": "Se connecter",
     "signingIn": "Connexion…",
     "loginSubtitle": "Connectez-vous à votre compte",
+    "loginFailed": "La connexion a échoué. Veuillez réessayer.",
     "register": "S'inscrire",
     "createAccount": "Créer un compte",
     "creatingAccount": "Création…",
@@ -56,7 +57,9 @@
     "password": "Mot de passe",
     "username": "Nom d'utilisateur",
     "noAccount": "Pas encore de compte ?",
-    "haveAccount": "Déjà un compte ?"
+    "haveAccount": "Déjà un compte ?",
+    "usernamePlaceholder": "alice",
+    "emailPlaceholder": "vous{'@'}exemple.com"
   },
   "collection": {
     "title": "Collections",
@@ -71,6 +74,9 @@
     "sendInvitation": "Envoyer l'invitation",
     "sending": "Envoi…",
     "invitationSent": "Invitation envoyée.",
+    "inviteEmailPlaceholder": "collègue{'@'}exemple.com",
+    "namePlaceholder": "Ma série de puzzles",
+    "descriptionPlaceholder": "Une brève description…",
     "noItems": "Aucune collection pour le moment.",
     "noItemsCreate": "Créez votre première collection.",
     "noItemsHint": "Créez une collection pour commencer à résoudre des puzzles en équipe.",
@@ -110,11 +116,23 @@
     "claim": "Prendre en charge",
     "markAs": "Marquer comme {status}",
     "saveChanges": "Enregistrer",
+    "tabNotes": "Notes",
+    "tabAttempts": "Tentatives",
     "addNote": "Ajouter une note",
     "addNoteAction": "Ajouter une note…",
+    "noteContent": "Contenu de la note",
     "record": "Enregistrer",
     "valueTested": "Valeur testée",
+    "result": "Résultat",
+    "commentLabel": "Commentaire",
     "comment": "Commentaire (facultatif)",
+    "dragToReorder": "Glisser pour réorganiser",
+    "titlePlaceholder": "Titre du puzzle",
+    "descriptionPlaceholder": "Brève description…",
+    "checkerUrlPlaceholder": "https://… (facultatif)",
+    "gcCodePlaceholder": "GC12345",
+    "ratingPlaceholder": "ex. 2,5",
+    "coordsPlaceholder": "N 48° 51.500 E 002° 21.000",
     "status": {
       "open": "Ouvert",
       "in_progress": "En cours",
@@ -148,7 +166,9 @@
     "save": "Enregistrer le modèle",
     "saveChanges": "Enregistrer",
     "noItems": "Aucun modèle pour le moment.",
-    "noItemsHint": "Les modèles définissent la structure de vos puzzles."
+    "noItemsHint": "Les modèles définissent la structure de vos puzzles.",
+    "namePlaceholder": "Mon modèle",
+    "descriptionPlaceholder": "Brève description…"
   },
   "invitation": {
     "title": "Vous avez été invité(e)",

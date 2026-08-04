@@ -126,7 +126,7 @@
                 v-model="newForm.title"
                 type="text"
                 required
-                placeholder="Puzzle title"
+                :placeholder="t('puzzle.titlePlaceholder')"
                 class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
               />
             </div>
@@ -139,7 +139,7 @@
                 id="new-puzzle-description"
                 v-model="newForm.description"
                 rows="2"
-                placeholder="Brief description…"
+                :placeholder="t('puzzle.descriptionPlaceholder')"
                 class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
               />
             </div>
@@ -152,7 +152,7 @@
                 id="new-puzzle-checker"
                 v-model="newForm.checkerUrl"
                 type="url"
-                placeholder="https://… (optional)"
+                :placeholder="t('puzzle.checkerUrlPlaceholder')"
                 class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
               />
             </div>
@@ -172,7 +172,7 @@
                   v-model="newForm.gcCode"
                   type="text"
                   :required="template.gcCodeMode === 'required'"
-                  placeholder="GC12345"
+                  :placeholder="t('puzzle.gcCodePlaceholder')"
                   class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
                 />
               </div>
@@ -197,7 +197,7 @@
                   max="5"
                   step="0.5"
                   :required="template.difficultyMode === 'required'"
-                  placeholder="e.g. 2.5"
+                  :placeholder="t('puzzle.ratingPlaceholder')"
                   class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
                 />
               </div>
@@ -219,7 +219,7 @@
                   max="5"
                   step="0.5"
                   :required="template.terrainMode === 'required'"
-                  placeholder="e.g. 1.5"
+                  :placeholder="t('puzzle.ratingPlaceholder')"
                   class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
                 />
               </div>
@@ -238,7 +238,7 @@
                   v-model="newForm.coords"
                   type="text"
                   :required="template.coordsMode === 'required'"
-                  placeholder="N 48° 51.500 E 002° 21.000"
+                  :placeholder="t('puzzle.coordsPlaceholder')"
                   class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
                 />
               </div>
@@ -325,7 +325,7 @@
                 v-if="isOwner"
                 aria-hidden="true"
                 class="cursor-grab select-none text-muted-foreground"
-                title="Drag to reorder"
+                :title="t('puzzle.dragToReorder')"
               >
                 ⠿
               </span>

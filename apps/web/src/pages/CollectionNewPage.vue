@@ -28,7 +28,7 @@
           v-model="form.name"
           type="text"
           required
-          placeholder="My puzzle series"
+          :placeholder="t('collection.namePlaceholder')"
           class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
         />
       </div>
@@ -42,7 +42,7 @@
           id="description"
           v-model="form.description"
           rows="3"
-          placeholder="A short description…"
+          :placeholder="t('collection.descriptionPlaceholder')"
           class="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
         />
       </div>
