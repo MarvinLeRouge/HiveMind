@@ -32,7 +32,7 @@ Chaque **Collection** contient des **Puzzles**. Chaque puzzle peut recevoir des 
 
 | Métrique | Valeur |
 |----------|--------|
-| Endpoints API | 42 (auth, templates, collections, invitations, puzzles, notes, tentatives, import) |
+| Endpoints API | 43 (auth, templates, collections, invitations, puzzles, notes, tentatives, import) |
 | Couverture de tests backend | ≥ 97 % |
 | Couverture de tests frontend | ≥ 92 % |
 | Langues | FR, EN (préférence par utilisateur) |
@@ -54,6 +54,7 @@ Chaque **Collection** contient des **Puzzles**. Chaque puzzle peut recevoir des 
 - **Interface multilingue** — FR/EN ; la préférence de langue est stockée par utilisateur et synchronisée entre les sessions
 - **Import GPX** — importer une pocket query Geocaching pour peupler automatiquement les puzzles avec coordonnées, difficulté, terrain et codes GC
 - **Import CSV** — importer un tableur avec mapping flexible colonne → champ
+- **Verification d'email** — activation du compte requise avant le premier login ; lien de vérification envoyé via Brevo SMTP
 - **Auth JWT** — access token (15 min) + cookie httpOnly de refresh (7 jours)
 - **Swagger UI** — documentation API interactive auto-générée sur `/docs` (développement uniquement ; désactivé en production)
 
@@ -256,6 +257,7 @@ docker compose -f docker-compose.prod.yml logs -f backend
 | Méthode | Route | Auth | Description |
 |---------|-------|------|-------------|
 | POST | /auth/register | — | Créer un compte |
+| POST | /auth/verify-email | — | Vérifier l'adresse email |
 | POST | /auth/login | — | Obtenir un access token + cookie |
 | POST | /auth/refresh | — | Rotation des tokens depuis le cookie |
 | POST | /auth/logout | ✓ | Effacer le cookie de refresh |
@@ -472,6 +474,8 @@ docker compose -f docker-compose.prod.yml up -d
 - [x] BLOCK-24 · Sauvegardes PostgreSQL automatisées (cron quotidien, rotation 7j + 4s)
 - [x] BLOCK-25 · Sécurisation (audit OWASP Top 10, Helmet/CSP, rate limiting, invalidation JWT côté serveur, correctifs CVE)
 - [x] BLOCK-26 · Polish design & UX (palette OKLCH accessible, dark mode, responsive mobile, états vides, gestion d'erreurs, micro-interactions)
+- [x] BLOCK-27 · Audit design (impeccable - score 14/20, tokens couleur sémantiques OKLCH, focus WCAG ring-2, drag-and-drop clavier, motion accessible)
+- [x] BLOCK-28 · Vérification d'email à l'inscription (token SHA-256, SMTP Brevo, page /verify-email, renvoi du lien)
 
 ---
 
@@ -479,9 +483,11 @@ docker compose -f docker-compose.prod.yml up -d
 
 HiveMind est un projet portfolio conçu pour explorer et démontrer le développement full-stack avec un écosystème Node.js moderne : Fastify pour une API performante et fortement typée, Prisma pour un accès ergonomique à la base de données, Vue 3 pour un frontend réactif, et GitHub Actions pour un pipeline CI/CD de qualité production.
 
-La sécurité a été traitée comme une contrainte de premier ordre : le code a fait l'objet d'un audit OWASP Top 10 ayant abouti à des en-têtes HTTP de sécurité (Helmet, CSP), un rate limiting sur les endpoints sensibles, une invalidation côté serveur des refresh tokens et des correctifs CVE ciblés sur les dépendances transitives.
+La sécurité a été traitée comme une contrainte de premier ordre : le code a fait l'objet d'un audit OWASP Top 10 ayant abouti à des en-têtes HTTP de sécurité (Helmet, CSP), un rate limiting sur les endpoints sensibles, une invalidation côté serveur des refresh tokens et des correctifs CVE ciblés sur les dépendances transitives. La vérification d'email est imposée à l'inscription pour limiter les risques d'énumération de comptes et de spam.
 
-Le projet a été conçu avec un usage réel en tête — spécifiquement les séries de mystères en géocaching collaboratif — mais le modèle de domaine est intentionnellement générique et applicable à toute collection d'énigmes.
+La qualité du design a fait l'objet de deux passes : un sprint de polish (BLOCK-26) centré sur une palette OKLCH accessible, le dark mode et la mise en page mobile ; puis un audit formel avec le framework impeccable (BLOCK-27, score 14/20) ayant produit des tokens couleur sémantiques, des anneaux de focus conformes WCAG, un drag-and-drop accessible au clavier et le support de prefers-reduced-motion.
+
+Le projet a été conçu avec un usage réel en tête - spécifiquement les séries de mystères en géocaching collaboratif - mais le modèle de domaine est intentionnellement générique et applicable à toute collection d'énigmes.
 
 ---
 

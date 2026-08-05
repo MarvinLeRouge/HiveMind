@@ -32,7 +32,7 @@ Each **Collection** contains **Puzzles**. Each puzzle can carry free-text **Note
 
 | Metric | Value |
 |--------|-------|
-| API endpoints | 42 (auth, templates, collections, invitations, puzzles, notes, attempts, import) |
+| API endpoints | 43 (auth, templates, collections, invitations, puzzles, notes, attempts, import) |
 | Backend test coverage | ≥ 97 % |
 | Frontend test coverage | ≥ 92 % |
 | Languages | EN, FR (per-user preference) |
@@ -54,6 +54,7 @@ Each **Collection** contains **Puzzles**. Each puzzle can carry free-text **Note
 - **Multilingual UI** — EN/FR interface; language preference stored per user and synced across sessions
 - **GPX import** — upload a Geocaching pocket query to auto-populate puzzles with coordinates, difficulty, terrain, and GC codes
 - **CSV import** — upload a spreadsheet with flexible column-to-field mapping
+- **Email verification** — account activation required before first login; verification link sent via Brevo SMTP
 - **JWT auth** — access token (15 min) + httpOnly refresh cookie (7 days)
 - **Swagger UI** — auto-generated interactive API documentation at `/docs` (development only; disabled in production)
 
@@ -256,6 +257,7 @@ docker compose -f docker-compose.prod.yml logs -f backend
 | Method | Route | Auth | Description |
 |--------|-------|------|-------------|
 | POST | /auth/register | — | Create account |
+| POST | /auth/verify-email | — | Verify email address |
 | POST | /auth/login | — | Get access token + set cookie |
 | POST | /auth/refresh | — | Rotate tokens from cookie |
 | POST | /auth/logout | ✓ | Clear refresh cookie |
@@ -472,6 +474,8 @@ docker compose -f docker-compose.prod.yml up -d
 - [x] BLOCK-24 · Automated PostgreSQL backups (daily cron, 7d + 4w rotation)
 - [x] BLOCK-25 · Security hardening (OWASP Top 10 audit, Helmet/CSP, rate limiting, server-side JWT invalidation, CVE patching)
 - [x] BLOCK-26 · Design polish (accessible OKLCH palette, dark mode, mobile-responsive layout, empty states, error boundaries, micro-interactions)
+- [x] BLOCK-27 · Design audit (impeccable — score 14/20, OKLCH semantic tokens, WCAG ring-2 focus, keyboard drag-and-drop, accessible motion)
+- [x] BLOCK-28 · Email verification on register (SHA-256 token, Brevo SMTP, /verify-email page, resend flow)
 
 ---
 
@@ -479,9 +483,11 @@ docker compose -f docker-compose.prod.yml up -d
 
 HiveMind is a portfolio project built to explore and demonstrate full-stack development with a modern Node.js ecosystem: Fastify for a performant and type-safe API, Prisma for ergonomic database access, Vue 3 for a reactive frontend, and GitHub Actions for a production-grade CI/CD pipeline.
 
-Security was treated as a first-class concern: the codebase went through an OWASP Top 10 audit covering HTTP security headers (Helmet, CSP), rate limiting on sensitive endpoints, server-side refresh token invalidation, and targeted CVE patching across transitive dependencies.
+Security was treated as a first-class concern: the codebase went through an OWASP Top 10 audit covering HTTP security headers (Helmet, CSP), rate limiting on sensitive endpoints, server-side refresh token invalidation, and targeted CVE patching across transitive dependencies. Email verification is enforced at registration to prevent account enumeration and reduce abuse vectors.
 
-The project was designed with real-world use in mind — specifically collaborative geocaching mystery series — but the domain model is intentionally generic enough to apply to any puzzle collection.
+Design quality went through two passes: a polish sprint (BLOCK-26) focused on an accessible OKLCH palette, dark mode, and mobile layout; then a formal audit with the impeccable framework (BLOCK-27, score 14/20) which produced semantic color tokens, WCAG-compliant focus rings, keyboard-accessible drag-and-drop, and prefers-reduced-motion support.
+
+The project was designed with real-world use in mind - specifically collaborative geocaching mystery series - but the domain model is intentionally generic enough to apply to any puzzle collection.
 
 ---
 
