@@ -98,6 +98,21 @@ describe('LoginPage', () => {
     );
   });
 
+  it('displays an invalid credentials message when login returns 401', async () => {
+    const router = makeRouter();
+    await router.push('/login');
+    const wrapper = mount(LoginPage, { global: { plugins: [pinia, router] } });
+    const auth = useAuthStore();
+    vi.spyOn(auth, 'login').mockRejectedValue({ status: 401 });
+
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    expect(wrapper.find('[role="alert"]').text()).toContain(
+      'Invalid email or password',
+    );
+  });
+
   it('displays an unverified email message when login returns 403', async () => {
     const router = makeRouter();
     await router.push('/login');

@@ -129,7 +129,13 @@ async function handleSubmit() {
     );
     emailSent.value = true;
   } catch (e) {
-    error.value = e instanceof Error ? e.message : t('auth.registerFailed');
+    const backendMessage =
+      e && typeof e === 'object' && 'data' in e
+        ? (e as { data?: { message?: string } }).data?.message
+        : undefined;
+    error.value =
+      backendMessage ??
+      (e instanceof Error ? e.message : t('auth.registerFailed'));
   } finally {
     loading.value = false;
   }

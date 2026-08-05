@@ -131,6 +131,27 @@ describe('RegisterPage', () => {
     expect(wrapper.find('form').exists()).toBe(true);
   });
 
+  it('displays the backend message when registration fails with data.message (e.g. 409)', async () => {
+    const router = makeRouter();
+    await router.push('/register');
+    const wrapper = mount(RegisterPage, {
+      global: { plugins: [pinia, router] },
+    });
+    const auth = useAuthStore();
+    vi.spyOn(auth, 'register').mockRejectedValue({
+      status: 409,
+      data: { message: 'Email already registered' },
+    });
+
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    expect(wrapper.find('[role="alert"]').text()).toContain(
+      'Email already registered',
+    );
+    expect(wrapper.find('form').exists()).toBe(true);
+  });
+
   it('displays a generic error when registration throws a non-Error value', async () => {
     const router = makeRouter();
     await router.push('/register');

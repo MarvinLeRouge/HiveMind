@@ -86,6 +86,18 @@ describe('apiFetch', () => {
     expect(auth.refresh).not.toHaveBeenCalled();
   });
 
+  it('throws an Error with the backend message when data.message is present', async () => {
+    const auth = useAuthStore();
+    vi.spyOn(auth, 'refresh');
+    mockFetch.mockRejectedValueOnce({
+      status: 422,
+      data: { message: 'Name is required' },
+    });
+
+    await expect(apiFetch('/test')).rejects.toThrow('Name is required');
+    expect(auth.refresh).not.toHaveBeenCalled();
+  });
+
   it('rethrows errors that have no status property', async () => {
     const auth = useAuthStore();
     vi.spyOn(auth, 'refresh');
