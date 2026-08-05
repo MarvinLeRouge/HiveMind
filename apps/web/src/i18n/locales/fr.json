@@ -49,6 +49,7 @@
     "signingIn": "Connexion…",
     "loginSubtitle": "Connectez-vous à votre compte",
     "loginFailed": "La connexion a échoué. Veuillez réessayer.",
+    "loginUnverified": "Veuillez vérifier votre adresse e-mail avant de vous connecter. Consultez votre boite de réception.",
     "register": "S'inscrire",
     "createAccount": "Créer un compte",
     "creatingAccount": "Création…",

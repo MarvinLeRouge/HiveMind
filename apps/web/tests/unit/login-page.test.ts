@@ -98,6 +98,21 @@ describe('LoginPage', () => {
     );
   });
 
+  it('displays an unverified email message when login returns 403', async () => {
+    const router = makeRouter();
+    await router.push('/login');
+    const wrapper = mount(LoginPage, { global: { plugins: [pinia, router] } });
+    const auth = useAuthStore();
+    vi.spyOn(auth, 'login').mockRejectedValue({ status: 403 });
+
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    expect(wrapper.find('[role="alert"]').text()).toContain(
+      'Please verify your email address',
+    );
+  });
+
   it('displays a generic error when login throws a non-Error value', async () => {
     const router = makeRouter();
     await router.push('/login');

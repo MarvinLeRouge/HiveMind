@@ -92,7 +92,16 @@ async function handleSubmit() {
     const redirect = (route.query.redirect as string) || '/collections';
     await router.push(redirect);
   } catch (e) {
-    error.value = e instanceof Error ? e.message : t('auth.loginFailed');
+    const status =
+      e && typeof e === 'object' && 'status' in e
+        ? (e as { status: number }).status
+        : 0;
+    error.value =
+      status === 403
+        ? t('auth.loginUnverified')
+        : e instanceof Error
+          ? e.message
+          : t('auth.loginFailed');
   } finally {
     loading.value = false;
   }
