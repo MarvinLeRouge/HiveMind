@@ -99,9 +99,11 @@ async function handleSubmit() {
     error.value =
       status === 403
         ? t('auth.loginUnverified')
-        : e instanceof Error
-          ? e.message
-          : t('auth.loginFailed');
+        : status === 401
+          ? t('auth.invalidCredentials')
+          : e instanceof Error
+            ? e.message
+            : t('auth.loginFailed');
   } finally {
     loading.value = false;
   }

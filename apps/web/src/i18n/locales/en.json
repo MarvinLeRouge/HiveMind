@@ -50,6 +50,7 @@
     "loginSubtitle": "Sign in to your account",
     "loginFailed": "Login failed. Please try again.",
     "loginUnverified": "Please verify your email address before logging in. Check your inbox for the verification link.",
+    "invalidCredentials": "Invalid email or password.",
     "register": "Register",
     "createAccount": "Create account",
     "creatingAccount": "Creating account…",

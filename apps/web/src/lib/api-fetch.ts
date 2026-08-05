@@ -39,6 +39,11 @@ export async function apiFetch<T>(
       auth.accessToken = null;
       auth.user = null;
     }
-    throw err;
+
+    const backendMessage =
+      err && typeof err === 'object' && 'data' in err
+        ? (err as { data?: { message?: string } }).data?.message
+        : undefined;
+    throw backendMessage ? new Error(backendMessage) : err;
   }
 }
