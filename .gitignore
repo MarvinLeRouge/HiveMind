@@ -43,6 +43,11 @@ Thumbs.db
 /.nova
 /.fleet
 
+# Tooling output
+.serena
+.husky
+graphify-out
+
 # ─── Work in progress ──────────────────────────────────────────────────────────
 docs/ai/
 
