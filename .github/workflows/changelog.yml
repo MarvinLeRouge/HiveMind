@@ -21,13 +21,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Generate changelog
-        uses: orhun/git-cliff-action@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          config: cliff.toml
-          args: --verbose
-        env:
-          OUTPUT: CHANGELOG.md
+          node-version: 20
+
+      - name: Generate changelog
+        run: npx --yes git-cliff --config cliff.toml --output CHANGELOG.md
 
       - name: Open or update changelog PR
         uses: peter-evans/create-pull-request@v6
