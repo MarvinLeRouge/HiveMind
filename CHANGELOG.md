@@ -86,6 +86,9 @@ Generated automatically from Conventional Commits history.
 - Ignore local AI tooling files
 - **web:** Apply ring-2 focus ring to remaining 8 files (WCAG 2.4.11)
 - Add .github/PULL_REQUEST_TEMPLATE.md
+- Add cliff.toml and generate initial CHANGELOG.md
+- Add changelog.yml workflow for automated CHANGELOG.md updates
+- Fix changelog workflow - replace orhun/git-cliff-action with npx git-cliff
 
 ### Documentation
 
