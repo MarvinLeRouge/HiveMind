@@ -89,6 +89,8 @@ Generated automatically from Conventional Commits history.
 - Add cliff.toml and generate initial CHANGELOG.md
 - Add changelog.yml workflow for automated CHANGELOG.md updates
 - Fix changelog workflow - replace orhun/git-cliff-action with npx git-cliff
+- Regenerate CHANGELOG.md
+- **changelog:** Homogenize changelog workflow
 
 ### Documentation
 
