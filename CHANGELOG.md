@@ -95,6 +95,7 @@ Generated automatically from Conventional Commits history.
 - Standardize AI working notes folder to docs/work-in-progress
 - **changelog:** Update CHANGELOG.md
 - **changelog:** Update CHANGELOG.md
+- **changelog:** Update CHANGELOG.md
 
 ### Documentation
 
@@ -121,6 +122,7 @@ Generated automatically from Conventional Commits history.
 - Add CODE_OF_CONDUCT.md and CODE_OF_CONDUCT.fr.md
 - Homogenize contributing guide with cross-project template
 - Fix reversed bilingual banner order
+- **guides:** Add backend, frontend and user developer guides
 
 ### Features
 
