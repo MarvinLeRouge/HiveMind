@@ -94,6 +94,9 @@ Each **Collection** contains **Puzzles**. Each puzzle can carry free-text **Note
 |----------|-------------|
 | [Architecture](docs/architecture.md) | Repository layout, backend layers, frontend structure, roles |
 | [API endpoints](docs/api/api_endpoints.md) | Full endpoint reference, grouped by domain |
+| [Backend developer guide](docs/guides/backend_developer_guide.md) | Day-to-day backend conventions, adding an endpoint |
+| [Frontend developer guide](docs/guides/frontend_developer_guide.md) | Day-to-day frontend conventions, adding a page |
+| [User guide](docs/guides/user_guide.md) | Using HiveMind: collections, puzzles, notes, attempts, import |
 | [Testing](docs/testing.md) | Backend, frontend and E2E test setup and commands |
 | [Operations](docs/operations.md) | Local setup, Docker, CI/CD pipeline, deployment, backup |
 | [Roadmap](docs/roadmap.md) | Completed blocks from V1 to V3 |
