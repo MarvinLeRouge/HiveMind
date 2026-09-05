@@ -94,6 +94,9 @@ Chaque **Collection** contient des **Puzzles**. Chaque puzzle peut recevoir des 
 |----------|-------------|
 | [Architecture](docs/architecture.fr.md) | Structure du depot, couches backend, structure frontend, roles |
 | [Endpoints API](docs/api/api_endpoints.fr.md) | Reference complete des endpoints, groupes par domaine |
+| [Guide developpeur backend](docs/guides/backend_developer_guide.fr.md) | Conventions backend au quotidien, ajouter un endpoint |
+| [Guide developpeur frontend](docs/guides/frontend_developer_guide.fr.md) | Conventions frontend au quotidien, ajouter une page |
+| [Guide utilisateur](docs/guides/user_guide.fr.md) | Utiliser HiveMind : collections, puzzles, notes, tentatives, import |
 | [Tests](docs/testing.fr.md) | Configuration et commandes des tests backend, frontend et E2E |
 | [Operations](docs/operations.fr.md) | Installation locale, Docker, pipeline CI/CD, deploiement, sauvegarde |
 | [Feuille de route](docs/roadmap.fr.md) | Blocs completes de V1 a V3 |
