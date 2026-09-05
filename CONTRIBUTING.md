@@ -1,16 +1,14 @@
-🇬🇧 English | [🇫🇷 Français](CONTRIBUTING.fr.md)
-
-# Contributing to HiveMind
+[🇫🇷 Version française](CONTRIBUTING.fr.md) | 🇬🇧 English version
 
 ---
+
+# Contributing to HiveMind
 
 ## Prerequisites
 
 - Node.js 20 LTS
 - pnpm 9+
 - Docker + Docker Compose
-
----
 
 ## Local setup
 
@@ -27,7 +25,23 @@ docker compose exec backend npx prisma db seed
 
 See [docs/operations.md](docs/operations.md) for full details on the local stack, Docker commands, and production deployment.
 
----
+## Running tests
+
+```bash
+pnpm --filter api test          # backend unit + integration tests
+pnpm --filter web test          # frontend tests
+pnpm test:e2e                   # E2E, requires the full Docker stack
+```
+
+Every pull request must keep backend and frontend coverage at 80% or above (`pnpm --filter api test:coverage`, `pnpm --filter web test:coverage`). See [docs/testing.md](docs/testing.md) for test database setup and E2E instructions.
+
+## Workflow
+
+1. Fork the repository and create a branch off `main`.
+2. Make your change, with tests covering it.
+3. Commit following the convention below.
+4. Push and open a pull request against `main`.
+5. CI must pass before review.
 
 ## Branch naming
 
@@ -42,18 +56,16 @@ See [docs/operations.md](docs/operations.md) for full details on the local stack
 
 Use lowercase kebab-case. Example: `feat/puzzle-checker-url`, `fix/invite-email-encoding`.
 
----
+## Commit convention
 
-## Commit format
-
-Follow [Conventional Commits](https://www.conventionalcommits.org/). Every commit must include a `Modified files:` section listing the files touched.
+Follow [Conventional Commits](https://www.conventionalcommits.org/), imperative mood, lowercase summary, no trailing period, with a mandatory `Modified files:` section:
 
 ```
-<type>(<optional scope>): <short summary in imperative mood, lowercase, no trailing period>
+<type>(<optional scope>): <short summary>
 
 Modified files:
-- path/to/file-a.ts — what was changed
-- path/to/file-b.vue — what was changed
+- path/to/file-a.ts - what was changed
+- path/to/file-b.vue - what was changed
 ```
 
 Types: `feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `style`, `perf`, `ci`.
@@ -64,13 +76,11 @@ Example:
 feat(api): add puzzle checker URL validation
 
 Modified files:
-- apps/api/src/services/puzzle.service.ts — validate checkerUrl format
-- apps/api/tests/unit/puzzle.service.test.ts — add validation tests
+- apps/api/src/services/puzzle.service.ts - validate checkerUrl format
+- apps/api/tests/unit/puzzle.service.test.ts - add validation tests
 ```
 
----
-
-## Code conventions
+## Code style
 
 - **TypeScript strict mode** - no `any`, no `@ts-ignore`
 - **Zod schemas** - every Fastify route must have an input and output schema
@@ -78,40 +88,28 @@ Modified files:
 - **Naming** - `camelCase` for variables/functions, `PascalCase` for classes/components, `UPPER_SNAKE_CASE` for constants, `kebab-case` for files
 - **No dead code** - do not leave commented-out blocks or unused imports
 
----
+CI will reject any pull request that fails these checks.
 
-## Testing
+## Code of Conduct
 
-Every pull request must:
+This project follows a [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold it.
 
-- Keep backend coverage >= 80% (`pnpm --filter api test:coverage`)
-- Keep frontend coverage >= 80% (`pnpm --filter web test:coverage`)
-- Add at least one unit test per new service method
-- Add at least one integration test per new API endpoint (happy path + 401/403 where applicable)
+## License
 
-See [docs/testing.md](docs/testing.md) for test database setup and E2E instructions.
+By contributing, you agree that your contributions will be licensed under the project's license (see [LICENSE](LICENSE)).
 
 ---
 
 ## Before opening a pull request
 
 ```bash
-# Lint and format
-pnpm lint
-
-# Backend tests
-pnpm --filter api test
-
-# Frontend tests
-pnpm --filter web test
-
-# E2E (requires full Docker stack)
-pnpm test:e2e
+pnpm lint                       # lint and format
+pnpm --filter api test          # backend tests
+pnpm --filter web test          # frontend tests
+pnpm test:e2e                   # E2E, requires the full Docker stack
 ```
 
 The CI workflow runs all of the above automatically on every push.
-
----
 
 ## Pull request checklist
 
