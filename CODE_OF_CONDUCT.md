@@ -1,4 +1,4 @@
-🇬🇧 English | [🇫🇷 Français](CODE_OF_CONDUCT.fr.md)
+[🇫🇷 Version française](CODE_OF_CONDUCT.fr.md) | 🇬🇧 English version
 
 # Contributor Covenant Code of Conduct
 

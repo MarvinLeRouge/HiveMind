@@ -1,4 +1,4 @@
-🇬🇧 English | [🇫🇷 Français](roadmap.fr.md)
+[🇫🇷 Version française](roadmap.fr.md) | 🇬🇧 English version
 
 # HiveMind - Roadmap
 

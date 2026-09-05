@@ -1,4 +1,4 @@
-[🇬🇧 English](roadmap.md) | 🇫🇷 Français
+🇫🇷 Version française | [🇬🇧 English version](roadmap.md)
 
 # HiveMind - Feuille de route
 

@@ -1,4 +1,4 @@
-[🇬🇧 English](SECURITY.md) | 🇫🇷 Français
+🇫🇷 Version française | [🇬🇧 English version](SECURITY.md)
 
 # Politique de securite
 

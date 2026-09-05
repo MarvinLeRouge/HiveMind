@@ -1,4 +1,4 @@
-🇬🇧 English | [🇫🇷 Français](design-system.fr.md)
+[🇫🇷 Version française](design-system.fr.md) | 🇬🇧 English version
 
 # HiveMind - Design System
 

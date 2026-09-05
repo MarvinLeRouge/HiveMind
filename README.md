@@ -1,4 +1,4 @@
-🇬🇧 English | [🇫🇷 Français](README.fr.md)
+[🇫🇷 Version française](README.fr.md) | 🇬🇧 English version
 
 # HiveMind
 

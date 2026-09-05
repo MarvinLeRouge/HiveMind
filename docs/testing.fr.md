@@ -1,4 +1,4 @@
-[🇬🇧 English](testing.md) | 🇫🇷 Français
+🇫🇷 Version française | [🇬🇧 English version](testing.md)
 
 # HiveMind - Tests
 
