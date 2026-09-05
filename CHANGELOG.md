@@ -91,6 +91,8 @@ Generated automatically from Conventional Commits history.
 - Fix changelog workflow - replace orhun/git-cliff-action with npx git-cliff
 - Regenerate CHANGELOG.md
 - **changelog:** Homogenize changelog workflow
+- **changelog:** Update CHANGELOG.md
+- Standardize AI working notes folder to docs/work-in-progress
 
 ### Documentation
 
