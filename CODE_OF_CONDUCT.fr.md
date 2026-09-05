@@ -1,4 +1,4 @@
-[🇬🇧 English](CODE_OF_CONDUCT.md) | 🇫🇷 Français
+🇫🇷 Version française | [🇬🇧 English version](CODE_OF_CONDUCT.md)
 
 # Code de conduite Contributor Covenant
 

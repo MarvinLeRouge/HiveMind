@@ -1,4 +1,4 @@
-🇬🇧 English | [🇫🇷 Français](operations.fr.md)
+[🇫🇷 Version française](operations.fr.md) | 🇬🇧 English version
 
 # HiveMind - Operations
 

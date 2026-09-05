@@ -1,4 +1,4 @@
-🇬🇧 English | [🇫🇷 Français](api_endpoints.fr.md)
+[🇫🇷 Version française](api_endpoints.fr.md) | 🇬🇧 English version
 
 # HiveMind - API Endpoints
 

@@ -1,4 +1,4 @@
-🇬🇧 English | [🇫🇷 Français](architecture.fr.md)
+[🇫🇷 Version française](architecture.fr.md) | 🇬🇧 English version
 
 # HiveMind - Architecture
 

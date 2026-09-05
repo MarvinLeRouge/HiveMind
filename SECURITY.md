@@ -1,4 +1,4 @@
-🇬🇧 English | [🇫🇷 Français](SECURITY.fr.md)
+[🇫🇷 Version française](SECURITY.fr.md) | 🇬🇧 English version
 
 # Security Policy
 
