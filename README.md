@@ -100,6 +100,7 @@ Each **Collection** contains **Puzzles**. Each puzzle can carry free-text **Note
 | [Testing](docs/testing.md) | Backend, frontend and E2E test setup and commands |
 | [Operations](docs/operations.md) | Local setup, Docker, CI/CD pipeline, deployment, backup |
 | [Roadmap](docs/roadmap.md) | Completed blocks from V1 to V3 |
+| [Architecture Decision Records](docs/adr/) | Significant design decisions, English-only |
 | [Design system](docs/design-system.md) | OKLCH tokens, dark mode, accessibility patterns |
 | [Contributing](CONTRIBUTING.md) | How to contribute, branch and commit conventions |
 | [Security](SECURITY.md) | Vulnerability disclosure and security measures |
