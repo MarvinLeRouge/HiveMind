@@ -96,6 +96,7 @@ Generated automatically from Conventional Commits history.
 - **changelog:** Update CHANGELOG.md
 - **changelog:** Update CHANGELOG.md
 - **changelog:** Update CHANGELOG.md
+- **changelog:** Update CHANGELOG.md
 
 ### Documentation
 
@@ -123,6 +124,7 @@ Generated automatically from Conventional Commits history.
 - Homogenize contributing guide with cross-project template
 - Fix reversed bilingual banner order
 - **guides:** Add backend, frontend and user developer guides
+- **adr:** Add architecture decision records
 
 ### Features
 
