@@ -27,7 +27,17 @@
     "typescript-eslint": "^8.63.0"
   },
   "lint-staged": {
-    "*.{ts,vue}": [
+    "apps/api/**/*.ts": [
+      "eslint --fix",
+      "prettier --write",
+      "pnpm --filter api typecheck"
+    ],
+    "apps/web/**/*.{ts,vue}": [
+      "eslint --fix",
+      "prettier --write",
+      "pnpm --filter web typecheck"
+    ],
+    "packages/**/*.ts": [
       "eslint --fix",
       "prettier --write"
     ]
