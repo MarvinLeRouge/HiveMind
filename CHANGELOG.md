@@ -97,6 +97,8 @@ Generated automatically from Conventional Commits history.
 - **changelog:** Update CHANGELOG.md
 - **changelog:** Update CHANGELOG.md
 - **changelog:** Update CHANGELOG.md
+- **changelog:** Update CHANGELOG.md
+- **tooling:** Scope pre-commit typecheck per app
 
 ### Documentation
 
