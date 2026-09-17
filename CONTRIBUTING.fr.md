@@ -33,7 +33,7 @@ pnpm --filter web test          # tests frontend
 pnpm test:e2e                   # E2E, nécessite la stack Docker complète
 ```
 
-Chaque pull request doit maintenir une couverture backend et frontend d'au moins 80 % (`pnpm --filter api test:coverage`, `pnpm --filter web test:coverage`). Voir [docs/testing.fr.md](docs/testing.fr.md) pour la configuration de la base de test et les instructions E2E.
+Chaque pull request doit maintenir une couverture backend et frontend d'au moins 80 % (`pnpm --filter api test:coverage`, `pnpm --filter web test:coverage`). Seuils de couverture (`codecov.yml`, bloquants) : projet 80 % (±2 %), patch 90 % (±5 %). Voir [docs/testing.fr.md](docs/testing.fr.md) pour la configuration de la base de test et les instructions E2E.
 
 ## Workflow
 
