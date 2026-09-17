@@ -59,6 +59,7 @@ Generated automatically from Conventional Commits history.
 - **e2e:** Update register test to match post-verification flow
 - **web:** Show localized error message on login with unverified email
 - **web:** Propagate backend error messages to all form error displays
+- **ci:** Trigger workflow on all pull requests, not just non-doc changes
 
 ### Chores
 
@@ -105,6 +106,7 @@ Generated automatically from Conventional Commits history.
 - **ci:** Raise patch coverage target to 90%
 - **changelog:** Update CHANGELOG.md
 - **ci:** Add ci-status aggregator job
+- **changelog:** Update CHANGELOG.md
 - **changelog:** Update CHANGELOG.md
 
 ### Documentation
