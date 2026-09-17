@@ -109,11 +109,12 @@ jobs:
         run: pnpm --filter api test:coverage
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           use_oidc: true
           flags: backend
           files: apps/api/coverage/lcov.info
+          fail_ci_if_error: false
 
   # ── Frontend ─────────────────────────────────────────────────────────────────
   frontend:
@@ -149,8 +150,9 @@ jobs:
         run: pnpm --filter web test:coverage
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           use_oidc: true
           flags: frontend
           files: apps/web/coverage/lcov.info
+          fail_ci_if_error: false
