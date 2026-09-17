@@ -114,6 +114,7 @@ jobs:
           use_oidc: true
           flags: backend
           files: apps/api/coverage/lcov.info
+          fail_ci_if_error: false
 
   # ── Frontend ─────────────────────────────────────────────────────────────────
   frontend:
@@ -154,3 +155,4 @@ jobs:
           use_oidc: true
           flags: frontend
           files: apps/web/coverage/lcov.info
+          fail_ci_if_error: false
