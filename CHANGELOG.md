@@ -105,6 +105,7 @@ Generated automatically from Conventional Commits history.
 - **ci:** Raise patch coverage target to 90%
 - **changelog:** Update CHANGELOG.md
 - **ci:** Add ci-status aggregator job
+- **changelog:** Update CHANGELOG.md
 
 ### Documentation
 
@@ -133,6 +134,7 @@ Generated automatically from Conventional Commits history.
 - Fix reversed bilingual banner order
 - **guides:** Add backend, frontend and user developer guides
 - **adr:** Add architecture decision records
+- **contributing:** Document codecov coverage thresholds
 
 ### Features
 
