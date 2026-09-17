@@ -99,6 +99,10 @@ Generated automatically from Conventional Commits history.
 - **changelog:** Update CHANGELOG.md
 - **changelog:** Update CHANGELOG.md
 - **tooling:** Scope pre-commit typecheck per app
+- **changelog:** Update CHANGELOG.md
+- Make Codecov upload non-blocking on failure
+- **ci:** Bump codecov-action to v7
+- **ci:** Raise patch coverage target to 90%
 
 ### Documentation
 
