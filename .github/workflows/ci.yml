@@ -109,7 +109,7 @@ jobs:
         run: pnpm --filter api test:coverage
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           use_oidc: true
           flags: backend
@@ -150,7 +150,7 @@ jobs:
         run: pnpm --filter web test:coverage
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           use_oidc: true
           flags: frontend
