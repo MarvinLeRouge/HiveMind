@@ -103,6 +103,8 @@ Generated automatically from Conventional Commits history.
 - Make Codecov upload non-blocking on failure
 - **ci:** Bump codecov-action to v7
 - **ci:** Raise patch coverage target to 90%
+- **changelog:** Update CHANGELOG.md
+- **ci:** Add ci-status aggregator job
 
 ### Documentation
 
