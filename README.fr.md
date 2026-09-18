@@ -12,9 +12,10 @@
 [![Fastify](https://img.shields.io/badge/fastify-5-black?logo=fastify)](https://fastify.dev)
 [![Vue.js](https://img.shields.io/badge/vue-3-42b883?logo=vue.js)](https://vuejs.org)
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-336791?logo=postgresql)](https://www.postgresql.org)
-[![Licence](https://img.shields.io/badge/licence-MIT-blue)](LICENSE)
 [![Backend coverage](https://img.shields.io/codecov/c/github/MarvinLeRouge/HiveMind/main?flag=backend&label=backend&logo=codecov)](https://app.codecov.io/gh/MarvinLeRouge/HiveMind)
 [![Frontend coverage](https://img.shields.io/codecov/c/github/MarvinLeRouge/HiveMind/main?flag=frontend&label=frontend&logo=codecov)](https://app.codecov.io/gh/MarvinLeRouge/HiveMind)
+![Tests](https://img.shields.io/badge/Tests-546%20passing-brightgreen)
+[![License](https://img.shields.io/github/license/MarvinLeRouge/HiveMind?cacheSeconds=3600)](LICENSE)
 
 ---
 
