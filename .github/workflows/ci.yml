@@ -36,8 +36,36 @@ jobs:
               - '.github/workflows/ci.yml'
 
   # ── Backend ──────────────────────────────────────────────────────────────────
-  backend:
-    name: Backend
+  backend-lint:
+    name: "Backend: lint"
+    needs: changes
+    if: ${{ needs.changes.outputs.backend == 'true' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter api exec prisma generate
+
+      - name: Lint
+        run: pnpm --filter api lint
+
+      - name: Typecheck
+        run: pnpm --filter api typecheck
+
+  backend-test:
+    name: "Backend: test"
     needs: changes
     if: ${{ needs.changes.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
@@ -96,12 +124,6 @@ jobs:
       - name: Seed database
         run: pnpm --filter api exec prisma db seed
 
-      - name: Lint
-        run: pnpm --filter api lint
-
-      - name: Typecheck
-        run: pnpm --filter api typecheck
-
       - name: Test with coverage
         run: pnpm --filter api test:coverage
 
@@ -113,9 +135,56 @@ jobs:
           files: apps/api/coverage/lcov.info
           fail_ci_if_error: false
 
+  backend-security:
+    name: "Backend: security"
+    needs: changes
+    if: ${{ needs.changes.outputs.backend == 'true' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: pnpm audit (dependency vulnerability scan)
+        run: pnpm audit --audit-level=critical
+
   # ── Frontend ─────────────────────────────────────────────────────────────────
-  frontend:
-    name: Frontend
+  frontend-lint:
+    name: "Frontend: lint"
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm --filter web lint
+
+      - name: Typecheck
+        run: pnpm --filter web typecheck
+
+  frontend-test:
+    name: "Frontend: test"
     needs: changes
     if: ${{ needs.changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
@@ -137,12 +206,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Lint
-        run: pnpm --filter web lint
-
-      - name: Typecheck
-        run: pnpm --filter web typecheck
-
       - name: Test with coverage
         run: pnpm --filter web test:coverage
 
@@ -154,10 +217,32 @@ jobs:
           files: apps/web/coverage/lcov.info
           fail_ci_if_error: false
 
+  frontend-security:
+    name: "Frontend: security"
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: pnpm audit (dependency vulnerability scan)
+        run: pnpm audit --audit-level=critical
+
   ci-status:
     name: CI status
     if: always()
-    needs: [changes, backend, frontend]
+    needs: [changes, backend-lint, backend-test, backend-security, frontend-lint, frontend-test, frontend-security]
     runs-on: ubuntu-latest
     steps:
       - name: Fail if any required job failed or was cancelled
