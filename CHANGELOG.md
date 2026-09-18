@@ -111,6 +111,7 @@ Generated automatically from Conventional Commits history.
 - **changelog:** Update CHANGELOG.md
 - **changelog:** Update CHANGELOG.md
 - Homogenize job naming and split lint/test/security stages
+- **changelog:** Update CHANGELOG.md
 
 ### Documentation
 
@@ -140,6 +141,7 @@ Generated automatically from Conventional Commits history.
 - **guides:** Add backend, frontend and user developer guides
 - **adr:** Add architecture decision records
 - **contributing:** Document codecov coverage thresholds
+- **readme:** Add tests badge and standardize license badge
 
 ### Features
 
