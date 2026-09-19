@@ -112,6 +112,8 @@ Generated automatically from Conventional Commits history.
 - **changelog:** Update CHANGELOG.md
 - Homogenize job naming and split lint/test/security stages
 - **changelog:** Update CHANGELOG.md
+- **changelog:** Update CHANGELOG.md
+- Add local post-commit hook for changelog generation
 
 ### Documentation
 
