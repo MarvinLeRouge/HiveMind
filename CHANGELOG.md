@@ -144,6 +144,7 @@ Generated automatically from Conventional Commits history.
 - **adr:** Add architecture decision records
 - **contributing:** Document codecov coverage thresholds
 - **readme:** Add tests badge and standardize license badge
+- **root:** Move French community-health docs into docs/i18n/fr
 
 ### Features
 

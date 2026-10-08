@@ -103,8 +103,8 @@ Chaque **Collection** contient des **Puzzles**. Chaque puzzle peut recevoir des 
 | [Feuille de route](docs/roadmap.fr.md) | Blocs completes de V1 a V3 |
 | [Architecture Decision Records](docs/adr/) | Decisions de conception significatives, en anglais uniquement |
 | [Design system](docs/design-system.fr.md) | Tokens OKLCH, dark mode, patterns d'accessibilite |
-| [Contribuer](CONTRIBUTING.fr.md) | Comment contribuer, conventions de branches et commits |
-| [Securite](SECURITY.fr.md) | Divulgation responsable et mesures de securite |
+| [Contribuer](docs/i18n/fr/CONTRIBUTING.fr.md) | Comment contribuer, conventions de branches et commits |
+| [Securite](docs/i18n/fr/SECURITY.fr.md) | Divulgation responsable et mesures de securite |
 | [Changelog](CHANGELOG.md) | Genere automatiquement depuis l'historique Conventional Commits |
 
 ---
