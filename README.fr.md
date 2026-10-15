@@ -2,7 +2,7 @@
 
 # HiveMind
 
-> Une plateforme collaborative pour resoudre des collections d'enigmes de maniere asynchrone.
+> *Plateforme collaborative de résolution asynchrone de collections d'énigmes : collections partagées, rôles par collection, notes et tentatives immuables, import GPX et CSV. API Fastify et TypeScript, PostgreSQL avec Prisma, frontend Vue.js.*
 
 [![Statut](https://img.shields.io/badge/statut-production-brightgreen)](https://github.com/MarvinLeRouge/HiveMind)
 [![CI](https://github.com/MarvinLeRouge/HiveMind/actions/workflows/ci.yml/badge.svg)](https://github.com/MarvinLeRouge/HiveMind/actions/workflows/ci.yml)

@@ -145,6 +145,7 @@ Generated automatically from Conventional Commits history.
 - **contributing:** Document codecov coverage thresholds
 - **readme:** Add tests badge and standardize license badge
 - **root:** Move French community-health docs into docs/i18n/fr
+- Align readme tagline with repository description
 
 ### Features
 
