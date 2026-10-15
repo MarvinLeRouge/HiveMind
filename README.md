@@ -2,7 +2,7 @@
 
 # HiveMind
 
-> A collaborative platform for solving puzzle collections asynchronously.
+> *Collaborative platform for solving puzzle collections asynchronously: shared collections, per-collection roles, notes and immutable attempts, GPX and CSV import. Fastify and TypeScript API, PostgreSQL with Prisma, Vue.js frontend.*
 
 [![Status](https://img.shields.io/badge/status-production-brightgreen)](https://github.com/MarvinLeRouge/HiveMind)
 [![CI](https://github.com/MarvinLeRouge/HiveMind/actions/workflows/ci.yml/badge.svg)](https://github.com/MarvinLeRouge/HiveMind/actions/workflows/ci.yml)
