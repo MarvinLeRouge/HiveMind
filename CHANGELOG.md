@@ -115,6 +115,7 @@ Generated automatically from Conventional Commits history.
 - **changelog:** Update CHANGELOG.md
 - Add local post-commit hook for changelog generation
 - **gitignore:** Ignore codegraph folder
+- **changelog:** Auto-merge the catch-up CHANGELOG.md PR
 
 ### Documentation
 
