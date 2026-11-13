@@ -54,3 +54,4 @@
 
 - [x] FIX-001 - Corriger les failles de fast-jwt (confusion d'algorithme critique, JWT non signes, contournement des claims)
 - [x] FIX-002 - Corriger les failles de severite haute (XSS vue-i18n et Vue SSR, DoS zod, busboy et source-map-js, vite)
+- [x] FIX-003 - Corriger les failles de severite moyenne et basse (fast-uri, glob, vitest, fastify, fast-xml-parser, csv-parse, postcss-selector-parser)
