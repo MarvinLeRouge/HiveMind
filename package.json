@@ -45,7 +45,7 @@
   "packageManager": "pnpm@9.15.4",
   "pnpm": {
     "overrides": {
-      "fast-jwt": ">=6.2.4",
+      "fast-jwt": ">=6.3.4",
       "fast-uri": ">=3.1.1",
       "postcss@<8.5.10": ">=8.5.10",
       "fast-xml-builder@<=1.1.6": ">=1.1.7",

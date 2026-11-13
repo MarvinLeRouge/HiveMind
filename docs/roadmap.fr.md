@@ -49,3 +49,7 @@
 - [x] BLOCK-26 · Polish design & UX (palette OKLCH accessible, dark mode, responsive mobile, etats vides, gestion d'erreurs, micro-interactions)
 - [x] BLOCK-27 · Audit design (impeccable - score 14/20, tokens couleur semantiques OKLCH, focus WCAG ring-2, drag-and-drop clavier, motion accessible)
 - [x] BLOCK-28 · Verification d'email a l'inscription (token SHA-256, SMTP Brevo, page /verify-email, renvoi du lien)
+
+## Section 5 - Maintenance
+
+- [x] FIX-001 - Corriger les failles de fast-jwt (confusion d'algorithme critique, JWT non signes, contournement des claims)
