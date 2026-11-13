@@ -52,4 +52,5 @@
 
 ## Section 5 - Maintenance
 
+- [x] FIX-001 - Corriger les failles de fast-jwt (confusion d'algorithme critique, JWT non signes, contournement des claims)
 - [x] CI-001 - Lancer la CI sur la PR du bot changelog pour que son auto-merge aboutisse

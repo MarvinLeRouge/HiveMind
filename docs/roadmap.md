@@ -52,4 +52,5 @@
 
 ## Section 5 - Maintenance
 
+- [x] FIX-001 - Patch fast-jwt advisories (critical algorithm confusion, unsigned JWT and claim bypasses)
 - [x] CI-001 - Run CI on the changelog bot PR so its auto-merge can complete

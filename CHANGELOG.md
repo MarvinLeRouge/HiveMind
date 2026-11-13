@@ -61,6 +61,7 @@ Generated automatically from Conventional Commits history.
 - **web:** Propagate backend error messages to all form error displays
 - **ci:** Trigger workflow on all pull requests, not just non-doc changes
 - **deps:** Resolve remaining pnpm audit vulnerabilities
+- **deps:** Patch fast-jwt advisories
 
 ### Chores
 
