@@ -54,3 +54,4 @@
 
 - [x] FIX-001 - Patch fast-jwt advisories (critical algorithm confusion, unsigned JWT and claim bypasses)
 - [x] FIX-002 - Patch high-severity advisories (vue-i18n XSS, Vue SSR XSS, zod, busboy and source-map-js DoS, vite)
+- [x] FIX-003 - Patch moderate and low advisories (fast-uri, glob, vitest, fastify, fast-xml-parser, csv-parse, postcss-selector-parser)
