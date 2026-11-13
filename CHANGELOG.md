@@ -62,6 +62,7 @@ Generated automatically from Conventional Commits history.
 - **ci:** Trigger workflow on all pull requests, not just non-doc changes
 - **deps:** Resolve remaining pnpm audit vulnerabilities
 - **deps:** Patch fast-jwt advisories
+- **deps:** Patch high-severity advisories
 
 ### Chores
 
