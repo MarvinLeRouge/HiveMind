@@ -63,6 +63,7 @@ Generated automatically from Conventional Commits history.
 - **deps:** Resolve remaining pnpm audit vulnerabilities
 - **deps:** Patch fast-jwt advisories
 - **deps:** Patch high-severity advisories
+- **deps:** Patch moderate and low advisories
 
 ### Chores
 
