@@ -53,4 +53,5 @@
 ## Section 5 - Maintenance
 
 - [x] FIX-001 - Patch fast-jwt advisories (critical algorithm confusion, unsigned JWT and claim bypasses)
+- [x] FIX-002 - Patch high-severity advisories (vue-i18n XSS, Vue SSR XSS, zod, busboy and source-map-js DoS, vite)
 - [x] CI-001 - Run CI on the changelog bot PR so its auto-merge can complete

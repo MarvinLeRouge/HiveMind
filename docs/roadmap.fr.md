@@ -53,4 +53,5 @@
 ## Section 5 - Maintenance
 
 - [x] FIX-001 - Corriger les failles de fast-jwt (confusion d'algorithme critique, JWT non signes, contournement des claims)
+- [x] FIX-002 - Corriger les failles de severite haute (XSS vue-i18n et Vue SSR, DoS zod, busboy et source-map-js, vite)
 - [x] CI-001 - Lancer la CI sur la PR du bot changelog pour que son auto-merge aboutisse
