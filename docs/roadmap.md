@@ -49,3 +49,7 @@
 - [x] BLOCK-26 · Design polish (accessible OKLCH palette, dark mode, mobile-responsive layout, empty states, error boundaries, micro-interactions)
 - [x] BLOCK-27 · Design audit (impeccable - score 14/20, OKLCH semantic tokens, WCAG ring-2 focus, keyboard drag-and-drop, accessible motion)
 - [x] BLOCK-28 · Email verification on register (SHA-256 token, Brevo SMTP, /verify-email page, resend flow)
+
+## Section 5 - Maintenance
+
+- [x] FIX-001 - Patch fast-jwt advisories (critical algorithm confusion, unsigned JWT and claim bypasses)
