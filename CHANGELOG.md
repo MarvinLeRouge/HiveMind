@@ -123,6 +123,7 @@ Generated automatically from Conventional Commits history.
 - **changelog:** Auto-merge the catch-up CHANGELOG.md PR
 - Run CI on the changelog bot PR so its auto-merge can complete
 - **deps:** Add dependabot config
+- **deps:** Upgrade vitest and @vitest/coverage-v8 to 5
 
 ### Documentation
 
