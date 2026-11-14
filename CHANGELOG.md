@@ -65,6 +65,7 @@ Generated automatically from Conventional Commits history.
 - **deps:** Patch high-severity advisories
 - **deps:** Patch moderate and low advisories
 - **api:** Drop upgrade-insecure-requests from the csp
+- **infra:** Redirect /api/docs to /api/docs/ in local traefik
 
 ### Chores
 

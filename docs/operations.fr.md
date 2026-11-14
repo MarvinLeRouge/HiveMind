@@ -58,7 +58,7 @@ L'application est accessible :
 |---------|-----|
 | Frontend | http://hivemind.marvinlerouge.local |
 | API | http://hivemind.marvinlerouge.local/api |
-| Swagger UI | http://hivemind.marvinlerouge.local/api/docs |
+| Swagger UI | http://hivemind.marvinlerouge.local/api/docs/ |
 
 Les identifiants admin par defaut sont definis dans `apps/api/.env` (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`).
 

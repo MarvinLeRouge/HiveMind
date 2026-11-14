@@ -58,7 +58,7 @@ The app is now running:
 |---------|-----|
 | Frontend | http://hivemind.marvinlerouge.local |
 | API | http://hivemind.marvinlerouge.local/api |
-| Swagger UI | http://hivemind.marvinlerouge.local/api/docs |
+| Swagger UI | http://hivemind.marvinlerouge.local/api/docs/ |
 
 The default admin credentials are defined in `apps/api/.env` (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`).
 
