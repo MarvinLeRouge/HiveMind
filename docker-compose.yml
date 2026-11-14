@@ -20,9 +20,12 @@ services:
       - "traefik.docker.network=traefik-public"
       - "traefik.http.routers.hivemind-api-dev.rule=Host(`hivemind.marvinlerouge.local`) && PathPrefix(`/api`)"
       - "traefik.http.routers.hivemind-api-dev.entrypoints=web"
-      - "traefik.http.routers.hivemind-api-dev.middlewares=hivemind-strip-api-dev"
+      - "traefik.http.routers.hivemind-api-dev.middlewares=hivemind-docs-slash-dev,hivemind-strip-api-dev"
       - "traefik.http.routers.hivemind-api-dev.service=hivemind-backend-dev"
       - "traefik.http.middlewares.hivemind-strip-api-dev.stripprefix.prefixes=/api"
+      # Swagger UI builds asset URLs without the stripped /api prefix unless the URL ends with a slash
+      - "traefik.http.middlewares.hivemind-docs-slash-dev.redirectregex.regex=^(https?://[^/]+/api/docs)$$"
+      - "traefik.http.middlewares.hivemind-docs-slash-dev.redirectregex.replacement=$${1}/"
       - "traefik.http.services.hivemind-backend-dev.loadbalancer.server.port=3000"
     networks:
       - traefik-public
