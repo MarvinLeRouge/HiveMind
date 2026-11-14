@@ -56,3 +56,4 @@
 - [x] FIX-002 - Corriger les failles de severite haute (XSS vue-i18n et Vue SSR, DoS zod, busboy et source-map-js, vite)
 - [x] FIX-003 - Corriger les failles de severite moyenne et basse (fast-uri, glob, vitest, fastify, fast-xml-parser, csv-parse, postcss-selector-parser)
 - [x] CI-001 - Lancer la CI sur la PR du bot changelog pour que son auto-merge aboutisse
+- [x] FIX-004 - Retirer upgrade-insecure-requests de la CSP de l'API (Swagger UI local vide)
