@@ -58,3 +58,5 @@
 - [x] CI-001 - Lancer la CI sur la PR du bot changelog pour que son auto-merge aboutisse
 - [x] FIX-004 - Retirer upgrade-insecure-requests de la CSP de l'API (Swagger UI local vide)
 - [x] CHORE-001 - Ajouter la configuration Dependabot (npm, docker, github-actions)
+- [x] CHORE-002 - Passer vitest et @vitest/coverage-v8 en version 5
+- [ ] CHORE-003 - Migrer vers Prisma 7 (prisma.config.ts, driver adapter ; PR Dependabot #145)
