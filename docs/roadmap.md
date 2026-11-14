@@ -57,3 +57,4 @@
 - [x] FIX-003 - Patch moderate and low advisories (fast-uri, glob, vitest, fastify, fast-xml-parser, csv-parse, postcss-selector-parser)
 - [x] CI-001 - Run CI on the changelog bot PR so its auto-merge can complete
 - [x] FIX-004 - Drop upgrade-insecure-requests from the API CSP (blank local Swagger UI)
+- [x] CHORE-001 - Add Dependabot config (npm, docker, github-actions)

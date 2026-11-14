@@ -122,6 +122,7 @@ Generated automatically from Conventional Commits history.
 - **gitignore:** Ignore codegraph folder
 - **changelog:** Auto-merge the catch-up CHANGELOG.md PR
 - Run CI on the changelog bot PR so its auto-merge can complete
+- **deps:** Add dependabot config
 
 ### Documentation
 
