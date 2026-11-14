@@ -64,6 +64,7 @@ Generated automatically from Conventional Commits history.
 - **deps:** Patch fast-jwt advisories
 - **deps:** Patch high-severity advisories
 - **deps:** Patch moderate and low advisories
+- **api:** Drop upgrade-insecure-requests from the csp
 
 ### Chores
 

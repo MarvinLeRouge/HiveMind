@@ -77,6 +77,8 @@ export async function buildApp(options?: AppOptions): Promise<FastifyInstance> {
         connectSrc: ["'self'"],
         fontSrc: ["'self'", 'data:'],
         objectSrc: ["'none'"],
+        // Helmet default: breaks the http local stack (assets rewritten to https), useless for a JSON API
+        upgradeInsecureRequests: null,
       },
     },
     crossOriginEmbedderPolicy: false,
