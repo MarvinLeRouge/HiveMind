@@ -80,8 +80,6 @@ function makeCollectionRepo(
 ): CollectionRepository {
   return {
     findAllByMember: vi.fn().mockResolvedValue([]),
-    findById: vi.fn().mockResolvedValue(null),
-    findBySlug: vi.fn().mockResolvedValue(null),
     findBySlugOrId: vi.fn().mockResolvedValue(null),
     slugExists: vi.fn().mockResolvedValue(false),
     findMembership: vi.fn().mockResolvedValue(null),

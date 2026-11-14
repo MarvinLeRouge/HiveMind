@@ -117,16 +117,6 @@ export class AuthRepository {
   }
 
   /**
-   * Deletes a verification token after use.
-   * Silently succeeds if the token does not exist.
-   */
-  async deleteVerificationToken(tokenHash: string): Promise<void> {
-    await this.prisma.verificationToken
-      .delete({ where: { tokenHash } })
-      .catch(() => undefined);
-  }
-
-  /**
    * Marks a user's email as verified.
    */
   async markEmailVerified(userId: string): Promise<User> {

@@ -7,6 +7,7 @@ import { usePuzzleStore } from '../../src/stores/puzzle';
 import { useNoteStore } from '../../src/stores/note';
 import { useAttemptStore } from '../../src/stores/attempt';
 import { useAuthStore } from '../../src/stores/auth';
+import { useCollectionStore } from '../../src/stores/collection';
 import { useToastStore } from '../../src/stores/toast';
 
 vi.mock('../../src/lib/api-fetch', () => ({ apiFetch: vi.fn() }));
@@ -865,5 +866,198 @@ describe('PuzzleDetailPage', () => {
     await flushPromises();
 
     expect(toast.toasts.some((t) => t.type === 'error')).toBe(true);
+  });
+});
+
+// ── Edit form, note editing and attempt details ───────────────────────────────
+
+describe('PuzzleDetailPage interactions', () => {
+  async function mountPage() {
+    const puzzleStore = usePuzzleStore();
+    const noteStore = useNoteStore();
+    const attemptStore = useAttemptStore();
+    const collectionStore = useCollectionStore();
+    vi.spyOn(puzzleStore, 'fetchById').mockResolvedValue();
+    vi.spyOn(noteStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(attemptStore, 'fetchAll').mockResolvedValue();
+    vi.spyOn(collectionStore, 'fetchById').mockResolvedValue();
+    // Template with no mode set: every optional field is visible
+    collectionStore.current = { id: 'col-1', templateSnapshot: {} } as never;
+    puzzleStore.current = mockPuzzle;
+    noteStore.notes = [mockNote];
+    useAuthStore().user = {
+      id: 'user-1',
+      username: 'alice',
+      email: 'alice@example.com',
+      isAdmin: false,
+      language: 'en',
+      createdAt: '2025-01-01',
+    };
+    const router = makeRouter();
+    await router.push('/collections/col-1/puzzles/pzl-1');
+    const wrapper = mount(PuzzleDetailPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+    return { wrapper, puzzleStore, noteStore, attemptStore };
+  }
+
+  const button = (
+    wrapper: Awaited<ReturnType<typeof mountPage>>['wrapper'],
+    text: string,
+    cls?: string,
+  ) =>
+    wrapper
+      .findAll('button')
+      .find((b) => b.text() === text && (!cls || b.classes().includes(cls)));
+
+  async function openEditForm(
+    wrapper: Awaited<ReturnType<typeof mountPage>>['wrapper'],
+  ) {
+    await button(wrapper, 'Edit', 'h-9')!.trigger('click');
+    await flushPromises();
+  }
+
+  it('saves every edited puzzle field', async () => {
+    const { wrapper, puzzleStore } = await mountPage();
+    vi.spyOn(puzzleStore, 'update').mockResolvedValue();
+    await openEditForm(wrapper);
+
+    await wrapper.find('#edit-title').setValue('Renamed');
+    await wrapper.find('#edit-description').setValue('New desc');
+    await wrapper.find('#edit-checker').setValue('https://new.example.com');
+    await wrapper.find('#edit-gc-code').setValue('GC999');
+    await wrapper.find('#edit-difficulty').setValue('4');
+    await wrapper.find('#edit-terrain').setValue('1');
+    await wrapper.find('#edit-coords').setValue('S 1 W 2');
+    await wrapper.find('#edit-hint').setValue('Magnetic');
+    await wrapper.find('#edit-spoiler').setValue('Under the rock');
+    await wrapper.find('form[aria-label="Edit puzzle"]').trigger('submit');
+    await flushPromises();
+
+    expect(puzzleStore.update).toHaveBeenCalledWith('col-1', 'pzl-1', {
+      title: 'Renamed',
+      description: 'New desc',
+      checkerUrl: 'https://new.example.com',
+      gcCode: 'GC999',
+      difficulty: 4,
+      terrain: 1,
+      coords: 'S 1 W 2',
+      hint: 'Magnetic',
+      spoiler: 'Under the rock',
+    });
+    expect(wrapper.find('form[aria-label="Edit puzzle"]').exists()).toBe(false);
+  });
+
+  it('keeps the edit form open with an error when saving fails', async () => {
+    const { wrapper, puzzleStore } = await mountPage();
+    vi.spyOn(puzzleStore, 'update').mockRejectedValue(
+      new Error('Save refused'),
+    );
+    await openEditForm(wrapper);
+
+    await wrapper.find('form[aria-label="Edit puzzle"]').trigger('submit');
+    await flushPromises();
+
+    expect(
+      wrapper.find('form[aria-label="Edit puzzle"] [role="alert"]').text(),
+    ).toBe('Save refused');
+  });
+
+  it('closes the edit form on cancel without saving', async () => {
+    const { wrapper, puzzleStore } = await mountPage();
+    vi.spyOn(puzzleStore, 'update').mockResolvedValue();
+    await openEditForm(wrapper);
+
+    await button(wrapper, 'Cancel')!.trigger('click');
+
+    expect(wrapper.find('form[aria-label="Edit puzzle"]').exists()).toBe(false);
+    expect(puzzleStore.update).not.toHaveBeenCalled();
+  });
+
+  it('switches back to the notes tab from the attempts tab', async () => {
+    const { wrapper } = await mountPage();
+
+    await wrapper.find('#tab-attempts').trigger('click');
+    await wrapper.find('#tab-notes').trigger('click');
+
+    expect(wrapper.find('#tab-notes').attributes('aria-selected')).toBe('true');
+    expect(wrapper.text()).toContain('Interesting cipher');
+  });
+
+  it('saves the edited note content', async () => {
+    const { wrapper, noteStore } = await mountPage();
+    vi.spyOn(noteStore, 'update').mockResolvedValue();
+
+    await button(wrapper, 'Edit', 'text-xs')!.trigger('click');
+    await wrapper.find('textarea[rows="3"]').setValue('Solved with ROT13');
+    await button(wrapper, 'Save', 'text-xs')!.trigger('click');
+    await flushPromises();
+
+    expect(noteStore.update).toHaveBeenCalledWith(
+      'pzl-1',
+      'note-1',
+      'Solved with ROT13',
+    );
+    expect(wrapper.find('textarea[rows="3"]').exists()).toBe(false);
+  });
+
+  it('leaves note edit mode on cancel without saving', async () => {
+    const { wrapper, noteStore } = await mountPage();
+    vi.spyOn(noteStore, 'update').mockResolvedValue();
+
+    await button(wrapper, 'Edit', 'text-xs')!.trigger('click');
+    await button(wrapper, 'Cancel', 'text-xs')!.trigger('click');
+
+    expect(wrapper.find('textarea[rows="3"]').exists()).toBe(false);
+    expect(noteStore.update).not.toHaveBeenCalled();
+  });
+
+  it('shows a note error when saving an edited note fails', async () => {
+    const { wrapper, noteStore } = await mountPage();
+    vi.spyOn(noteStore, 'update').mockRejectedValue(new Error('Note locked'));
+
+    await button(wrapper, 'Edit', 'text-xs')!.trigger('click');
+    await button(wrapper, 'Save', 'text-xs')!.trigger('click');
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('Note locked');
+  });
+
+  it('shows a note error when deleting a note fails', async () => {
+    const { wrapper, noteStore } = await mountPage();
+    vi.spyOn(noteStore, 'delete').mockRejectedValue(
+      new Error('Delete refused'),
+    );
+
+    await button(wrapper, 'Delete')!.trigger('click');
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('Delete refused');
+    expect(wrapper.text()).toContain('Interesting cipher');
+  });
+
+  it('records an attempt with its result and comment, then resets the form', async () => {
+    const { wrapper, attemptStore } = await mountPage();
+    vi.spyOn(attemptStore, 'add').mockResolvedValue();
+    await wrapper.find('#tab-attempts').trigger('click');
+
+    await wrapper.find('#attempt-value').setValue('N 48 E 2');
+    await wrapper.find('#attempt-result').setValue('true');
+    await wrapper.find('#attempt-comment').setValue('Checker said yes');
+    await wrapper
+      .find('#attempt-value')
+      .element.closest('form')!
+      .requestSubmit();
+    await flushPromises();
+
+    expect(attemptStore.add).toHaveBeenCalledWith('pzl-1', {
+      valueTested: 'N 48 E 2',
+      checkerResult: true,
+      comment: 'Checker said yes',
+    });
+    expect(
+      (wrapper.find('#attempt-comment').element as HTMLInputElement).value,
+    ).toBe('');
   });
 });

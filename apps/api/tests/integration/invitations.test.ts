@@ -132,6 +132,18 @@ describe('POST /collections/:id/invitations', () => {
     expect(res.statusCode).toBe(403);
   });
 
+  it('creates an invitation for an email with no account yet', async () => {
+    const collectionId = await createCollection(userToken);
+    const res = await sendInvitation(
+      userToken,
+      collectionId,
+      'not-registered@example.com',
+    );
+
+    expect(res.statusCode).toBe(201);
+    expect(res.json().inviteeEmail).toBe('not-registered@example.com');
+  });
+
   it('returns 409 when a pending invitation already exists for the email', async () => {
     const collectionId = await createCollection(userToken);
     await sendInvitation(userToken, collectionId, 'user2@example.com');

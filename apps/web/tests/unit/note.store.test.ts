@@ -61,6 +61,18 @@ describe('useNoteStore', () => {
     });
   });
 
+  describe('update of an unlisted note', () => {
+    it('leaves the list unchanged when the note is not loaded', async () => {
+      mockFetch.mockResolvedValueOnce({ ...mockNote, id: 'note-2' });
+      const store = useNoteStore();
+      store.notes = [mockNote];
+
+      await store.update('pzl-1', 'note-2', 'Elsewhere');
+
+      expect(store.notes).toEqual([mockNote]);
+    });
+  });
+
   describe('delete', () => {
     it('removes the note from the list', async () => {
       mockFetch.mockResolvedValueOnce(undefined);

@@ -148,3 +148,47 @@ describe('TemplateEditPage', () => {
     expect(fetchBySpy).toHaveBeenCalledTimes(2);
   });
 });
+
+describe('TemplateEditPage full form', () => {
+  it('submits every edited field', async () => {
+    const store = useTemplateStore();
+    vi.spyOn(store, 'fetchById').mockImplementation(async () => {
+      store.current = mockTemplate;
+    });
+    vi.spyOn(store, 'update').mockResolvedValue();
+    const router = makeRouter();
+    await router.push('/templates/tpl-1/edit');
+    const wrapper = mount(TemplateEditPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    await wrapper.find('input#name').setValue('Full');
+    await wrapper.find('textarea#description').setValue('All fields');
+    await wrapper.find('input#isPublic').setValue(true);
+    await wrapper.find('select#gcCodeMode').setValue('required');
+    await wrapper.find('select#hintMode').setValue('optional');
+    const customRows = wrapper.findAll('fieldset div.border-t');
+    await customRows[0].find('input').setValue('Owner');
+    await customRows[0].find('select').setValue('optional');
+    await customRows[1].find('input').setValue('Bonus');
+    await customRows[1].find('select').setValue('required');
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    expect(store.update).toHaveBeenCalledWith(
+      'tpl-1',
+      expect.objectContaining({
+        name: 'Full',
+        description: 'All fields',
+        isPublic: true,
+        gcCodeMode: 'required',
+        hintMode: 'optional',
+        customField1Label: 'Owner',
+        customField1Mode: 'optional',
+        customField2Label: 'Bonus',
+        customField2Mode: 'required',
+      }),
+    );
+  });
+});
