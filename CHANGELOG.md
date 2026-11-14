@@ -124,6 +124,12 @@ Generated automatically from Conventional Commits history.
 - Run CI on the changelog bot PR so its auto-merge can complete
 - **deps:** Add dependabot config
 - **deps:** Upgrade vitest and @vitest/coverage-v8 to 5
+- **deps:** Bump docker/login-action from 3 to 4
+- **deps:** Bump actions/checkout from 4 to 7
+- **deps:** Bump docker/build-push-action from 6 to 7
+- **deps:** Bump peter-evans/create-pull-request from 7 to 8
+- **deps:** Bump dorny/paths-filter from 3 to 4
+- **deps:** Bump the minor-and-patch group across 1 directory with 15 updates
 
 ### Documentation
 
