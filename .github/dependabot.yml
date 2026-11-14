@@ -1,0 +1,53 @@
+version: 2
+
+updates:
+  # One entry covers the whole pnpm workspace (apps/api, apps/web, packages/shared)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    ignore:
+      # TypeScript 7 is not supported by typescript-eslint yet: lift once it is
+      - dependency-name: "typescript"
+        versions: [">= 7"]
+      # Node types follow the Node runtime major (Dockerfiles, CI node-version)
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+    groups:
+      vue:
+        patterns: ["vue", "vue-*", "@vue/*", "@vitejs/plugin-vue"]
+      # vitest and its plugins must move together, majors included
+      vitest:
+        patterns: ["vitest", "@vitest/*"]
+      fastify:
+        patterns: ["fastify", "@fastify/*", "fastify-*"]
+      prisma:
+        patterns: ["prisma", "@prisma/*"]
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "docker"
+    directories: ["/apps/api", "/apps/web"]
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    ignore:
+      # Node majors follow package.json engines and CI node-version, changed together on purpose
+      - dependency-name: "node"
+        update-types: ["version-update:semver-major"]
+    groups:
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types: ["minor", "patch"]
