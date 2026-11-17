@@ -48,26 +48,6 @@ export class CollectionRepository {
   }
 
   /**
-   * Finds a collection by ID, including its template snapshot.
-   */
-  async findById(id: string): Promise<CollectionRow | null> {
-    return this.prisma.collection.findUnique({
-      where: { id },
-      include: { templateSnapshot: true },
-    });
-  }
-
-  /**
-   * Finds a collection by its URL slug, including its template snapshot.
-   */
-  async findBySlug(slug: string): Promise<CollectionRow | null> {
-    return this.prisma.collection.findUnique({
-      where: { slug },
-      include: { templateSnapshot: true },
-    });
-  }
-
-  /**
    * Finds a collection by slug or UUID — used by route handlers that accept
    * either identifier (slug in URLs, UUID in internal references).
    */

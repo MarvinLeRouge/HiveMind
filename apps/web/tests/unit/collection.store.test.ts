@@ -115,6 +115,34 @@ describe('useCollectionStore', () => {
     });
   });
 
+  describe('update of a listed collection', () => {
+    it('also replaces the collection in the list', async () => {
+      const updated = { ...mockCollection, name: 'Renamed' };
+      mockFetch.mockResolvedValueOnce(updated);
+      const store = useCollectionStore();
+      store.collections = [mockCollection];
+
+      await store.update('col-1', { name: 'Renamed' });
+
+      expect(store.collections[0].name).toBe('Renamed');
+    });
+  });
+
+  describe('delete of a non-current collection', () => {
+    it('keeps the current collection', async () => {
+      const other = { ...mockCollection, id: 'col-2' };
+      mockFetch.mockResolvedValueOnce(undefined);
+      const store = useCollectionStore();
+      store.collections = [mockCollection, other];
+      store.current = mockCollection;
+
+      await store.delete('col-2');
+
+      expect(store.collections).toEqual([mockCollection]);
+      expect(store.current).toEqual(mockCollection);
+    });
+  });
+
   describe('delete', () => {
     it('removes the collection from the list', async () => {
       mockFetch.mockResolvedValueOnce(undefined);

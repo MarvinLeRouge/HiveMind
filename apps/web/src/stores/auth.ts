@@ -13,7 +13,7 @@ const ACCESS_TOKEN_KEY = 'hivemind_access_token';
 /**
  * Global authentication store.
  * Manages current user state and JWT access token.
- * Uses raw ofetch directly to avoid circular dependency with useApi.
+ * Uses raw ofetch directly to avoid a circular dependency with apiFetch.
  */
 export const useAuthStore = defineStore('auth', {
   state: () => ({

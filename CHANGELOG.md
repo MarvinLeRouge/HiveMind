@@ -132,6 +132,7 @@ Generated automatically from Conventional Commits history.
 - **deps:** Bump the minor-and-patch group across 1 directory with 15 updates
 - **deps-dev:** Bump @vitejs/plugin-vue
 - **deps:** Bump pinia from 2.3.1 to 4.1.0
+- **changelog:** Update CHANGELOG.md (#149)
 
 ### Documentation
 
@@ -228,5 +229,7 @@ Generated automatically from Conventional Commits history.
 - **web:** Add missing coverage for error handlers and retry paths
 - **web:** Cover loginFailed fallback and template-driven puzzle fields
 - **web:** Cover moveUp and moveDown keyboard reorder in PuzzlesPage and CollectionDetailPage
+- **coverage:** Close per-file coverage gaps in api and web
+- **api:** Make the valid-env test independent of the shell environment
 
 

@@ -21,6 +21,8 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'lcov'],
       include: ['src/**/*.{ts,vue}'],
+      // Bootstrap entry point: only mounts the app with its plugins
+      exclude: ['src/main.ts'],
     },
   },
 });

@@ -113,3 +113,61 @@ describe('CollectionsPage', () => {
     expect(fetchAllSpy).toHaveBeenCalledTimes(2);
   });
 });
+
+describe('CollectionsPage relative dates', () => {
+  it.each([
+    [2 * 3_600_000, '2 hours ago'],
+    [5 * 86_400_000, '5 days ago'],
+    [90 * 86_400_000, '3 months ago'],
+  ])('shows a creation date %i ms old as "%s"', async (ageMs, expected) => {
+    const store = useCollectionStore();
+    vi.spyOn(store, 'fetchAll').mockResolvedValue();
+    store.collections = [
+      {
+        ...mockCollection,
+        createdAt: new Date(Date.now() - ageMs).toISOString(),
+      } as never,
+    ];
+    const router = makeRouter();
+    await router.push('/collections');
+
+    const wrapper = mount(CollectionsPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    expect(wrapper.text()).toContain(expected);
+  });
+});
+
+describe('CollectionsPage edge cases', () => {
+  it('omits the description line when a collection has none', async () => {
+    const store = useCollectionStore();
+    vi.spyOn(store, 'fetchAll').mockResolvedValue();
+    store.collections = [{ ...mockCollection, description: null } as never];
+    const router = makeRouter();
+    await router.push('/collections');
+
+    const wrapper = mount(CollectionsPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('My Collection');
+    expect(wrapper.text()).not.toContain('A description');
+  });
+
+  it('shows the generic error when loading rejects with a non-Error value', async () => {
+    const store = useCollectionStore();
+    vi.spyOn(store, 'fetchAll').mockRejectedValue('boom');
+    const router = makeRouter();
+    await router.push('/collections');
+
+    const wrapper = mount(CollectionsPage, {
+      global: { plugins: [pinia, router] },
+    });
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('Something went wrong');
+  });
+});

@@ -59,4 +59,5 @@
 - [x] FIX-004 - Retirer upgrade-insecure-requests de la CSP de l'API (Swagger UI local vide)
 - [x] CHORE-001 - Ajouter la configuration Dependabot (npm, docker, github-actions)
 - [x] CHORE-002 - Passer vitest et @vitest/coverage-v8 en version 5
+- [x] TEST-001 - Combler les trous de couverture par fichier (tous les fichiers api et web a 80 % ou plus, code mort supprime)
 - [ ] CHORE-003 - Migrer vers Prisma 7 (prisma.config.ts, driver adapter ; PR Dependabot #145)

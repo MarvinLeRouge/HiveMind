@@ -48,7 +48,6 @@ function makeRepo(overrides: Partial<AuthRepository> = {}): AuthRepository {
     deleteExpiredRefreshTokens: vi.fn().mockResolvedValue(undefined),
     createVerificationToken: vi.fn().mockResolvedValue(undefined),
     findVerificationToken: vi.fn().mockResolvedValue({ userId: mockUser.id }),
-    deleteVerificationToken: vi.fn().mockResolvedValue(undefined),
     markEmailVerified: vi.fn().mockResolvedValue(mockUser),
     deleteVerificationTokensByUser: vi.fn().mockResolvedValue(undefined),
     ...overrides,
