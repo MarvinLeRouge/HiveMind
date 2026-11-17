@@ -19,6 +19,10 @@ afterEach(() => {
 
 describe('env validation', () => {
   it('exposes parsed values with defaults when the environment is valid', async () => {
+    vi.stubEnv('DATABASE_URL', 'postgresql://user:pass@localhost:5432/db');
+    vi.stubEnv('JWT_ACCESS_SECRET', 'a'.repeat(32));
+    vi.stubEnv('JWT_REFRESH_SECRET', 'b'.repeat(32));
+    vi.stubEnv('CORS_ORIGIN', 'http://localhost:5173');
     vi.stubEnv('PORT', undefined);
     vi.stubEnv('SMTP_SECURE', 'true');
 
