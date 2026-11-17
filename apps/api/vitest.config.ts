@@ -1,4 +1,10 @@
+import { existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
+
+// Local runs only: CI sets its variables in the workflow, and existing variables are never overridden
+const localEnvFile = fileURLToPath(new URL('.env.test', import.meta.url));
+if (existsSync(localEnvFile)) process.loadEnvFile(localEnvFile);
 
 export default defineConfig({
   test: {

@@ -20,19 +20,21 @@ pnpm --filter api test:coverage     # Avec rapport de couverture (cible >= 80 %)
 
 ### Configuration de la base de test (local)
 
-Les tests d'integration necessitent une base PostgreSQL separee. A creer une fois :
+Les tests d'integration s'executent sur `HiveMind_test`, une base dediee dans le conteneur de la stack de dev (`hivemind-db-1`, publie sur `127.0.0.1:5434`). La creer une fois si elle n'existe pas :
 
 ```bash
-createdb HiveMind_test
+docker compose exec db createdb -U HiveMind HiveMind_test
 ```
 
-Puis ajouter la chaine de connexion dans `apps/api/.env` :
+Puis creer le fichier d'environnement de test local a partir de son modele et renseigner le mot de passe de la base :
 
-```env
-DATABASE_URL_TEST=postgresql://postgres@localhost:5432/HiveMind_test
+```bash
+cp apps/api/.env.test.example apps/api/.env.test
 ```
 
-Quand `DATABASE_URL_TEST` est defini, le global setup des tests applique les migrations et le seed sur cette base avant l'execution de la suite. En CI, `DATABASE_URL_TEST` est absent - le service PostgreSQL CI est utilise directement via `DATABASE_URL`.
+`vitest.config.ts` charge `apps/api/.env.test` s'il existe, donc `pnpm --filter api test:coverage` fonctionne tel quel depuis l'hote. Les variables deja definies dans le shell sont prioritaires sur le fichier. Le global setup des tests applique les migrations et le seed sur `DATABASE_URL_TEST` avant l'execution de la suite.
+
+Hors CI, le global setup refuse de s'executer si le nom de la base cible ne se termine pas par `_test` : un fichier mal configure ne peut donc pas vider la base de dev. En CI, il n'y a ni `.env.test` ni `DATABASE_URL_TEST` : le workflow definit les variables et le service PostgreSQL CI est utilise directement via `DATABASE_URL`.
 
 ---
 

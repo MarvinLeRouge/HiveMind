@@ -132,6 +132,8 @@ Generated automatically from Conventional Commits history.
 - **deps:** Bump the minor-and-patch group across 1 directory with 15 updates
 - **deps-dev:** Bump @vitejs/plugin-vue
 - **deps:** Bump pinia from 2.3.1 to 4.1.0
+- **changelog:** Update CHANGELOG.md (#149)
+- **api:** Load a local test env file and refuse non-test databases
 
 ### Documentation
 
