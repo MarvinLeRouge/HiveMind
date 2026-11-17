@@ -60,4 +60,5 @@
 - [x] CHORE-001 - Ajouter la configuration Dependabot (npm, docker, github-actions)
 - [x] CHORE-002 - Passer vitest et @vitest/coverage-v8 en version 5
 - [x] TEST-001 - Combler les trous de couverture par fichier (tous les fichiers api et web a 80 % ou plus, code mort supprime)
+- [x] CHORE-004 - Charger un fichier d'environnement de test local pour les tests api et refuser les bases hors test
 - [ ] CHORE-003 - Migrer vers Prisma 7 (prisma.config.ts, driver adapter ; PR Dependabot #145)
