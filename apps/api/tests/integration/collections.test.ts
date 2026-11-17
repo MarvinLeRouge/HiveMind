@@ -249,6 +249,38 @@ describe('PATCH /collections/:id', () => {
     expect(res.statusCode).toBe(403);
   });
 
+  it('suffixes the slug when the new name collides with another collection', async () => {
+    await createCollection(userToken, 'Taken Name');
+    const createRes = await createCollection(userToken, 'Original');
+    const id = createRes.json().id as string;
+
+    const res = await app.inject({
+      method: 'PATCH',
+      url: `/collections/${id}`,
+      headers: { authorization: `Bearer ${userToken}` },
+      payload: { name: 'Taken Name' },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.json().slug).toBe('taken-name-2');
+  });
+
+  it('returns 404 for an unknown collection', async () => {
+    const res = await app.inject({
+      method: 'PATCH',
+      url: '/collections/does-not-exist',
+      headers: { authorization: `Bearer ${userToken}` },
+      payload: { name: 'Ghost' },
+    });
+
+    expect(res.statusCode).toBe(404);
+    expect(res.json()).toMatchObject({
+      statusCode: 404,
+      error: 'Not Found',
+      message: 'Collection not found',
+    });
+  });
+
   it('returns 400 when body is empty', async () => {
     const createRes = await createCollection(userToken);
     const id = createRes.json().id as string;

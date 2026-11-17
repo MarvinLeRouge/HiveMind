@@ -157,6 +157,24 @@ describe('POST /auth/verify-email', () => {
     expect(res.statusCode).toBe(400);
   });
 
+  it('returns 400 and deletes the token when it has expired', async () => {
+    const regRes = await registerUser();
+    const userId = regRes.json().user.id as string;
+    await prisma.verificationToken.updateMany({
+      where: { userId },
+      data: { expiresAt: new Date(Date.now() - 1000) },
+    });
+
+    const res = await app.inject({
+      method: 'POST',
+      url: '/auth/verify-email',
+      payload: { token: mailer.lastVerificationToken! },
+    });
+
+    expect(res.statusCode).toBe(400);
+    expect(await prisma.verificationToken.count({ where: { userId } })).toBe(0);
+  });
+
   it('returns 400 if the token is used a second time', async () => {
     await registerUser();
     const token = mailer.lastVerificationToken!;

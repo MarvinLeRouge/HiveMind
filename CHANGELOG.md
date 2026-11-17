@@ -230,5 +230,7 @@ Generated automatically from Conventional Commits history.
 - **web:** Add missing coverage for error handlers and retry paths
 - **web:** Cover loginFailed fallback and template-driven puzzle fields
 - **web:** Cover moveUp and moveDown keyboard reorder in PuzzlesPage and CollectionDetailPage
+- **coverage:** Close per-file coverage gaps in api and web
+- **api:** Make the valid-env test independent of the shell environment
 
 

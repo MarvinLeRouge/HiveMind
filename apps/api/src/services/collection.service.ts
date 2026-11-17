@@ -142,16 +142,6 @@ export class CollectionService {
     await this.repo.removeMember(collection.id, targetUserId);
   }
 
-  /**
-   * Returns a collection by its URL slug.
-   * Throws 404 if the collection does not exist.
-   */
-  async getBySlug(slug: string): Promise<CollectionRow> {
-    const collection = await this.repo.findBySlug(slug);
-    if (!collection) throw this.notFound();
-    return collection;
-  }
-
   // ── Private helpers ────────────────────────────────────────────────────────
 
   private notFound(): Error {

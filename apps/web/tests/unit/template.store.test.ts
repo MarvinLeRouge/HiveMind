@@ -121,6 +121,24 @@ describe('useTemplateStore', () => {
     });
   });
 
+  describe('update without a loaded template', () => {
+    it('uses the user endpoint and leaves the list untouched when the template is not listed', async () => {
+      const updated = { ...mockTemplate, id: 'tpl-2', name: 'Other' };
+      mockFetch.mockResolvedValueOnce(updated);
+      const store = useTemplateStore();
+      store.templates = [mockTemplate];
+
+      await store.update('tpl-2', { name: 'Other' });
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringMatching(/\/templates\/tpl-2$/),
+        expect.objectContaining({ method: 'PATCH' }),
+      );
+      expect(store.current).toEqual(updated);
+      expect(store.templates).toEqual([mockTemplate]);
+    });
+  });
+
   describe('delete', () => {
     it('deletes a user template via DELETE /templates/:id', async () => {
       mockFetch.mockResolvedValueOnce(undefined);
@@ -136,6 +154,22 @@ describe('useTemplateStore', () => {
       );
       expect(store.templates).toHaveLength(0);
       expect(store.current).toBeNull();
+    });
+
+    it('uses the user endpoint and keeps another current template when the id is not listed', async () => {
+      mockFetch.mockResolvedValueOnce(undefined);
+      const store = useTemplateStore();
+      store.templates = [mockTemplate];
+      store.current = mockTemplate;
+
+      await store.delete('tpl-unknown');
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringMatching(/\/templates\/tpl-unknown$/),
+        expect.objectContaining({ method: 'DELETE' }),
+      );
+      expect(store.templates).toEqual([mockTemplate]);
+      expect(store.current).toEqual(mockTemplate);
     });
 
     it('deletes a system template via DELETE /templates/system/:id', async () => {
