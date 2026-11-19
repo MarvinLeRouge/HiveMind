@@ -100,7 +100,7 @@ docker compose -f docker-compose.prod.yml ps
 docker compose -f docker-compose.prod.yml logs -f backend
 ```
 
-On the VPS, under `/home/mlr/marvinlerouge.dev/hivemind/`, `compose/` holds only the `docker-compose.prod.yml` fetched by the deploy workflow, and `shared/env/` holds the two env files (`chmod 600`, never committed). Containers get their configuration only through `env_file`: the compose file interpolates nothing from a file (the domain is written in the Traefik rules, `IMAGE_TAG` defaults to `latest`).
+On the VPS, under `/home/mlr/marvinlerouge.dev/hivemind/`, `compose/` holds only the `docker-compose.prod.yml` fetched by the deploy workflow, and `shared/env/` holds the two env files (`chmod 600`, never committed). Containers get their configuration only through `env_file`: the compose file interpolates nothing from a file (the domain is written in the Traefik rules; `IMAGE_TAG` is set to the deployed commit SHA by the deploy workflow, and defaults to `latest` for manual compose commands).
 
 | File | Loaded by | Holds | Template |
 |------|-----------|-------|----------|

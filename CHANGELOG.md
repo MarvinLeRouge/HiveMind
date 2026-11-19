@@ -66,6 +66,7 @@ Generated automatically from Conventional Commits history.
 - **deps:** Patch moderate and low advisories
 - **api:** Drop upgrade-insecure-requests from the csp
 - **infra:** Redirect /api/docs to /api/docs/ in local traefik
+- **deploy:** Deploy the images tagged with the commit SHA (FIX-005)
 
 ### Chores
 
