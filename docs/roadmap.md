@@ -62,3 +62,4 @@
 - [x] TEST-001 - Close per-file coverage gaps (all api and web files at 80% or more, dead code removed)
 - [x] CHORE-004 - Load a local test env file for api tests and refuse non-test databases
 - [ ] CHORE-003 - Migrate to Prisma 7 (prisma.config.ts, driver adapter; Dependabot PR #145)
+- [x] CHORE-005 - Load prod config only from shared/env (backend loads secrets.env), drop compose/.env interpolation

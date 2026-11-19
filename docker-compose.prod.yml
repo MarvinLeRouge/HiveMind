@@ -8,6 +8,7 @@ services:
       - "3000"
     env_file:
       - ../shared/env/app.env
+      - ../shared/env/secrets.env
     depends_on:
       db:
         condition: service_healthy
@@ -15,7 +16,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik-public"
-      - "traefik.http.routers.hivemind-api.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.hivemind-api.rule=Host(`hivemind.marvinlerouge.dev`) && PathPrefix(`/api`)"
       - "traefik.http.routers.hivemind-api.entrypoints=websecure"
       - "traefik.http.routers.hivemind-api.tls=true"
       - "traefik.http.routers.hivemind-api.tls.certresolver=letsencrypt"
@@ -36,7 +37,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik-public"
-      - "traefik.http.routers.hivemind-frontend.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.hivemind-frontend.rule=Host(`hivemind.marvinlerouge.dev`)"
       - "traefik.http.routers.hivemind-frontend.entrypoints=websecure"
       - "traefik.http.routers.hivemind-frontend.tls=true"
       - "traefik.http.routers.hivemind-frontend.tls.certresolver=letsencrypt"
@@ -47,9 +48,11 @@ services:
   db:
     container_name: hivemind-db
     image: postgres:16-alpine
+    # POSTGRES_PASSWORD comes from secrets.env (must match the password inside DATABASE_URL)
+    env_file:
+      - ../shared/env/secrets.env
     environment:
       POSTGRES_USER: HiveMind
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: HiveMind
     volumes:
       - pgdata:/var/lib/postgresql/data
