@@ -63,3 +63,4 @@
 - [x] CHORE-004 - Load a local test env file for api tests and refuse non-test databases
 - [ ] CHORE-003 - Migrate to Prisma 7 (prisma.config.ts, driver adapter; Dependabot PR #145)
 - [x] CHORE-005 - Load prod config only from shared/env (backend loads secrets.env), drop compose/.env interpolation
+- [x] FIX-005 - Deploy the images tagged with the commit SHA instead of `latest` (`IMAGE_TAG` was never set)
