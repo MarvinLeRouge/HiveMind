@@ -100,6 +100,15 @@ docker compose -f docker-compose.prod.yml ps
 docker compose -f docker-compose.prod.yml logs -f backend
 ```
 
+On the VPS, under `/home/mlr/marvinlerouge.dev/hivemind/`, `compose/` holds only the `docker-compose.prod.yml` fetched by the deploy workflow, and `shared/env/` holds the two env files (`chmod 600`, never committed). Containers get their configuration only through `env_file`: the compose file interpolates nothing from a file (the domain is written in the Traefik rules, `IMAGE_TAG` defaults to `latest`).
+
+| File | Loaded by | Holds | Template |
+|------|-----------|-------|----------|
+| `shared/env/app.env` | backend | non-secret settings: `NODE_ENV`, `PORT`, `CORS_ORIGIN`, `FRONTEND_BASE_URL`, token lifetimes, SMTP host and options, `SENTRY_ENVIRONMENT` | [`docker/env/app.env.example`](../docker/env/app.env.example) |
+| `shared/env/secrets.env` | backend (last, so it wins), db | `POSTGRES_PASSWORD`, `DATABASE_URL`, JWT secrets, SMTP credentials, `SEED_ADMIN_*`, Sentry DSNs | [`docker/env/secrets.env.example`](../docker/env/secrets.env.example) |
+
+`POSTGRES_PASSWORD` and the password inside `DATABASE_URL` must match: the first initialises the database volume (first start only), the second is what Prisma connects with. The database user and name (`HiveMind`) are set in the compose file.
+
 ---
 
 ## CI/CD pipeline
@@ -155,7 +164,7 @@ Required GitHub secrets:
 | `DEPLOY_SSH_PRIVATE_KEY` | SSH private key with access to the VPS |
 | `VITE_API_BASE_URL` | Public API URL baked into the frontend (e.g. `https://example.com/api`) |
 
-The VPS must have Docker installed, the `traefik-public` Docker network created, and a production `.env` file at the path referenced in `docker-compose.prod.yml`.
+The VPS must have Docker installed, the `traefik-public` Docker network created, and the two env files described in [Production stack](#production-stack).
 
 On first deployment, seed the database manually:
 

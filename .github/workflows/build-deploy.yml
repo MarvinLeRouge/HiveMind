@@ -88,6 +88,9 @@ jobs:
           script: |
             set -Eeuo pipefail
 
+            echo "==> Ensure deploy directories exist"
+            mkdir -p /home/mlr/marvinlerouge.dev/hivemind/compose /home/mlr/marvinlerouge.dev/hivemind/shared/env
+
             echo "==> Fetch docker-compose.prod.yml (commit: ${SHA})"
             curl -fsSL \
               "https://raw.githubusercontent.com/${REPO}/${SHA}/docker-compose.prod.yml" \

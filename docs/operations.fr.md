@@ -100,6 +100,15 @@ docker compose -f docker-compose.prod.yml ps
 docker compose -f docker-compose.prod.yml logs -f backend
 ```
 
+Sur le VPS, sous `/home/mlr/marvinlerouge.dev/hivemind/`, `compose/` contient uniquement le `docker-compose.prod.yml` récupéré par le workflow de déploiement, et `shared/env/` contient les deux fichiers d'environnement (`chmod 600`, jamais commités). Les conteneurs reçoivent leur configuration uniquement via `env_file` : le fichier compose n'interpole rien depuis un fichier (le domaine est écrit dans les règles Traefik, `IMAGE_TAG` vaut `latest` par défaut).
+
+| Fichier | Chargé par | Contenu | Modèle |
+|---------|------------|---------|--------|
+| `shared/env/app.env` | backend | réglages non secrets : `NODE_ENV`, `PORT`, `CORS_ORIGIN`, `FRONTEND_BASE_URL`, durées de vie des tokens, hôte et options SMTP, `SENTRY_ENVIRONMENT` | [`docker/env/app.env.example`](../docker/env/app.env.example) |
+| `shared/env/secrets.env` | backend (en dernier, donc prioritaire), db | `POSTGRES_PASSWORD`, `DATABASE_URL`, secrets JWT, identifiants SMTP, `SEED_ADMIN_*`, DSN Sentry | [`docker/env/secrets.env.example`](../docker/env/secrets.env.example) |
+
+`POSTGRES_PASSWORD` et le mot de passe contenu dans `DATABASE_URL` doivent correspondre : le premier initialise le volume de la base (au premier démarrage uniquement), le second sert à Prisma pour se connecter. L'utilisateur et le nom de la base (`HiveMind`) sont fixés dans le fichier compose.
+
 ---
 
 ## Pipeline CI/CD
@@ -155,7 +164,7 @@ Secrets GitHub requis :
 | `DEPLOY_SSH_PRIVATE_KEY` | Cle privee SSH avec acces au VPS |
 | `VITE_API_BASE_URL` | URL publique de l'API compilee dans le frontend (ex. `https://example.com/api`) |
 
-Le VPS doit avoir Docker installe, le reseau Docker `traefik-public` cree, et un fichier `.env` de production au chemin reference dans `docker-compose.prod.yml`.
+Le VPS doit avoir Docker installe, le reseau Docker `traefik-public` cree, et les deux fichiers d'environnement décrits dans [Stack de production](#stack-de-production).
 
 Au premier deploiement, executer le seed de la base manuellement :
 
