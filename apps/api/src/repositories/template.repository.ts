@@ -1,4 +1,4 @@
-import type { PrismaClient, Template } from '@prisma/client';
+import type { PrismaClient, Template } from '../generated/prisma/client.js';
 
 /** Input shape for creating a template. */
 export interface CreateTemplateData {

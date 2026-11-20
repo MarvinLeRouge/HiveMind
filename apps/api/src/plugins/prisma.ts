@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { createPrismaClient, type PrismaClient } from '../lib/prisma-client.js';
 import fp from 'fastify-plugin';
 import type { FastifyInstance } from 'fastify';
 
@@ -13,7 +13,7 @@ declare module 'fastify' {
  * Disconnects automatically when the server closes.
  */
 export default fp(async (app: FastifyInstance) => {
-  const prisma = new PrismaClient();
+  const prisma = createPrismaClient();
   await prisma.$connect();
 
   app.decorate('prisma', prisma);

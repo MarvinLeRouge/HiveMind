@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import type { FastifyInstance } from 'fastify';
-import type { User } from '@prisma/client';
+import type { User } from '../generated/prisma/client.js';
 import type { AuthRepository } from '../repositories/auth.repository.js';
 import type { MailerService } from './mailer.service.js';
 import { env } from '../config/env.js';

@@ -1,4 +1,4 @@
-import type { Note, PrismaClient } from '@prisma/client';
+import type { Note, PrismaClient } from '../generated/prisma/client.js';
 
 /** Input shape for creating a note. */
 export interface CreateNoteData {

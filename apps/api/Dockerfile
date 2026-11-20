@@ -32,10 +32,12 @@ RUN pnpm --filter api exec prisma generate
 RUN pnpm --filter api build
 # Bundle all production deps into a self-contained directory (no pnpm symlinks).
 # pnpm deploy flattens node_modules so Node.js module resolution works from /app/dist/.
+# The Prisma 7 client is generated into src/ and compiled into dist/ by the build above;
+# prisma.config.ts is what `prisma migrate deploy` reads on the server.
 RUN pnpm --filter api deploy /deployed && \
     cp -r apps/api/dist /deployed/dist && \
     cp -r apps/api/prisma /deployed/prisma && \
-    cd /deployed && node_modules/.bin/prisma generate
+    cp apps/api/prisma.config.ts /deployed/prisma.config.ts
 
 # ─── production — minimal runtime image ───────────────────────────────────────
 FROM node:26-alpine AS production

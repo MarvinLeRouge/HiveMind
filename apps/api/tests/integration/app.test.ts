@@ -1,6 +1,6 @@
 import { afterAll, afterEach, describe, expect, it, vi } from 'vitest';
 import type { FastifyInstance } from 'fastify';
-import { PrismaClient } from '@prisma/client';
+import { createPrismaClient } from '../../src/lib/prisma-client.js';
 import { buildApp } from '../../src/app.js';
 import { env } from '../../src/config/env.js';
 
@@ -11,9 +11,7 @@ vi.mock('../../src/config/env.js', async (importOriginal) => {
   return { env: { ...original.env } };
 });
 
-const prisma = new PrismaClient({
-  datasourceUrl: process.env['DATABASE_URL'],
-});
+const prisma = createPrismaClient();
 const originalEnv = { ...env };
 const EMAIL = 'default-mailer@example.com';
 

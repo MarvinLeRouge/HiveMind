@@ -1,5 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { Collection, CollectionMember, Template } from '@prisma/client';
+import type {
+  Collection,
+  CollectionMember,
+  Template,
+} from '../../src/generated/prisma/client.js';
 import { CollectionService } from '../../src/services/collection.service.js';
 import type { CollectionRepository } from '../../src/repositories/collection.repository.js';
 import type { TemplateRepository } from '../../src/repositories/template.repository.js';

@@ -18,8 +18,8 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'lcov'],
       include: ['src/**/*.ts'],
-      // Bootstrap entry point: only starts the server, behavior is covered via buildApp
-      exclude: ['src/index.ts'],
+      // Bootstrap entry point (only starts the server, covered via buildApp) and the generated Prisma client
+      exclude: ['src/index.ts', 'src/generated/**'],
     },
   },
 });

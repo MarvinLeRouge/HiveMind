@@ -1,4 +1,4 @@
-import type { PrismaClient, Invitation } from '@prisma/client';
+import type { PrismaClient, Invitation } from '../generated/prisma/client.js';
 
 /** Input shape for creating an invitation. */
 export interface CreateInvitationData {

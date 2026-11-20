@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { Note } from '@prisma/client';
+import type { Note } from '../../src/generated/prisma/client.js';
 import { NoteService } from '../../src/services/note.service.js';
 import type { NoteRepository } from '../../src/repositories/note.repository.js';
 

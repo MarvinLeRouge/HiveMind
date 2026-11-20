@@ -61,7 +61,7 @@
 - [x] CHORE-002 - Passer vitest et @vitest/coverage-v8 en version 5
 - [x] TEST-001 - Combler les trous de couverture par fichier (tous les fichiers api et web a 80 % ou plus, code mort supprime)
 - [x] CHORE-004 - Charger un fichier d'environnement de test local pour les tests api et refuser les bases hors test
-- [ ] CHORE-003 - Migrer vers Prisma 7 (prisma.config.ts, driver adapter ; PR Dependabot #145)
+- [x] CHORE-003 - Migrer vers Prisma 7 (prisma.config.ts, driver adapter ; PR Dependabot #145)
 - [x] CHORE-005 - Charger la config prod uniquement depuis shared/env (le backend charge secrets.env), supprimer l'interpolation via compose/.env
 - [x] FIX-005 - Déployer les images taguées avec le SHA du commit plutôt que `latest` (`IMAGE_TAG` n'était jamais fixé)
 - [x] CHORE-006 - Aligner le runtime Node sur la 26 LTS (CI, images Docker, engines, @types/node, docs)

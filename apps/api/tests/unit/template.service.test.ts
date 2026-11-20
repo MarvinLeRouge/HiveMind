@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { Template } from '@prisma/client';
+import type { Template } from '../../src/generated/prisma/client.js';
 import { TemplateService } from '../../src/services/template.service.js';
 import type { TemplateRepository } from '../../src/repositories/template.repository.js';
 

@@ -1,10 +1,8 @@
-import { PrismaClient } from '@prisma/client';
+import { createPrismaClient } from '../../src/lib/prisma-client.js';
 import { createHash } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-const prisma = new PrismaClient({
-  datasourceUrl: process.env['DATABASE_URL'],
-});
+const prisma = createPrismaClient();
 
 beforeAll(async () => {
   await prisma.$connect();

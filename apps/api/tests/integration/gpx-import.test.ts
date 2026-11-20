@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
-import { PrismaClient } from '@prisma/client';
+import { createPrismaClient } from '../../src/lib/prisma-client.js';
 import { buildApp } from '../../src/app.js';
 import { NoopMailerService } from '../../src/services/mailer.service.js';
 
@@ -14,9 +14,7 @@ const FIXTURE_GPX = readFileSync(
   'utf-8',
 );
 
-const prisma = new PrismaClient({
-  datasourceUrl: process.env['DATABASE_URL'],
-});
+const prisma = createPrismaClient();
 
 let app: FastifyInstance;
 let userToken: string;

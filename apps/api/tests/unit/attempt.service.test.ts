@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { Attempt } from '@prisma/client';
+import type { Attempt } from '../../src/generated/prisma/client.js';
 import { AttemptService } from '../../src/services/attempt.service.js';
 import type { AttemptRepository } from '../../src/repositories/attempt.repository.js';
 

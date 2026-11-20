@@ -69,7 +69,7 @@ Chaque **Collection** contient des **Puzzles**. Chaque puzzle peut recevoir des 
 | Runtime | Node.js 26 LTS | [![Node.js](https://img.shields.io/badge/node-26%20LTS-brightgreen?logo=node.js)](https://nodejs.org) |
 | Backend | Fastify 5 + TypeScript | [![Fastify](https://img.shields.io/badge/fastify-5-black?logo=fastify)](https://fastify.dev) |
 | Validation | Zod + fastify-type-provider-zod | [![Zod](https://img.shields.io/badge/zod-3-3e67b1)](https://zod.dev) |
-| ORM | Prisma 6 | [![Prisma](https://img.shields.io/badge/prisma-6-2d3748?logo=prisma)](https://prisma.io) |
+| ORM | Prisma 7 | [![Prisma](https://img.shields.io/badge/prisma-7-2d3748?logo=prisma)](https://prisma.io) |
 | Base de donnees | PostgreSQL 16 | [![PostgreSQL](https://img.shields.io/badge/postgresql-16-336791?logo=postgresql)](https://www.postgresql.org) |
 | Auth | JWT + cookie httpOnly | |
 | Docs API | @fastify/swagger + Swagger UI | |

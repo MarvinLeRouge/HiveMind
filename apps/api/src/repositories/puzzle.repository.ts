@@ -1,4 +1,9 @@
-import type { PrismaClient, Puzzle, Prisma, User } from '@prisma/client';
+import type {
+  PrismaClient,
+  Puzzle,
+  Prisma,
+  User,
+} from '../generated/prisma/client.js';
 
 /** Template field modes needed for field-filtering puzzle responses. */
 type TemplateFlags = {
@@ -145,9 +150,7 @@ export class PuzzleRepository {
       data: {
         ...data,
         customFields: data.customFields as unknown as
-          | Prisma.NullableJsonNullValueInput
-          | Prisma.InputJsonValue
-          | undefined,
+          Prisma.NullableJsonNullValueInput | Prisma.InputJsonValue | undefined,
       },
       include: PUZZLE_INCLUDE,
     }) as unknown as Promise<PuzzleRow>;

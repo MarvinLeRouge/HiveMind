@@ -11,6 +11,7 @@ export default tseslint.config(
       '**/node_modules/**',
       '**/.pnpm-store/**',
       '**/coverage/**',
+      'apps/api/src/generated/**',
       'playwright-report/**',
       'test-results/**',
     ],
