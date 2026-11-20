@@ -138,6 +138,7 @@ Generated automatically from Conventional Commits history.
 - **api:** Load a local test env file and refuse non-test databases
 - **deploy:** Load prod config only from shared/env (CHORE-005)
 - **runtime:** Align the node runtime on 26 lts (CHORE-006)
+- **deps:** Ignore prisma majors in dependabot until the prisma 7 migration (CHORE-007)
 
 ### Documentation
 
