@@ -10,7 +10,7 @@
 
 ```bash
 pnpm --filter api test              # Lancer tous les tests
-pnpm --filter api test:coverage     # Avec rapport de couverture (cible >= 80 %)
+pnpm --filter api test:coverage     # Avec rapport de couverture (cible >= 85 %)
 ```
 
 - **Tests unitaires** - `apps/api/tests/unit/` - logique des services, repositories mockes
@@ -42,7 +42,7 @@ Hors CI, le global setup refuse de s'executer si le nom de la base cible ne se t
 
 ```bash
 pnpm --filter web test              # Lancer tous les tests
-pnpm --filter web test:coverage     # Avec rapport de couverture (cible >= 80 %)
+pnpm --filter web test:coverage     # Avec rapport de couverture (cible >= 85 %)
 ```
 
 - Environnement JSDOM, Vue Test Utils

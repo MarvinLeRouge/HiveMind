@@ -17,7 +17,7 @@
 - [ ] Commits follow Conventional Commits format with `Modified files:` section
 - [ ] Backend tests pass (`pnpm --filter api test`)
 - [ ] Frontend tests pass (`pnpm --filter web test`)
-- [ ] Coverage is maintained or improved (target >= 80% for both)
+- [ ] Coverage is maintained or improved (target >= 85% for both)
 - [ ] No `.env` file or secret committed
 - [ ] Documentation updated if behavior changed (README, `docs/`, JSDoc)
 

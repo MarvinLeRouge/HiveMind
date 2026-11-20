@@ -10,7 +10,7 @@
 
 ```bash
 pnpm --filter api test              # Run all tests
-pnpm --filter api test:coverage     # With coverage report (target >= 80%)
+pnpm --filter api test:coverage     # With coverage report (target >= 85%)
 ```
 
 - **Unit tests** - `apps/api/tests/unit/` - service logic, repositories mocked
@@ -42,7 +42,7 @@ Outside CI, the global setup refuses to run unless the target database name ends
 
 ```bash
 pnpm --filter web test              # Run all tests
-pnpm --filter web test:coverage     # With coverage report (target >= 80%)
+pnpm --filter web test:coverage     # With coverage report (target >= 85%)
 ```
 
 - JSDOM environment, Vue Test Utils

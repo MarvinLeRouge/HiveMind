@@ -68,7 +68,7 @@ presentational where possible.
 
 ```bash
 pnpm --filter web test              # Vitest + Vue Test Utils
-pnpm --filter web test:coverage     # Coverage report (target >= 80%)
+pnpm --filter web test:coverage     # Coverage report (target >= 85%)
 ```
 
 Mirror the test structure to the source structure: a page's spec file sits

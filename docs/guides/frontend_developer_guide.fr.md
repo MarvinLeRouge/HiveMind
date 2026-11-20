@@ -76,7 +76,7 @@ composants restent présentationnels autant que possible.
 
 ```bash
 pnpm --filter web test              # Vitest + Vue Test Utils
-pnpm --filter web test:coverage     # Rapport de couverture (cible >= 80 %)
+pnpm --filter web test:coverage     # Rapport de couverture (cible >= 85 %)
 ```
 
 Faire correspondre la structure des tests à celle du code source : le

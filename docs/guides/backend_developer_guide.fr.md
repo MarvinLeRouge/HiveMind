@@ -80,7 +80,7 @@ npx prisma migrate dev --name <description>
 
 ```bash
 pnpm --filter api test              # Vitest (unitaires + intégration)
-pnpm --filter api test:coverage     # Rapport de couverture (cible >= 80 %)
+pnpm --filter api test:coverage     # Rapport de couverture (cible >= 85 %)
 ```
 
 - Les tests unitaires vivent dans `apps/api/tests/unit/` : les services sont
