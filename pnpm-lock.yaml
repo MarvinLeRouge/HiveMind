@@ -24,6 +24,7 @@ overrides:
   fast-uri@>=3.0.0 <3.1.5: '>=3.1.5'
   js-yaml@>=4.0.0 <4.3.1: '>=4.3.1'
   nanoid@>=4.0.0 <5.1.16: '>=5.1.16'
+  effect@<3.22.1: '>=3.22.1 <4'
   nanoid@<3.3.16: '>=3.3.16'
   nanoid@<3.3.18: '>=3.3.18'
   postcss@<=8.5.17: '>=8.5.18'
@@ -1520,8 +1521,8 @@ packages:
     engines: {node: '>=20'}
     hasBin: true
 
-  effect@3.21.0:
-    resolution: {integrity: sha512-PPN80qRokCd1f015IANNhrwOnLO7GrrMQfk4/lnZRE/8j7UPWrNNjPV0uBrZutI/nHzernbW+J0hdqQysHiSnQ==}
+  effect@3.22.5:
+    resolution: {integrity: sha512-AdIU4llI19BzhJ4xUBZix7kS8oiYSlCsJ61j3UM3UyJw9ecDrsrrweDFm/Ku1nHbJWMLoynK+1Me4it3Zkmjpw==}
 
   electron-to-chromium@1.5.485:
     resolution: {integrity: sha512-m3uadzR0Z+sR19HGWgfxoZcKv9hE/edVM9OZ+FJ4wNRyfuFtkwZJIDoehEty5sisYVwmge8lKV1tenWOyClVgw==}
@@ -3403,7 +3404,7 @@ snapshots:
     dependencies:
       c12: 3.1.0(magicast@0.3.5)
       deepmerge-ts: 8.0.2
-      effect: 3.21.0
+      effect: 3.22.5
       empathic: 2.0.0
     transitivePeerDependencies:
       - magicast
@@ -4093,7 +4094,7 @@ snapshots:
       minimatch: 10.2.6
       semver: 7.8.6
 
-  effect@3.21.0:
+  effect@3.22.5:
     dependencies:
       '@standard-schema/spec': 1.1.0
       fast-check: 3.23.2
