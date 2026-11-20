@@ -20,7 +20,7 @@
 
 ### Prerequis
 
-- Node.js 20 LTS
+- Node.js 26 LTS
 - pnpm 9+
 - Docker + Docker Compose
 - Traefik en fonctionnement local avec un reseau Docker `traefik-public`
