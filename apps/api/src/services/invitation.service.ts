@@ -1,4 +1,4 @@
-import type { Invitation } from '@prisma/client';
+import type { Invitation } from '../generated/prisma/client.js';
 import type { InvitationRepository } from '../repositories/invitation.repository.js';
 import type { MailerService } from './mailer.service.js';
 

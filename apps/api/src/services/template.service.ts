@@ -1,4 +1,4 @@
-import type { Template } from '@prisma/client';
+import type { Template } from '../generated/prisma/client.js';
 import type {
   CreateTemplateData,
   TemplateRepository,

@@ -2,11 +2,9 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 import { buildApp } from '../../src/app.js';
 import { NoopMailerService } from '../../src/services/mailer.service.js';
-import { PrismaClient } from '@prisma/client';
+import { createPrismaClient } from '../../src/lib/prisma-client.js';
 
-const prisma = new PrismaClient({
-  datasourceUrl: process.env['DATABASE_URL'],
-});
+const prisma = createPrismaClient();
 
 let app: FastifyInstance;
 let mailer: NoopMailerService;

@@ -1,4 +1,4 @@
-import type { Note } from '@prisma/client';
+import type { Note } from '../generated/prisma/client.js';
 import type { NoteRepository } from '../repositories/note.repository.js';
 
 /**

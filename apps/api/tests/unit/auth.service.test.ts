@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { describe, expect, it, vi } from 'vitest';
 import type { FastifyInstance } from 'fastify';
-import type { User } from '@prisma/client';
+import type { User } from '../../src/generated/prisma/client.js';
 import { AuthService } from '../../src/services/auth.service.js';
 import type { AuthRepository } from '../../src/repositories/auth.repository.js';
 import type { MailerService } from '../../src/services/mailer.service.js';

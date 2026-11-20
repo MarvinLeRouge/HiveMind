@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { Invitation } from '@prisma/client';
+import type { Invitation } from '../../src/generated/prisma/client.js';
 import { InvitationService } from '../../src/services/invitation.service.js';
 import type { InvitationRepository } from '../../src/repositories/invitation.repository.js';
 import type { MailerService } from '../../src/services/mailer.service.js';

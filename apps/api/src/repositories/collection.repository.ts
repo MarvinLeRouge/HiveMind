@@ -3,7 +3,7 @@ import type {
   Collection,
   CollectionMember,
   Template,
-} from '@prisma/client';
+} from '../generated/prisma/client.js';
 
 /** A collection row with its template snapshot included. */
 export type CollectionRow = Collection & { templateSnapshot: Template };

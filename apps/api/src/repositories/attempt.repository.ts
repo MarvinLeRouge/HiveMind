@@ -1,4 +1,4 @@
-import type { Attempt, PrismaClient } from '@prisma/client';
+import type { Attempt, PrismaClient } from '../generated/prisma/client.js';
 
 /** Input shape for recording an attempt. */
 export interface CreateAttemptData {

@@ -1,4 +1,4 @@
-import type { Attempt } from '@prisma/client';
+import type { Attempt } from '../generated/prisma/client.js';
 import type { AttemptRepository } from '../repositories/attempt.repository.js';
 
 /**

@@ -1,7 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+import { createPrismaClient } from '../src/lib/prisma-client.js';
 import bcrypt from 'bcryptjs';
 
-const prisma = new PrismaClient();
+const prisma = createPrismaClient();
 
 /** Hashes a plain-text password with bcrypt (matches the auth service). */
 async function hashPassword(plain: string): Promise<string> {
