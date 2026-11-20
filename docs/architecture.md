@@ -45,7 +45,7 @@ HiveMind/
 ├── .github/workflows/
 │   ├── ci.yml                  # Lint + unit + integration tests + Codecov
 │   ├── e2e.yml                 # Playwright E2E (35 tests, Chromium, gates CD)
-│   └── build-deploy.yml        # Build images + deploy to VPS
+│   └── build-push-deploy.yml        # Build images + deploy to VPS
 ├── docker-compose.yml          # Dev stack (hot reload)
 ├── docker-compose.prod.yml     # Prod stack (Traefik labels)
 └── pnpm-workspace.yaml

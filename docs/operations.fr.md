@@ -135,7 +135,7 @@ La couverture est envoyee a Codecov via OIDC - aucun token requis pour les depot
 
 Declenche sur push vers `main` et `workflow_dispatch`. Construit la stack Docker de production complete, applique les migrations, seed la base, puis execute les 35 tests Playwright. Le workflow CD est conditionne au succes de l'E2E via `workflow_run`.
 
-### Workflow CD (`build-deploy.yml`)
+### Workflow CD (`build-push-deploy.yml`)
 
 Declenche par le succes du workflow E2E via `workflow_run`, et sur `workflow_dispatch` (contournement hotfix).
 
@@ -174,7 +174,7 @@ docker exec hivemind-backend node node_modules/.bin/prisma db seed
 
 ### Deploiement manuel
 
-Pour declencher un deploiement manuel : aller dans **Actions → Build & Deploy → Run workflow** sur GitHub.
+Pour declencher un deploiement manuel : aller dans **Actions → Build, Push & Deploy → Run workflow** sur GitHub.
 
 ---
 

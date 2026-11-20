@@ -7,7 +7,7 @@
 [![Statut](https://img.shields.io/badge/statut-production-brightgreen)](https://github.com/MarvinLeRouge/HiveMind)
 [![CI](https://github.com/MarvinLeRouge/HiveMind/actions/workflows/ci.yml/badge.svg)](https://github.com/MarvinLeRouge/HiveMind/actions/workflows/ci.yml)
 [![E2E](https://github.com/MarvinLeRouge/HiveMind/actions/workflows/e2e.yml/badge.svg)](https://github.com/MarvinLeRouge/HiveMind/actions/workflows/e2e.yml)
-[![CD](https://github.com/MarvinLeRouge/HiveMind/actions/workflows/build-deploy.yml/badge.svg)](https://github.com/MarvinLeRouge/HiveMind/actions/workflows/build-deploy.yml)
+[![CD](https://github.com/MarvinLeRouge/HiveMind/actions/workflows/build-push-deploy.yml/badge.svg)](https://github.com/MarvinLeRouge/HiveMind/actions/workflows/build-push-deploy.yml)
 [![Node.js](https://img.shields.io/badge/node-26%20LTS-brightgreen?logo=node.js)](https://nodejs.org)
 [![Fastify](https://img.shields.io/badge/fastify-5-black?logo=fastify)](https://fastify.dev)
 [![Vue.js](https://img.shields.io/badge/vue-3-42b883?logo=vue.js)](https://vuejs.org)
