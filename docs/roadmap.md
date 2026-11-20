@@ -70,3 +70,4 @@
 - [x] CI-002 - Move every GitHub Action to its current major pinned by commit SHA, changelog workflow on Node 26, single Dependabot actions group
 - [x] CI-003 - Rename the deploy workflow to build-push-deploy.yml, two explicit jobs (Build & push, Deploy), no functional change
 - [x] CHORE-008 - Update the frontend toolchain: TypeScript 6.0, Vite 8, Vue Router 5, vue-tsc 3, ESLint 10 with eslint-plugin-vue 10
+- [x] CI-004 - Raise the coverage floor from 80% to 85% (gates and docs)

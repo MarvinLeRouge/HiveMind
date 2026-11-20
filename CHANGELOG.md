@@ -143,6 +143,7 @@ Generated automatically from Conventional Commits history.
 - **deploy:** Split deploy workflow into build & push and deploy jobs (CI-003)
 - **frontend:** Update toolchain to typescript 6, vite 8, eslint 10 (CHORE-008)
 - **api:** Migrate to prisma 7 with the pg driver adapter (CHORE-003)
+- **coverage:** Raise the coverage floor to 85% (CI-004)
 
 ### Documentation
 

@@ -74,7 +74,7 @@ npx prisma migrate dev --name <description>
 
 ```bash
 pnpm --filter api test              # Vitest (unit + integration)
-pnpm --filter api test:coverage     # Coverage report (target >= 80%)
+pnpm --filter api test:coverage     # Coverage report (target >= 85%)
 ```
 
 - Unit tests live in `apps/api/tests/unit/`: services are tested with
