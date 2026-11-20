@@ -67,6 +67,7 @@ Generated automatically from Conventional Commits history.
 - **api:** Drop upgrade-insecure-requests from the csp
 - **infra:** Redirect /api/docs to /api/docs/ in local traefik
 - **deploy:** Deploy the images tagged with the commit SHA (FIX-005)
+- **deps:** Patch the effect redos advisory (FIX-006)
 
 ### Chores
 
