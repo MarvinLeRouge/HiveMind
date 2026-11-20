@@ -68,3 +68,4 @@
 - [x] CHORE-007 - Ignore Prisma majors in Dependabot until the Prisma 7 migration (CHORE-003)
 - [x] FIX-006 - Patch the effect ReDoS advisory (high, pulled by Prisma 6 @prisma/config)
 - [x] CI-002 - Move every GitHub Action to its current major pinned by commit SHA, changelog workflow on Node 26, single Dependabot actions group
+- [x] CI-003 - Rename the deploy workflow to build-push-deploy.yml, two explicit jobs (Build & push, Deploy), no functional change
