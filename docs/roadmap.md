@@ -65,3 +65,4 @@
 - [x] CHORE-005 - Load prod config only from shared/env (backend loads secrets.env), drop compose/.env interpolation
 - [x] FIX-005 - Deploy the images tagged with the commit SHA instead of `latest` (`IMAGE_TAG` was never set)
 - [x] CHORE-006 - Align the Node runtime on 26 LTS (CI, Docker images, engines, @types/node, docs)
+- [x] CHORE-007 - Ignore Prisma majors in Dependabot until the Prisma 7 migration (CHORE-003)
