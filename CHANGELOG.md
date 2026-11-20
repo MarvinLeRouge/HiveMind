@@ -136,6 +136,7 @@ Generated automatically from Conventional Commits history.
 - **changelog:** Update CHANGELOG.md (#149)
 - **api:** Load a local test env file and refuse non-test databases
 - **deploy:** Load prod config only from shared/env (CHORE-005)
+- **runtime:** Align the node runtime on 26 lts (CHORE-006)
 
 ### Documentation
 

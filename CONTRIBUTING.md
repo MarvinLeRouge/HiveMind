@@ -6,7 +6,7 @@
 
 ## Prerequisites
 
-- Node.js 20 LTS
+- Node.js 26 LTS
 - pnpm 9+
 - Docker + Docker Compose
 

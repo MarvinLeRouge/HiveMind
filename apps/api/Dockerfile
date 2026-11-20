@@ -1,6 +1,7 @@
 # ─── base ──────────────────────────────────────────────────────────────────────
-FROM node:20-alpine AS base
-RUN corepack enable
+FROM node:26-alpine AS base
+# Node 25+ no longer bundles corepack; pnpm version still comes from packageManager
+RUN npm install -g corepack@0.36.0 && corepack enable
 
 # ─── deps — install all workspace dependencies ─────────────────────────────────
 FROM base AS deps
@@ -37,7 +38,7 @@ RUN pnpm --filter api deploy /deployed && \
     cd /deployed && node_modules/.bin/prisma generate
 
 # ─── production — minimal runtime image ───────────────────────────────────────
-FROM node:20-alpine AS production
+FROM node:26-alpine AS production
 WORKDIR /app
 COPY --from=build /deployed ./
 EXPOSE 3000
