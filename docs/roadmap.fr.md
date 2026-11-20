@@ -67,3 +67,4 @@
 - [x] CHORE-006 - Aligner le runtime Node sur la 26 LTS (CI, images Docker, engines, @types/node, docs)
 - [x] CHORE-007 - Ignorer les majeures Prisma dans Dependabot jusqu'à la migration Prisma 7 (CHORE-003)
 - [x] FIX-006 - Corriger l'alerte ReDoS de effect (haute, tirée par @prisma/config de Prisma 6)
+- [x] CI-002 - Passer chaque GitHub Action sur sa majeure actuelle épinglée par SHA de commit, workflow changelog sur Node 26, groupe Dependabot actions unique
