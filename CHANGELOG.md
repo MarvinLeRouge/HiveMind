@@ -139,6 +139,7 @@ Generated automatically from Conventional Commits history.
 - **deploy:** Load prod config only from shared/env (CHORE-005)
 - **runtime:** Align the node runtime on 26 lts (CHORE-006)
 - **deps:** Ignore prisma majors in dependabot until the prisma 7 migration (CHORE-007)
+- **actions:** Move actions to current majors pinned by sha (CI-002)
 
 ### Documentation
 
