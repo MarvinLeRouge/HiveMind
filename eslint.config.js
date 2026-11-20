@@ -2,6 +2,7 @@ import eslint from '@eslint/js'
 import tseslint from 'typescript-eslint'
 import pluginVue from 'eslint-plugin-vue'
 import eslintConfigPrettier from 'eslint-config-prettier'
+import globals from 'globals'
 
 export default tseslint.config(
   {
@@ -20,6 +21,8 @@ export default tseslint.config(
   {
     files: ['**/*.vue'],
     languageOptions: {
+      // eslint-plugin-vue 10 no longer injects browser globals in flat/recommended
+      globals: { ...globals.browser },
       parserOptions: {
         parser: tseslint.parser,
       },

@@ -69,3 +69,4 @@
 - [x] FIX-006 - Corriger l'alerte ReDoS de effect (haute, tirée par @prisma/config de Prisma 6)
 - [x] CI-002 - Passer chaque GitHub Action sur sa majeure actuelle épinglée par SHA de commit, workflow changelog sur Node 26, groupe Dependabot actions unique
 - [x] CI-003 - Renommer le workflow de déploiement en build-push-deploy.yml, deux jobs explicites (Build & push, Deploy), sans changement fonctionnel
+- [x] CHORE-008 - Mettre à jour l'outillage frontend : TypeScript 6.0, Vite 8, Vue Router 5, vue-tsc 3, ESLint 10 avec eslint-plugin-vue 10

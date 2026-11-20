@@ -141,6 +141,7 @@ Generated automatically from Conventional Commits history.
 - **deps:** Ignore prisma majors in dependabot until the prisma 7 migration (CHORE-007)
 - **actions:** Move actions to current majors pinned by sha (CI-002)
 - **deploy:** Split deploy workflow into build & push and deploy jobs (CI-003)
+- **frontend:** Update toolchain to typescript 6, vite 8, eslint 10 (CHORE-008)
 
 ### Documentation
 
