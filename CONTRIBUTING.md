@@ -9,6 +9,7 @@
 - Node.js 26 LTS
 - pnpm 9+
 - Docker + Docker Compose
+- [gitleaks](https://github.com/gitleaks/gitleaks): the pre-commit hook scans staged changes for secrets and refuses to commit without it
 
 ## Local setup
 

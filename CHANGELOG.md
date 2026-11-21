@@ -144,6 +144,7 @@ Generated automatically from Conventional Commits history.
 - **frontend:** Update toolchain to typescript 6, vite 8, eslint 10 (CHORE-008)
 - **api:** Migrate to prisma 7 with the pg driver adapter (CHORE-003)
 - **coverage:** Raise the coverage floor to 85% (CI-004)
+- **security:** Scan staged changes for secrets with gitleaks (CI-005)
 
 ### Documentation
 
