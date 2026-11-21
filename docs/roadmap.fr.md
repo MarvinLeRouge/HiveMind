@@ -71,3 +71,4 @@
 - [x] CI-003 - Renommer le workflow de déploiement en build-push-deploy.yml, deux jobs explicites (Build & push, Deploy), sans changement fonctionnel
 - [x] CHORE-008 - Mettre à jour l'outillage frontend : TypeScript 6.0, Vite 8, Vue Router 5, vue-tsc 3, ESLint 10 avec eslint-plugin-vue 10
 - [x] CI-004 - Relever le seuil de couverture de 80 % à 85 % (seuils et docs)
+- [x] CI-005 - Analyser les modifications indexées avec gitleaks dans le hook pre-commit

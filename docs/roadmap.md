@@ -71,3 +71,4 @@
 - [x] CI-003 - Rename the deploy workflow to build-push-deploy.yml, two explicit jobs (Build & push, Deploy), no functional change
 - [x] CHORE-008 - Update the frontend toolchain: TypeScript 6.0, Vite 8, Vue Router 5, vue-tsc 3, ESLint 10 with eslint-plugin-vue 10
 - [x] CI-004 - Raise the coverage floor from 80% to 85% (gates and docs)
+- [x] CI-005 - Scan staged changes for secrets with gitleaks in the pre-commit hook

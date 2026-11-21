@@ -9,6 +9,7 @@
 - Node.js 26 LTS
 - pnpm 9+
 - Docker + Docker Compose
+- [gitleaks](https://github.com/gitleaks/gitleaks) : le hook pre-commit analyse les modifications indexées à la recherche de secrets et refuse de committer s'il est absent
 
 ## Installation locale
 
