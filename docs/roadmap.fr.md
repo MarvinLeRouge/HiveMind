@@ -73,3 +73,4 @@
 - [x] CI-004 - Relever le seuil de couverture de 80 % à 85 % (seuils et docs)
 - [x] CI-005 - Analyser les modifications indexées avec gitleaks dans le hook pre-commit
 - [x] CHORE-009 - Ignorer la sortie de build de chaque package du workspace (`dist/`), pas seulement les deux apps
+- [x] DOCS-001 - Rédiger le contexte produit (plateforme générique de résolution collaborative d'énigmes)
