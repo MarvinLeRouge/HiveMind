@@ -145,6 +145,7 @@ Generated automatically from Conventional Commits history.
 - **api:** Migrate to prisma 7 with the pg driver adapter (CHORE-003)
 - **coverage:** Raise the coverage floor to 85% (CI-004)
 - **security:** Scan staged changes for secrets with gitleaks (CI-005)
+- **gitignore:** Ignore the dist folder of every workspace package (CHORE-009)
 
 ### Documentation
 
