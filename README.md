@@ -74,7 +74,7 @@ Each **Collection** contains **Puzzles**. Each puzzle can carry free-text **Note
 | Auth | JWT + httpOnly cookie | |
 | API docs | @fastify/swagger + Swagger UI | |
 | Frontend | Vue 3 + Vite + Vue Router + Pinia | [![Vue.js](https://img.shields.io/badge/vue-3-42b883?logo=vue.js)](https://vuejs.org) |
-| UI | Tailwind CSS + shadcn-vue | [![Tailwind](https://img.shields.io/badge/tailwind-3-38bdf8?logo=tailwindcss)](https://tailwindcss.com) |
+| UI | Tailwind CSS + shadcn-vue | [![Tailwind](https://img.shields.io/badge/tailwind-4-38bdf8?logo=tailwindcss)](https://tailwindcss.com) |
 | i18n | vue-i18n v9 (EN + FR) | |
 | HTTP client | ofetch | |
 | Backend tests | Vitest + fastify.inject() | [![Vitest](https://img.shields.io/badge/vitest-3-6e9f18?logo=vitest)](https://vitest.dev) |

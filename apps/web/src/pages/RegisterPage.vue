@@ -38,7 +38,10 @@
           </div>
 
           <div class="space-y-2">
-            <label for="username" class="text-sm font-medium leading-none">
+            <label
+              for="username"
+              class="inline-block text-sm font-medium leading-none"
+            >
               {{ t('auth.username') }}
             </label>
             <input
@@ -48,12 +51,15 @@
               required
               autocomplete="username"
               :placeholder="t('auth.usernamePlaceholder')"
-              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors placeholder:text-muted-foreground focus:outline-hidden focus:ring-2 focus:ring-ring"
             />
           </div>
 
           <div class="space-y-2">
-            <label for="email" class="text-sm font-medium leading-none">
+            <label
+              for="email"
+              class="inline-block text-sm font-medium leading-none"
+            >
               {{ t('auth.email') }}
             </label>
             <input
@@ -63,12 +69,15 @@
               required
               autocomplete="email"
               :placeholder="t('auth.emailPlaceholder')"
-              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors placeholder:text-muted-foreground focus:outline-hidden focus:ring-2 focus:ring-ring"
             />
           </div>
 
           <div class="space-y-2">
-            <label for="password" class="text-sm font-medium leading-none">
+            <label
+              for="password"
+              class="inline-block text-sm font-medium leading-none"
+            >
               {{ t('auth.password') }}
             </label>
             <input
@@ -77,14 +86,14 @@
               type="password"
               required
               autocomplete="new-password"
-              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
+              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus:outline-hidden focus:ring-2 focus:ring-ring"
             />
           </div>
 
           <button
             type="submit"
             :disabled="loading"
-            class="inline-flex h-9 w-full items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+            class="inline-flex h-9 w-full items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {{ loading ? t('auth.creatingAccount') : t('auth.createAccount') }}
           </button>

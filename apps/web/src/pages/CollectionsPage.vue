@@ -4,7 +4,7 @@
       <h1 class="text-2xl font-bold">{{ t('collection.title') }}</h1>
       <RouterLink
         to="/collections/new"
-        class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90"
+        class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90"
       >
         {{ t('collection.new') }}
       </RouterLink>
@@ -43,7 +43,7 @@
       </p>
       <RouterLink
         to="/collections/new"
-        class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90"
+        class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90"
       >
         {{ t('collection.new') }}
       </RouterLink>

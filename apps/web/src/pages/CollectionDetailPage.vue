@@ -103,7 +103,7 @@
             <h2 class="text-lg font-semibold">{{ t('collection.puzzles') }}</h2>
             <button
               v-if="isOwner"
-              class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90"
+              class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90"
               @click="showAddForm = !showAddForm"
             >
               {{ t('puzzle.add') }}
@@ -118,7 +118,10 @@
             @submit.prevent="handleAdd"
           >
             <div class="space-y-1">
-              <label for="new-puzzle-title" class="text-sm font-medium">
+              <label
+                for="new-puzzle-title"
+                class="inline-block text-sm font-medium"
+              >
                 {{ t('puzzle.title') }} <span class="text-destructive">*</span>
               </label>
               <input
@@ -127,12 +130,15 @@
                 type="text"
                 required
                 :placeholder="t('puzzle.titlePlaceholder')"
-                class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
               />
             </div>
 
             <div class="space-y-1">
-              <label for="new-puzzle-description" class="text-sm font-medium">
+              <label
+                for="new-puzzle-description"
+                class="inline-block text-sm font-medium"
+              >
                 {{ t('puzzle.description') }}
               </label>
               <textarea
@@ -140,12 +146,15 @@
                 v-model="newForm.description"
                 rows="2"
                 :placeholder="t('puzzle.descriptionPlaceholder')"
-                class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
               />
             </div>
 
             <div class="space-y-1">
-              <label for="new-puzzle-checker" class="text-sm font-medium">
+              <label
+                for="new-puzzle-checker"
+                class="inline-block text-sm font-medium"
+              >
                 {{ t('puzzle.checkerUrl') }}
               </label>
               <input
@@ -153,13 +162,16 @@
                 v-model="newForm.checkerUrl"
                 type="url"
                 :placeholder="t('puzzle.checkerUrlPlaceholder')"
-                class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
               />
             </div>
 
             <template v-if="template">
               <div v-if="template.gcCodeMode !== 'disabled'" class="space-y-1">
-                <label for="new-gc-code" class="text-sm font-medium">
+                <label
+                  for="new-gc-code"
+                  class="inline-block text-sm font-medium"
+                >
                   {{ t('puzzle.gcCode') }}
                   <span
                     v-if="template.gcCodeMode === 'required'"
@@ -173,7 +185,7 @@
                   type="text"
                   :required="template.gcCodeMode === 'required'"
                   :placeholder="t('puzzle.gcCodePlaceholder')"
-                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
                 />
               </div>
 
@@ -181,7 +193,10 @@
                 v-if="template.difficultyMode !== 'disabled'"
                 class="space-y-1"
               >
-                <label for="new-difficulty" class="text-sm font-medium">
+                <label
+                  for="new-difficulty"
+                  class="inline-block text-sm font-medium"
+                >
                   {{ t('puzzle.difficulty') }}
                   <span
                     v-if="template.difficultyMode === 'required'"
@@ -198,12 +213,15 @@
                   step="0.5"
                   :required="template.difficultyMode === 'required'"
                   :placeholder="t('puzzle.ratingPlaceholder')"
-                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
                 />
               </div>
 
               <div v-if="template.terrainMode !== 'disabled'" class="space-y-1">
-                <label for="new-terrain" class="text-sm font-medium">
+                <label
+                  for="new-terrain"
+                  class="inline-block text-sm font-medium"
+                >
                   {{ t('puzzle.terrain') }}
                   <span
                     v-if="template.terrainMode === 'required'"
@@ -220,12 +238,15 @@
                   step="0.5"
                   :required="template.terrainMode === 'required'"
                   :placeholder="t('puzzle.ratingPlaceholder')"
-                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
                 />
               </div>
 
               <div v-if="template.coordsMode !== 'disabled'" class="space-y-1">
-                <label for="new-coords" class="text-sm font-medium">
+                <label
+                  for="new-coords"
+                  class="inline-block text-sm font-medium"
+                >
                   {{ t('puzzle.coords') }}
                   <span
                     v-if="template.coordsMode === 'required'"
@@ -239,12 +260,12 @@
                   type="text"
                   :required="template.coordsMode === 'required'"
                   :placeholder="t('puzzle.coordsPlaceholder')"
-                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
                 />
               </div>
 
               <div v-if="template.hintMode !== 'disabled'" class="space-y-1">
-                <label for="new-hint" class="text-sm font-medium">
+                <label for="new-hint" class="inline-block text-sm font-medium">
                   {{ t('puzzle.hint') }}
                   <span
                     v-if="template.hintMode === 'required'"
@@ -257,12 +278,15 @@
                   v-model="newForm.hint"
                   rows="2"
                   :required="template.hintMode === 'required'"
-                  class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
                 />
               </div>
 
               <div v-if="template.spoilerMode !== 'disabled'" class="space-y-1">
-                <label for="new-spoiler" class="text-sm font-medium">
+                <label
+                  for="new-spoiler"
+                  class="inline-block text-sm font-medium"
+                >
                   {{ t('puzzle.spoiler') }}
                   <span
                     v-if="template.spoilerMode === 'required'"
@@ -275,7 +299,7 @@
                   v-model="newForm.spoiler"
                   rows="2"
                   :required="template.spoilerMode === 'required'"
-                  class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
                 />
               </div>
             </template>
@@ -284,7 +308,7 @@
               <button
                 type="submit"
                 :disabled="adding"
-                class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-50"
+                class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50"
               >
                 {{ adding ? '…' : t('common.add') }}
               </button>
@@ -333,7 +357,7 @@
                 <button
                   :disabled="index === 0"
                   :aria-label="t('puzzle.moveUp')"
-                  class="flex h-4 w-4 items-center justify-center rounded text-muted-foreground hover:text-foreground disabled:opacity-30 focus:outline-none focus:ring-2 focus:ring-ring"
+                  class="flex h-4 w-4 items-center justify-center rounded text-muted-foreground hover:text-foreground disabled:opacity-30 focus:outline-hidden focus:ring-2 focus:ring-ring"
                   @click.stop="moveUp(index)"
                 >
                   <span aria-hidden="true" class="text-[10px] leading-none"
@@ -343,7 +367,7 @@
                 <button
                   :disabled="index === puzzles.length - 1"
                   :aria-label="t('puzzle.moveDown')"
-                  class="flex h-4 w-4 items-center justify-center rounded text-muted-foreground hover:text-foreground disabled:opacity-30 focus:outline-none focus:ring-2 focus:ring-ring"
+                  class="flex h-4 w-4 items-center justify-center rounded text-muted-foreground hover:text-foreground disabled:opacity-30 focus:outline-hidden focus:ring-2 focus:ring-ring"
                   @click.stop="moveDown(index)"
                 >
                   <span aria-hidden="true" class="text-[10px] leading-none"

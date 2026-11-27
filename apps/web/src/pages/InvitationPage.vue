@@ -1,6 +1,6 @@
 <template>
   <div class="flex min-h-screen items-center justify-center bg-muted px-4">
-    <div class="w-full max-w-md rounded-lg border bg-background p-8 shadow-sm">
+    <div class="w-full max-w-md rounded-lg border bg-background p-8 shadow-xs">
       <!-- Loading -->
       <p v-if="loading" class="text-sm text-muted-foreground">
         {{ t('common.loading') }}
@@ -40,8 +40,9 @@
         <h1 class="text-xl font-bold">{{ t('invitation.title') }}</h1>
         <p class="mt-3 text-sm text-muted-foreground">
           {{ t('invitation.sentTo') }}
-          <strong class="text-foreground">{{ invitation.inviteeEmail }}</strong
-          >.
+          <strong class="text-foreground">{{
+            invitation.inviteeEmail
+          }}</strong>.
         </p>
         <p class="mt-1 text-sm text-muted-foreground">
           {{ t('invitation.expires') }} {{ expiryLabel }}.
@@ -58,7 +59,7 @@
         <div class="mt-6 flex gap-3">
           <button
             :disabled="!!acting"
-            class="inline-flex h-9 items-center rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-50"
+            class="inline-flex h-9 items-center rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50"
             @click="accept"
           >
             {{

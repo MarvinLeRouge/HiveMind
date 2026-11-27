@@ -20,7 +20,7 @@
       <form class="mt-6 space-y-6" @submit.prevent="handleSubmit">
         <!-- Name -->
         <div class="space-y-1">
-          <label for="name" class="text-sm font-medium">
+          <label for="name" class="inline-block text-sm font-medium">
             {{ t('template.name') }}
           </label>
           <input
@@ -29,13 +29,13 @@
             type="text"
             required
             maxlength="64"
-            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
           />
         </div>
 
         <!-- Description -->
         <div class="space-y-1">
-          <label for="description" class="text-sm font-medium">
+          <label for="description" class="inline-block text-sm font-medium">
             {{ t('template.description') }}
             <span class="text-muted-foreground">{{
               t('common.optional')
@@ -46,7 +46,7 @@
             v-model="form.description"
             rows="2"
             maxlength="256"
-            class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
           />
         </div>
 
@@ -78,7 +78,7 @@
             <select
               :id="field.key"
               v-model="form[field.key]"
-              class="h-8 rounded-md border border-input bg-transparent px-2 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              class="h-8 rounded-md border border-input bg-transparent px-2 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
             >
               <option value="disabled">{{ t('template.disabled') }}</option>
               <option value="optional">{{ t('template.optional') }}</option>
@@ -101,11 +101,11 @@
               type="text"
               maxlength="32"
               :placeholder="`Label (e.g. ${cf.placeholder})`"
-              class="flex h-8 flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              class="flex h-8 flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
             />
             <select
               v-model="form[cf.modeKey]"
-              class="h-8 rounded-md border border-input bg-transparent px-2 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              class="h-8 rounded-md border border-input bg-transparent px-2 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
             >
               <option value="disabled">{{ t('template.disabled') }}</option>
               <option value="optional">{{ t('template.optional') }}</option>
@@ -126,7 +126,7 @@
           <button
             type="submit"
             :disabled="saving"
-            class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-50"
+            class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50"
           >
             {{ saving ? t('common.saving') : t('template.saveChanges') }}
           </button>
