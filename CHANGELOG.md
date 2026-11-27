@@ -149,6 +149,7 @@ Generated automatically from Conventional Commits history.
 - **deploy:** Run one deploy at a time (CI-006)
 - **deps:** Bump the minor-and-patch group across 1 directory with 15 updates
 - **web:** Migrate to tailwind css 4 and tailwind-merge 3 (CHORE-010)
+- **web:** Build the web app in ci (CI-007)
 
 ### Documentation
 

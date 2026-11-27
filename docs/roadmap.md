@@ -76,3 +76,4 @@
 - [x] CHORE-009 - Ignore the build output of every workspace package (`dist/`), not only the two apps
 - [x] DOCS-001 - Write the product context (generic collaborative puzzle-solving platform)
 - [x] CHORE-010 - Migrate to Tailwind CSS 4 and tailwind-merge 3 (supersedes Dependabot #157 and #156)
+- [x] CI-007 - Build the web app in CI (vite build), so a dependency bump that breaks the production build fails the PR

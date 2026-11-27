@@ -76,3 +76,4 @@
 - [x] CHORE-009 - Ignorer la sortie de build de chaque package du workspace (`dist/`), pas seulement les deux apps
 - [x] DOCS-001 - Rédiger le contexte produit (plateforme générique de résolution collaborative d'énigmes)
 - [x] CHORE-010 - Migrer vers Tailwind CSS 4 et tailwind-merge 3 (remplace les PR Dependabot #157 et #156)
+- [x] CI-007 - Construire l'application web en CI (vite build), pour qu'une mise à jour de dépendance qui casse le build de production fasse échouer la PR
