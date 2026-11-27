@@ -186,6 +186,11 @@ jobs:
       - name: Typecheck
         run: pnpm --filter web typecheck
 
+      # Compiles the CSS and bundle like the production image, which lint, typecheck and
+      # tests never do (vue-tsc already ran above, so vite build only)
+      - name: Build
+        run: pnpm --filter web exec vite build
+
   frontend-test:
     name: "Frontend: test"
     needs: changes
