@@ -39,7 +39,7 @@
 
           <button
             v-if="nextStatus"
-            class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-50"
+            class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50"
             :disabled="statusBusy"
             @click="handleAdvanceStatus"
           >
@@ -139,7 +139,7 @@
       >
         <!-- Title -->
         <div class="space-y-1">
-          <label for="edit-title" class="text-sm font-medium">
+          <label for="edit-title" class="inline-block text-sm font-medium">
             {{ t('puzzle.title') }} <span class="text-destructive">*</span>
           </label>
           <input
@@ -147,26 +147,29 @@
             v-model="editForm.title"
             type="text"
             required
-            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
           />
         </div>
 
         <!-- Description -->
         <div class="space-y-1">
-          <label for="edit-description" class="text-sm font-medium">
+          <label
+            for="edit-description"
+            class="inline-block text-sm font-medium"
+          >
             {{ t('puzzle.description') }}
           </label>
           <textarea
             id="edit-description"
             v-model="editForm.description"
             rows="3"
-            class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
           />
         </div>
 
         <!-- Checker URL -->
         <div class="space-y-1">
-          <label for="edit-checker" class="text-sm font-medium">
+          <label for="edit-checker" class="inline-block text-sm font-medium">
             {{ t('puzzle.checkerUrl') }}
           </label>
           <input
@@ -174,14 +177,14 @@
             v-model="editForm.checkerUrl"
             type="url"
             :placeholder="t('puzzle.checkerUrlPlaceholder')"
-            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
           />
         </div>
 
         <!-- Template-driven fields -->
         <template v-if="template">
           <div v-if="template.gcCodeMode !== 'disabled'" class="space-y-1">
-            <label for="edit-gc-code" class="text-sm font-medium">
+            <label for="edit-gc-code" class="inline-block text-sm font-medium">
               {{ t('puzzle.gcCode') }}
               <span
                 v-if="template.gcCodeMode === 'required'"
@@ -194,12 +197,15 @@
               v-model="editForm.gcCode"
               type="text"
               :required="template.gcCodeMode === 'required'"
-              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
             />
           </div>
 
           <div v-if="template.difficultyMode !== 'disabled'" class="space-y-1">
-            <label for="edit-difficulty" class="text-sm font-medium">
+            <label
+              for="edit-difficulty"
+              class="inline-block text-sm font-medium"
+            >
               {{ t('puzzle.difficulty') }}
               <span
                 v-if="template.difficultyMode === 'required'"
@@ -215,12 +221,12 @@
               max="5"
               step="0.5"
               :required="template.difficultyMode === 'required'"
-              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
             />
           </div>
 
           <div v-if="template.terrainMode !== 'disabled'" class="space-y-1">
-            <label for="edit-terrain" class="text-sm font-medium">
+            <label for="edit-terrain" class="inline-block text-sm font-medium">
               {{ t('puzzle.terrain') }}
               <span
                 v-if="template.terrainMode === 'required'"
@@ -236,12 +242,12 @@
               max="5"
               step="0.5"
               :required="template.terrainMode === 'required'"
-              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
             />
           </div>
 
           <div v-if="template.coordsMode !== 'disabled'" class="space-y-1">
-            <label for="edit-coords" class="text-sm font-medium">
+            <label for="edit-coords" class="inline-block text-sm font-medium">
               {{ t('puzzle.coords') }}
               <span
                 v-if="template.coordsMode === 'required'"
@@ -254,12 +260,12 @@
               v-model="editForm.coords"
               type="text"
               :required="template.coordsMode === 'required'"
-              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
             />
           </div>
 
           <div v-if="template.hintMode !== 'disabled'" class="space-y-1">
-            <label for="edit-hint" class="text-sm font-medium">
+            <label for="edit-hint" class="inline-block text-sm font-medium">
               {{ t('puzzle.hint') }}
               <span
                 v-if="template.hintMode === 'required'"
@@ -272,12 +278,12 @@
               v-model="editForm.hint"
               rows="2"
               :required="template.hintMode === 'required'"
-              class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
             />
           </div>
 
           <div v-if="template.spoilerMode !== 'disabled'" class="space-y-1">
-            <label for="edit-spoiler" class="text-sm font-medium">
+            <label for="edit-spoiler" class="inline-block text-sm font-medium">
               {{ t('puzzle.spoiler') }}
               <span
                 v-if="template.spoilerMode === 'required'"
@@ -290,7 +296,7 @@
               v-model="editForm.spoiler"
               rows="2"
               :required="template.spoilerMode === 'required'"
-              class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
             />
           </div>
         </template>
@@ -303,7 +309,7 @@
           <button
             type="submit"
             :disabled="editSaving"
-            class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-50"
+            class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50"
           >
             {{ editSaving ? t('common.saving') : t('puzzle.saveChanges') }}
           </button>
@@ -371,7 +377,7 @@
                   v-else
                   v-model="editNoteContent"
                   rows="3"
-                  class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  class="w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
                 />
               </div>
               <div
@@ -428,12 +434,12 @@
             rows="2"
             required
             :placeholder="t('puzzle.addNoteAction')"
-            class="flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            class="flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
           />
           <button
             type="submit"
             :disabled="addingNote"
-            class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-50"
+            class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50"
           >
             {{ addingNote ? '…' : t('puzzle.addNote') }}
           </button>
@@ -516,7 +522,7 @@
             type="text"
             required
             :placeholder="t('puzzle.valueTested')"
-            class="flex h-9 flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            class="flex h-9 flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
           />
           <label for="attempt-result" class="sr-only">{{
             t('puzzle.result')
@@ -524,7 +530,7 @@
           <select
             id="attempt-result"
             v-model="newAttemptResult"
-            class="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            class="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
           >
             <option :value="true">✓ {{ t('puzzle.status.solved') }}</option>
             <option :value="false">✗ {{ t('puzzle.status.open') }}</option>
@@ -537,12 +543,12 @@
             v-model="newAttemptComment"
             type="text"
             :placeholder="t('puzzle.comment')"
-            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring sm:w-48"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring sm:w-48"
           />
           <button
             type="submit"
             :disabled="addingAttempt"
-            class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-50"
+            class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50"
           >
             {{ addingAttempt ? '…' : t('puzzle.record') }}
           </button>

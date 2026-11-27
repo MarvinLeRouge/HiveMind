@@ -20,7 +20,7 @@
       </p>
 
       <div class="space-y-2">
-        <label for="name" class="text-sm font-medium">
+        <label for="name" class="inline-block text-sm font-medium">
           {{ t('collection.name') }}
         </label>
         <input
@@ -29,12 +29,12 @@
           type="text"
           required
           :placeholder="t('collection.namePlaceholder')"
-          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
         />
       </div>
 
       <div class="space-y-2">
-        <label for="description" class="text-sm font-medium">
+        <label for="description" class="inline-block text-sm font-medium">
           {{ t('collection.description') }}
           <span class="text-muted-foreground">{{ t('common.optional') }}</span>
         </label>
@@ -43,19 +43,19 @@
           v-model="form.description"
           rows="3"
           :placeholder="t('collection.descriptionPlaceholder')"
-          class="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          class="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
         />
       </div>
 
       <div class="space-y-2">
-        <label for="template" class="text-sm font-medium">
+        <label for="template" class="inline-block text-sm font-medium">
           {{ t('collection.template') }}
         </label>
         <select
           id="template"
           v-model="form.templateId"
           required
-          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-ring"
         >
           <option value="" disabled>Select a template…</option>
           <option v-for="tmpl in templates" :key="tmpl.id" :value="tmpl.id">
@@ -74,7 +74,7 @@
         <button
           type="submit"
           :disabled="loading"
-          class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {{ loading ? t('collection.creating') : t('collection.create') }}
         </button>

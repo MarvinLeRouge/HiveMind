@@ -67,7 +67,7 @@
           <span class="flex-1 text-sm">{{ toast.message }}</span>
 
           <button
-            class="shrink-0 rounded p-0.5 opacity-60 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-current"
+            class="shrink-0 rounded p-0.5 opacity-60 hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-current"
             :aria-label="t('common.dismiss')"
             @click="store.dismiss(toast.id)"
           >

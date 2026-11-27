@@ -75,3 +75,4 @@
 - [x] CI-006 - Run one deploy at a time (concurrency group), so close merges no longer remove each other's containers
 - [x] CHORE-009 - Ignore the build output of every workspace package (`dist/`), not only the two apps
 - [x] DOCS-001 - Write the product context (generic collaborative puzzle-solving platform)
+- [x] CHORE-010 - Migrate to Tailwind CSS 4 and tailwind-merge 3 (supersedes Dependabot #157 and #156)

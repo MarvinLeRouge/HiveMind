@@ -75,3 +75,4 @@
 - [x] CI-006 - Un seul déploiement à la fois (groupe concurrency), pour que deux merges rapprochés ne suppriment plus les conteneurs l'un de l'autre
 - [x] CHORE-009 - Ignorer la sortie de build de chaque package du workspace (`dist/`), pas seulement les deux apps
 - [x] DOCS-001 - Rédiger le contexte produit (plateforme générique de résolution collaborative d'énigmes)
+- [x] CHORE-010 - Migrer vers Tailwind CSS 4 et tailwind-merge 3 (remplace les PR Dependabot #157 et #156)

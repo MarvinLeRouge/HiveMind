@@ -147,6 +147,8 @@ Generated automatically from Conventional Commits history.
 - **security:** Scan staged changes for secrets with gitleaks (CI-005)
 - **gitignore:** Ignore the dist folder of every workspace package (CHORE-009)
 - **deploy:** Run one deploy at a time (CI-006)
+- **deps:** Bump the minor-and-patch group across 1 directory with 15 updates
+- **web:** Migrate to tailwind css 4 and tailwind-merge 3 (CHORE-010)
 
 ### Documentation
 
