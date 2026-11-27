@@ -146,6 +146,7 @@ Generated automatically from Conventional Commits history.
 - **coverage:** Raise the coverage floor to 85% (CI-004)
 - **security:** Scan staged changes for secrets with gitleaks (CI-005)
 - **gitignore:** Ignore the dist folder of every workspace package (CHORE-009)
+- **deploy:** Run one deploy at a time (CI-006)
 
 ### Documentation
 
