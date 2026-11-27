@@ -72,5 +72,6 @@
 - [x] CHORE-008 - Mettre à jour l'outillage frontend : TypeScript 6.0, Vite 8, Vue Router 5, vue-tsc 3, ESLint 10 avec eslint-plugin-vue 10
 - [x] CI-004 - Relever le seuil de couverture de 80 % à 85 % (seuils et docs)
 - [x] CI-005 - Analyser les modifications indexées avec gitleaks dans le hook pre-commit
+- [x] CI-006 - Un seul déploiement à la fois (groupe concurrency), pour que deux merges rapprochés ne suppriment plus les conteneurs l'un de l'autre
 - [x] CHORE-009 - Ignorer la sortie de build de chaque package du workspace (`dist/`), pas seulement les deux apps
 - [x] DOCS-001 - Rédiger le contexte produit (plateforme générique de résolution collaborative d'énigmes)
