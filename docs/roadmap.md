@@ -73,3 +73,4 @@
 - [x] CI-004 - Raise the coverage floor from 80% to 85% (gates and docs)
 - [x] CI-005 - Scan staged changes for secrets with gitleaks in the pre-commit hook
 - [x] CHORE-009 - Ignore the build output of every workspace package (`dist/`), not only the two apps
+- [x] DOCS-001 - Write the product context (generic collaborative puzzle-solving platform)

@@ -178,6 +178,7 @@ Generated automatically from Conventional Commits history.
 - **readme:** Add tests badge and standardize license badge
 - **root:** Move French community-health docs into docs/i18n/fr
 - Align readme tagline with repository description
+- Write the product context (DOCS-001)
 
 ### Features
 
